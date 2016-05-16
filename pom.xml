@@ -3,6 +3,7 @@
   <groupId>com.warren.selenium.helloworld</groupId>
   <artifactId>selenium-test</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <packaging>war</packaging>  
   <name>helloworld</name>
   <description>Simple hello world selenium project</description>
 

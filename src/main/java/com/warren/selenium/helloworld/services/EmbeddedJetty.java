@@ -18,7 +18,7 @@ public abstract class EmbeddedJetty {
 		
 		// Instantiate the web server and define what extra tasks it must do when it starts up.
     	String webappDirLocation = "src/main/webapp/";
-        server = new Server(port);
+    	server = new Server(port);
         server.addLifeCycleListener(new AbstractLifeCycleListener(){
 			@Override
 			public void lifeCycleStarted(LifeCycle event) {
