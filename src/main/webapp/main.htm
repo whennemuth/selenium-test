@@ -1,0 +1,70 @@
+<html>
+<body leftmargin=50 topmargin=50 rightmargin=50>
+
+	<head>
+	 	<link rel="stylesheet" type="text/css" href="style.css" />
+		<script src = "http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+		<script src = "http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.min.js"></script>
+		<script src = "http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-sanitize.min.js"></script>
+	</head>
+	
+	<div ng-app="kitApp" ng-controller="kitAppController">
+		
+		<a href="#/home">home</a>
+		<a href="#/help">help</a>
+		<a href="#" onclick="document.location.href = 'main.htm';">refresh</a>
+		
+		<!-- 
+		<a href="" ng-click="currentview = 'home.htm'">home</a>
+		<a href="" ng-click="currentview = 'help.htm'">help</a>
+		<a href="" onclick="document.location.href = 'main.htm';">refresh</a>
+		-->
+		
+		<div ng-view></div>
+	
+		<!-- 
+		<script type="text/ng-template" id="default.htm">
+			default.htm
+		</script>
+		
+		<script type="text/ng-template" id="help.htm">
+			help.htm
+		</script>
+		-->
+	</div>
+	
+	<script>
+		// 1) Create the application module
+		//    (NOTE: 'ngRoute' is another module loaded in with the angular-route.min.js script file.)
+		var app = angular.module('kitApp', ['ngRoute']);
+
+		// 2) Configure the application module by defining how its routeProvider service will operate.
+		//    (NOTE: Like other core Angular identifiers, built-in services always start with $ (e.g. $http)).
+		app.config(['$routeProvider', function routeProvider($routeProvider){
+			$routeProvider
+				.when('/home', {
+					templateUrl: 'default.htm',
+					controller: 'kitAppController'
+				})
+				.when('/help', {
+					templateUrl: 'help.htm',
+					controller: 'kitAppController'
+				})
+				.when('/suite', {
+					templateUrl: 'suite.htm',
+					controller: 'kitAppController'
+				})
+				.otherwise({
+					redirectTo: '/home'
+				});
+		}]);
+
+		// 3) Set the controller for the application module
+		app.controller('kitAppController', function($scope, $routeParams, $location){
+			
+		});
+		
+	</script>
+</body>
+
+</html>

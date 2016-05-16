@@ -13,7 +13,7 @@
     <session-timeout>60</session-timeout>
   </session-config>
   <welcome-file-list>
-    <welcome-file>/hello.htm</welcome-file>
+    <welcome-file>/main.htm</welcome-file>
   </welcome-file-list>
 
 <!--  
@@ -77,6 +77,6 @@
 		<!-- 
 		<location>/demo.htm?error=true</location>
 		-->
-		<location>/hello.htm</location>
+		<location>/main.htm</location>
 	</error-page>
 </web-app>
