@@ -2,21 +2,41 @@ package edu.bu.ist.apps.kualiautomation.services;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Date;
+
+import javax.swing.JFileChooser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.bu.ist.apps.kualiautomation.Utils;
 import edu.bu.ist.apps.kualiautomation.model.Config;
 import edu.bu.ist.apps.kualiautomation.model.ConfigDefaults;
+import edu.bu.ist.apps.kualiautomation.model.Directory;
 
+/**
+ * @author wrh
+ *
+ */
 public class ConfigService {
 
 	public static final String CFG_NAME = "kualiautomation.cfg";
 	
+	/**
+	 * The content of the configuration file is all json which can be reverse mapped back to a Config instance.
+	 * @return The reverse mapped instance
+	 * @throws Exception
+	 */
 	public Config getConfig() throws Exception {
 		return getConfigInstance(getConfigFile());
 	}
 
+	/**
+	 * The configuration file is located in a config directory next to the jar file for this application.
+	 * Create it (with default values) if it does not exist and return it.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	private File getConfigFile() throws Exception {
 		File rootdir = Utils.getRootDirectory();
 		File cfgfile = null;
@@ -56,6 +76,17 @@ public class ConfigService {
 	private void createDefaultConfigFile(File cfgfile) throws Exception {
 		Config cfg = new Config();			
 		ConfigDefaults.populate(cfg);
+		saveConfigFile(cfg, cfgfile);		
+	}
+	
+	/**
+	 * Save a the Config instance as json to the specified file.
+	 * 
+	 * @param cfg
+	 * @param cfgfile
+	 * @throws Exception
+	 */
+	private void saveConfigFile(Config cfg, File cfgfile) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 		FileOutputStream out = null;
 		try {
@@ -68,6 +99,39 @@ public class ConfigService {
 				out.close();
 			}
 		}		
+	}
+	
+	public void saveConfig(Config cfg) throws Exception {
+		cfg.setLastUpdated(new Date(System.currentTimeMillis()).toString());
+		saveConfigFile(cfg, getConfigFile());
+	}
+
+	/**
+	 * Throw up a file chooser to get the user to pick a directory on their file system.
+	 * Once selected, the configuration for the app is updated with the path of this directory and returned.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public Config setOutputDirectory() throws Exception {
+		Directory dir = null;
+		final JFileChooser fc = new JFileChooser();
+		fc.setCurrentDirectory(new java.io.File("."));
+		fc.setDialogTitle("Where should you output files go?");
+		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		
+		int returnVal = fc.showOpenDialog(null);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+		    File file = fc.getSelectedFile();
+		    dir = new Directory(file);
+			Config cfg = getConfig();
+			cfg.setOutputDir(dir.getFilepath());
+			saveConfig(cfg);
+			return cfg;
+		} 
+		else {
+		    return null;
+		}
 	}
 
 	public static void main(String[] args) throws Exception {

@@ -6,18 +6,20 @@
 		<script src = "http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
 		<script src = "http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.min.js"></script>
 		<script src = "http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-sanitize.min.js"></script>
+		<script src = "js/configService.js"></script>
+		<script src = "js/navigationService.js"></script>
 	</head>
 	
 	<div ng-app="kitApp" ng-controller="kitAppController">
 		
 		<div class=navstrip>
-			<div class=navigation>
+			<div class="{{getTabs().configClass}}">
 				<a href="#/config">config</a>
 			</div>
-			<div class=navigation>
+			<div class="{{getTabs().homeClass}}">
 				<a href="#/home">home</a>
 			</div>
-			<div class=navigation>
+			<div class="{{getTabs().helpClass}}">
 				<a href="#/help">help</a>
 			</div>
 			<div class=navigation>
@@ -45,7 +47,7 @@
 
 		// 2) Configure the application module by defining how its routeProvider service will operate.
 		//    (NOTE: Like other core Angular identifiers, built-in services always start with $ (e.g. $http)).
-		app.config(['$routeProvider', function routeProvider($routeProvider){
+		app.config(['$routeProvider', function routeProvider($routeProvider) {
 			$routeProvider
 				.when('/home', {
 					templateUrl: 'default.htm',
@@ -68,10 +70,63 @@
 				});
 		}]);
 
-		// 3) Set the controller for the application module
-		app.controller('kitAppController', function($scope, $routeParams, $location, configSvc){
+		// 3) Set the controller for the application module and load its default model and event handlers
+		app.controller('kitAppController', function($scope, $routeParams, $location, configSvc, navSvc) {
 			
+			navSvc.setTabs($location.path());
+			$scope.servername = '';
+			$scope.serverurl = '';
+			
+			// Load in the existing configuration
+			configSvc.getConfig(false).then(
+					function(data) {
+						$scope.config = data;
+					},
+					function(error) {
+						alert(error);
+					}
+				);
+			
+			// Define and event handler for the save button associated with updates to the configuration
+			$scope.setConfig = function(action) {
+				if(action == 'addserver') {
+					// RESUME NEXT: add a row to the servers select element, or replace an existing one, depending on servername already existing as a select element member or not.
+				}
+				else if(action == 'removeserver') {
+					// RESUME NEXT: remove a row (as long as the servername value matches a row in the select element)
+				}
+				configSvc.saveConfig($scope.config).then(
+					function(data) {
+						$scope.config = data;
+						alert('Configuration saved!')
+					},
+					function(error) {
+						alert(error);
+					}
+				);
+			};
+			
+			// Define and event handler for the save button associated with updates to the output directory
+			$scope.setOutputDir = function() {
+				configSvc.setOutputDirectory().then(
+					function(data) {
+						$scope.config = data;
+						alert('Directory setting saved!')
+					},
+					function(error) {
+						alert(error);
+					}
+				);
+			};
+			
+			$scope.getTabs = function() {
+				return navSvc.getTabs();
+			}
 		});
+		
+		// 4) Setup injection for the various services.
+		app.factory("configSvc", configFactory);
+		app.factory("navSvc", navigationFactory);
 		
 	</script>
 </body>

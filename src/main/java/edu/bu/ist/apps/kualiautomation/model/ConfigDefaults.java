@@ -1,10 +1,12 @@
 package edu.bu.ist.apps.kualiautomation.model;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public enum ConfigDefaults {
 	CONFIG_FILE_NAME("kualiautomation.cfg"), 
+	DEFAULT_ENVIRONMENT("test"),
 	ENVIRONMENTS(
 		String.join("&&",
 				"test",
@@ -28,13 +30,16 @@ public enum ConfigDefaults {
 	 * @param cfg
 	 */
 	public static void populate(Config cfg) {
-		cfg.setOutputDir(CONFIG_FILE_NAME.getValue());
 		String[] vals = ENVIRONMENTS.getValues();
 		for(int i=0; i< vals.length; i+=2) {
 			Environment env = new Environment();
 			env.setName(vals[i]);
 			env.setURL(vals[i+1]);
 			cfg.addEnvironment(env);
+			if(env.getName().equalsIgnoreCase(DEFAULT_ENVIRONMENT.getValue())) {
+				cfg.setCurrentEnvironment(env);
+			}
 		}
+		cfg.setLastUpdated(new Date(System.currentTimeMillis()).toString());
 	}
 }

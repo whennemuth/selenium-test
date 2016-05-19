@@ -13,8 +13,20 @@
 	font: normal bold 16px arial;
 }
 
+.navigated {
+	border: solid 1px #007acc;
+	border-bottom: solid 2px white;	
+	background-color: white;
+	padding-bottom: 1px;	
+}
+
 div.navigation a {
 	color: white;
+	text-decoration:none;
+}
+
+div.navigated a {
+	color: #007acc;
 	text-decoration:none;
 }
 

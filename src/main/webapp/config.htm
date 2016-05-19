@@ -1,20 +1,51 @@
+<form name="configfrm" action="" method="post" novalidate>
 <div class=floatingbox>
 	<div class=sectionlabel>Environments</div>
 	<div class=sectionarea>
 		<div class=fieldlabel>Servers</div>
 		<div>
-			<select size="5" style="width:180px;">
-				<option value="https://kuali-test.bu.edu/kc/portal.do">test</option>
-				<option value="https://kuali-stg.bu.edu/kc/portal.do">staging</option>
+			<select 
+				required
+				name="server" 
+				size="5" 
+				style="width:180px;"
+				ng-change="setConfig();"
+				ng-model="config.currentEnvironment"
+				ng-options="environment.name 
+							for environment in config.environments 
+							track by environment.url">
 			</select>
 		</div>
 		<div class=fieldlabel>Name</div>
-		<div><input type='text'></div>
+		<div>
+			<input 
+				required 
+				name="servername" 
+				type='text' 
+				ng-model="servername" >
+		</div>
 		<div class=fieldlabel>URL</div>
-		<div><input type='text'></div>
+		<div>
+			<input 
+				required 
+				name="serverurl" 
+				type='text' 
+				ng-model="serverurl">
+		</div>
 		<div align=right style='margin: 5px;'>
-			<input type='button' value=' Add/Edit ' style='padding:5px;'>
-			<input type='button' value=' Remove ' style='padding:5px;'>
+			<input 
+				type='button' 
+				value=' Add/Edit ' 
+				style='padding:5px;'
+				ng-disabled="configfrm.servername.$error.required || 
+							 configfrm.serverurl.$error.required"
+				ng-click="">
+				
+			<input 
+				type='button' 
+				value=' Remove ' 
+				style='padding:5px;'
+				ng-disabled="configfrm.server.$error.required">
 		</div>
 	</div>
 </div>
@@ -23,9 +54,19 @@
 	<div class=sectionlabel>Script output</div>
 	<div class=sectionarea>
 		<div class=fieldlabel>Directory</div>
-		<div><input type='text'></div>
+		<div><input type='text' ng-model="config.outputDir"></div>
 		<div align=right style='margin: 5px;'>
-			<input type='button' value=' browse... ' style='padding:5px;'>
+			<input 
+				type='button' 
+				value=' browse... ' 
+				style='padding:5px;'
+				ng-click="setOutputDir();">
 		</div>
 	</div>
 </div>
+
+<div style="padding: 20px; float:left; clear:both; font: normal normal 10px arial;">
+	last updated: 
+	{{config.lastUpdated}}
+</div>
+</form>
