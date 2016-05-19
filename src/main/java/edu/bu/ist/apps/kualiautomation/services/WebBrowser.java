@@ -1,4 +1,4 @@
-package com.warren.selenium.helloworld.services;
+package edu.bu.ist.apps.kualiautomation.services;
 
 public abstract class WebBrowser {
 

@@ -1,9 +1,9 @@
-package com.warren.selenium.helloworld;
+package edu.bu.ist.apps.kualiautomation;
 
-import com.warren.selenium.helloworld.services.EmbeddedJetty;
-import com.warren.selenium.helloworld.services.OperatingSystem;
-import com.warren.selenium.helloworld.services.WebBrowser;
-import com.warren.selenium.helloworld.services.WebBrowserFactory;
+import edu.bu.ist.apps.kualiautomation.services.EmbeddedJetty;
+import edu.bu.ist.apps.kualiautomation.services.OperatingSystem;
+import edu.bu.ist.apps.kualiautomation.services.WebBrowser;
+import edu.bu.ist.apps.kualiautomation.services.WebBrowserFactory;
 
 public class ScriptBuilderGUI {
 

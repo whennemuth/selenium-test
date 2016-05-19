@@ -10,15 +10,20 @@
 	
 	<div ng-app="kitApp" ng-controller="kitAppController">
 		
-		<a href="#/home">home</a>
-		<a href="#/help">help</a>
-		<a href="#" onclick="document.location.href = 'main.htm';">refresh</a>
-		
-		<!-- 
-		<a href="" ng-click="currentview = 'home.htm'">home</a>
-		<a href="" ng-click="currentview = 'help.htm'">help</a>
-		<a href="" onclick="document.location.href = 'main.htm';">refresh</a>
-		-->
+		<div class=navstrip>
+			<div class=navigation>
+				<a href="#/config">config</a>
+			</div>
+			<div class=navigation>
+				<a href="#/home">home</a>
+			</div>
+			<div class=navigation>
+				<a href="#/help">help</a>
+			</div>
+			<div class=navigation>
+				<a href="#" onclick="document.location.href = 'main.htm';">refresh</a>
+			</div>
+		</div>
 		
 		<div ng-view></div>
 	
@@ -54,13 +59,17 @@
 					templateUrl: 'suite.htm',
 					controller: 'kitAppController'
 				})
+				.when('/config', {
+					templateUrl: 'config.htm',
+					controller: 'kitAppController'
+				})
 				.otherwise({
 					redirectTo: '/home'
 				});
 		}]);
 
 		// 3) Set the controller for the application module
-		app.controller('kitAppController', function($scope, $routeParams, $location){
+		app.controller('kitAppController', function($scope, $routeParams, $location, configSvc){
 			
 		});
 		
