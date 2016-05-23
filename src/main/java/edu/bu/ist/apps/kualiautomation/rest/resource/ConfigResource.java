@@ -50,7 +50,7 @@ public class ConfigResource {
 	}
 	
 	@POST
-	@Path("/config/update/output/directory")
+	@Path("/config/relocate")
 	public Response updateOutputDirectory() throws Exception {
 		try {
 			ConfigService svc = new ConfigService();

@@ -76,6 +76,7 @@
 			navSvc.setTabs($location.path());
 			$scope.servername = '';
 			$scope.serverurl = '';
+			$scope.action = '';
 			
 			// Load in the existing configuration
 			configSvc.getConfig(false).then(
@@ -89,16 +90,14 @@
 			
 			// Define and event handler for the save button associated with updates to the configuration
 			$scope.setConfig = function(action) {
-				if(action == 'addserver') {
-					// RESUME NEXT: add a row to the servers select element, or replace an existing one, depending on servername already existing as a select element member or not.
-				}
-				else if(action == 'removeserver') {
-					// RESUME NEXT: remove a row (as long as the servername value matches a row in the select element)
-				}
-				configSvc.saveConfig($scope.config).then(
+				$scope.action = action;
+				configSvc.saveConfig($scope).then(
 					function(data) {
-						$scope.config = data;
-						alert('Configuration saved!')
+						$scope.config = data.config.data;
+						if(data.config.data.currentEnvironment != undefined) {
+							$scope.servername = data.config.data.currentEnvironment.name;
+							$scope.serverurl = data.config.data.currentEnvironment.url;
+						}
 					},
 					function(error) {
 						alert(error);

@@ -39,13 +39,14 @@
 				style='padding:5px;'
 				ng-disabled="configfrm.servername.$error.required || 
 							 configfrm.serverurl.$error.required"
-				ng-click="">
+				ng-click="setConfig('addserver');">
 				
 			<input 
 				type='button' 
 				value=' Remove ' 
 				style='padding:5px;'
-				ng-disabled="configfrm.server.$error.required">
+				ng-disabled="configfrm.server.$error.required" 
+				ng-click="setConfig('removeserver');">
 		</div>
 	</div>
 </div>

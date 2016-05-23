@@ -14,7 +14,7 @@ var configFactory = function($http, $q) {
 
 	var GET_URL = '/rest/config';
 	var SAVE_URL = '/rest/config/save';
-	var SET_DIR_URL = '/rest/config/update/output/directory';
+	var SET_DIR_URL = '/rest/config/relocate';
 	
 	var configCache;
 	
@@ -60,12 +60,46 @@ var configFactory = function($http, $q) {
 		/**
 		 * 
 		 */
-		saveConfig : function(config) {
+		saveConfig : function(scope) {
+			if(scope.action) {
+				if(scope.action == 'addserver') {
+					
+					// Validate by ensuring the name and or url are not already present in config.environments
+					for(var e in scope.config.environments) {
+						var env = scope.config.environments[e];
+						if(areEqualIgnoreCase(scope.servername, env.name)) {
+							alert(scope.servername + ' already used!');
+							// RESUME NEXT: return a deferred promise here to avoid exception
+							return;
+						}
+						if(areEqualIgnoreCase(scope.serverurl, env.url)) {
+							alert(scope.serverurl + ' already used!');
+							// RESUME NEXT: return a deferred promise here to avoid exception
+							return;
+						}
+					}
+
+					// Validation success, so add a new environment to the collection in config object
+					scope.config.environments[scope.config.environments.length] = {
+						name: scope.servername,
+						url:  scope.serverurl
+					};
+				}
+				else if(scope.action == 'removeserver') {
+					for(var i=0; i< scope.config.environments.length; i++) {
+						var env = scope.config.environments[i];
+						if(areEqualIgnoreCase(scope.servername, env.name)) {
+							scope.config.environments.splice(i, 1);
+						}
+					}
+				}
+			}
+
 			var deferred = $q.defer();
 			$http({
 				method: 'POST',
 				url: SAVE_URL,
-				data: config
+				data: scope.config
 			}).then(
 				function successCallback(response){
 					configCache = response;
@@ -79,3 +113,17 @@ var configFactory = function($http, $q) {
 		}
 	};
 };
+
+function areEqualIgnoreCase(val1, val2) {
+	if(val1 == undefined || val1 == null)
+		return false;
+	if(val2 == undefined || val1 == null)
+		return false;
+	if(val1.length != val2.length)
+		return false;
+	val1 = val1.trim().toLowerCase();
+	val2 = val2.trim().toLowerCase();
+	if(val1 == false || val2 == false)
+		return false;
+	return val1 == val2;
+}

@@ -1,7 +1,6 @@
 package edu.bu.ist.apps.kualiautomation.model;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Config {
