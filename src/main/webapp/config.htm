@@ -64,6 +64,21 @@
 				ng-click="setOutputDir();">
 		</div>
 	</div>
+	<div class=sectionlabel>Head selection</div>
+	<div class=sectionarea>
+		<div class="fieldlabel"><input 
+			name="browser" 
+			type='radio'
+			ng-model="config.headless"
+			ng-value="false"
+			ng-click="setConfig();">Use Browser</div>
+		<div class="fieldlabel"><input 
+			name="browser" 
+			type='radio'
+			ng-model="config.headless"
+			ng-value="true"
+			ng-click="setConfig();">Headless Mode</div>
+	</div>
 </div>
 
 <div style="padding: 20px; float:left; clear:both; font: normal normal 10px arial;">

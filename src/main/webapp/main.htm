@@ -95,6 +95,7 @@
 					function(data) {
 						$scope.config = data.config.data;
 						if(data.config.data.currentEnvironment != undefined) {
+							// Make the 2 text boxes reflect the selection in the listbox
 							$scope.servername = data.config.data.currentEnvironment.name;
 							$scope.serverurl = data.config.data.currentEnvironment.url;
 						}

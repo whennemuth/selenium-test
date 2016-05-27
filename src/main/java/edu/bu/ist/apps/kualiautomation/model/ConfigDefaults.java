@@ -1,8 +1,6 @@
 package edu.bu.ist.apps.kualiautomation.model;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 public enum ConfigDefaults {
 	CONFIG_FILE_NAME("kualiautomation.cfg"), 

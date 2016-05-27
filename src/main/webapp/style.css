@@ -72,6 +72,10 @@ div.navigated a {
 	font: normal normal 12px arial;
 }
 
+.padding10 {
+	padding: 10px;	
+}
+
 input[type='text'],[type='password'] {
 	border: solid 1px #007acc;
 }

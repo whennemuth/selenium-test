@@ -61,6 +61,8 @@ var configFactory = function($http, $q) {
 		 * 
 		 */
 		saveConfig : function(scope) {
+			var deferred = $q.defer();
+			
 			if(scope.action) {
 				if(scope.action == 'addserver') {
 					
@@ -68,14 +70,12 @@ var configFactory = function($http, $q) {
 					for(var e in scope.config.environments) {
 						var env = scope.config.environments[e];
 						if(areEqualIgnoreCase(scope.servername, env.name)) {
-							alert(scope.servername + ' already used!');
-							// RESUME NEXT: return a deferred promise here to avoid exception
-							return;
+							deferred.reject(scope.servername + ' already used!');
+							return deferred.promise;
 						}
 						if(areEqualIgnoreCase(scope.serverurl, env.url)) {
-							alert(scope.serverurl + ' already used!');
-							// RESUME NEXT: return a deferred promise here to avoid exception
-							return;
+							deferred.reject(scope.serverurl + ' already used!');
+							return deferred.promise;
 						}
 					}
 
@@ -95,7 +95,6 @@ var configFactory = function($http, $q) {
 				}
 			}
 
-			var deferred = $q.defer();
 			$http({
 				method: 'POST',
 				url: SAVE_URL,

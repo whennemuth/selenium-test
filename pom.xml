@@ -11,6 +11,7 @@
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	<jersey.version>2.22</jersey.version>
   	<jetty.version>9.3.8.RC0</jetty.version>
+  	<hibernate.version>5.1.0.Final</hibernate.version>
   </properties>
   
 	<dependencies>
@@ -68,7 +69,27 @@
 	        <artifactId>jstl</artifactId>
 	        <version>1.2</version>
 	    </dependency>
-	
+
+	    <dependency>
+	    	<groupId>org.hibernate</groupId>
+	    	<artifactId>hibernate-core</artifactId>
+	    	<version>${hibernate.version}</version>
+	    </dependency>
+	    <dependency>
+	    	<groupId>org.hibernate</groupId>
+	    	<artifactId>hibernate-entitymanager</artifactId>
+	    	<version>${hibernate.version}</version>
+	    </dependency>
+	    <dependency>
+	    	<groupId>org.hibernate</groupId>
+	    	<artifactId>hibernate-envers</artifactId>
+	    	<version>${hibernate.version}</version>
+	    </dependency>
+	    <dependency>
+	    	<groupId>org.hibernate</groupId>
+	    	<artifactId>hibernate-infinispan</artifactId>
+	    	<version>${hibernate.version}</version>
+	    </dependency>
 	</dependencies>
         
       <build>
