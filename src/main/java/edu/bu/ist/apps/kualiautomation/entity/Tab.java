@@ -1,8 +1,28 @@
 package edu.bu.ist.apps.kualiautomation.entity;
 
+import java.io.IOException;
 import java.io.Serializable;
-import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
 
 
 /**
@@ -28,7 +48,7 @@ public class Tab implements Serializable {
 
 	//bi-directional many-to-one association to LabelAndValue
 	@OneToMany(mappedBy="tab")
-	private List<LabelAndValue> labelAndValues;
+	private List<LabelAndValue> labelAndValues = new ArrayList<LabelAndValue>();
 
 	//bi-directional many-to-one association to Module
 	@ManyToOne
@@ -84,12 +104,23 @@ public class Tab implements Serializable {
 		return labelAndValue;
 	}
 
+	@JsonSerialize(using=ModuleFieldSerializer.class)
 	public Module getModule() {
 		return this.module;
 	}
 
 	public void setModule(Module module) {
 		this.module = module;
+	}
+	
+	public static class ModuleFieldSerializer extends JsonSerializer<Module> {
+		@Override public void serialize(
+				Module module, 
+				JsonGenerator generator, 
+				SerializerProvider provider) throws IOException, JsonProcessingException {
+			
+			(new CustomJsonSerializer<Module>()).serialize(module, generator, provider);
+		}
 	}
 
 }

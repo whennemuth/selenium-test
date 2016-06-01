@@ -1,8 +1,28 @@
 package edu.bu.ist.apps.kualiautomation.entity;
 
+import java.io.IOException;
 import java.io.Serializable;
-import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
 
 
 /**
@@ -26,14 +46,14 @@ public class Module implements Serializable {
 	@Column(nullable=false)
 	private int sequence;
 
-	//bi-directional many-to-one association to Cycle
+	//bi-directional many-to-one association to Suite
 	@ManyToOne
-	@JoinColumn(name="cycle_id", nullable=false)
-	private Cycle cycle;
+	@JoinColumn(name="suite_id", nullable=false)
+	private Suite suite;
 
 	//bi-directional many-to-one association to Tab
 	@OneToMany(mappedBy="module")
-	private List<Tab> tabs;
+	private List<Tab> tabs = new ArrayList<Tab>();
 
 	public Module() {
 	}
@@ -62,12 +82,13 @@ public class Module implements Serializable {
 		this.sequence = sequence;
 	}
 
-	public Cycle getCycle() {
-		return this.cycle;
+	@JsonSerialize(using=SuiteFieldSerializer.class)
+	public Suite getSuite() {
+		return this.suite;
 	}
 
-	public void setCycle(Cycle cycle) {
-		this.cycle = cycle;
+	public void setSuite(Suite suite) {
+		this.suite = suite;
 	}
 
 	public List<Tab> getTabs() {
@@ -90,6 +111,16 @@ public class Module implements Serializable {
 		tab.setModule(null);
 
 		return tab;
+	}
+	
+	public static class SuiteFieldSerializer extends JsonSerializer<Suite> {
+		@Override public void serialize(
+				Suite suite, 
+				JsonGenerator generator, 
+				SerializerProvider provider) throws IOException, JsonProcessingException {
+			
+			(new CustomJsonSerializer<Suite>()).serialize(suite, generator, provider);
+		}
 	}
 
 }

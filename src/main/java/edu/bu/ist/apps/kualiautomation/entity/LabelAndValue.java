@@ -1,9 +1,25 @@
 package edu.bu.ist.apps.kualiautomation.entity;
 
+import java.io.IOException;
 import java.io.Serializable;
-import javax.persistence.*;
 
-import edu.bu.ist.apps.kualiautomation.model.InputElement;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
 
 
 /**
@@ -22,8 +38,7 @@ public class LabelAndValue implements Serializable {
 	private int id;
 
 	@Column(name="input_element", nullable=false, length=45)
-	@Enumerated(EnumType.STRING)
-	private InputElement inputElement;
+	private String inputElement;
 
 	@Column(nullable=false)
 	private int sequence;
@@ -47,11 +62,11 @@ public class LabelAndValue implements Serializable {
 		this.id = id;
 	}
 
-	public InputElement getInputElement() {
+	public String getInputElement() {
 		return this.inputElement;
 	}
 
-	public void setInputElement(InputElement inputElement) {
+	public void setInputElement(String inputElement) {
 		this.inputElement = inputElement;
 	}
 
@@ -71,12 +86,23 @@ public class LabelAndValue implements Serializable {
 		this.value = value;
 	}
 
+	@JsonSerialize(using=TabFieldSerializer.class)
 	public Tab getTab() {
 		return this.tab;
 	}
 
 	public void setTab(Tab tab) {
 		this.tab = tab;
+	}
+	
+	public static class TabFieldSerializer extends JsonSerializer<Tab> {
+		@Override public void serialize(
+				Tab tab, 
+				JsonGenerator generator, 
+				SerializerProvider provider) throws IOException, JsonProcessingException {
+			
+			(new CustomJsonSerializer<Tab>()).serialize(tab, generator, provider);
+		}
 	}
 
 }

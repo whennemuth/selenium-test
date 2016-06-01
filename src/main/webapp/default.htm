@@ -12,40 +12,44 @@
 			<select size="15" style="width:180px;"></select>
 			<div align=right style='margin: 5px;'>
 				<input type='button' value=' Launch ' style='padding:5px;'>
-				<input type='button' value=' New ' style='padding:5px;'>
+				<input type='button' value=' New ' style='padding:5px;' ng-click="newCycle();">
 			</div>
 		</div>
 	</div>
 	<div class="section suite">
 		<div class=sectionlabel>Add/Edit Script</div>
 		<div class=sectionarea style="height:800px;">
-			<div>Cycle name: <input type="text"></div>
-			<div class=sectionarea>				
-				<div>Suite name: <input type="text"></div>
-				<div class=sectionarea>
-					Module <select>
-						<option value="1">Proposal Log</option>
-						<option value="2">Institutional Proposal</option>
-						<option value="3">Award</option>
-						<option value="4">Negotiations</option>
-					</select>
-					<div class=sectionarea>
-						Tab: <select>
-							<option value="1">Award</option>
-							<option value="">Contacts</option>
-							<option value="">Commitments</option>
-							<option value="">Budget Versions</option>
-							<option value="">Payment, Reports & Terms</option>
-							<option value="">Special Review</option>
-							<option value="">Custom Data</option>
-							<option value="">Comments, Notes, & Attachments</option>
-							<option value="">Award Actions</option>
-							<option value="">History</option>
-							<option value="">Medusa</option>
-						</select>
+			<div ng-repeat="cycle in cycles">
+				<div>Cycle name: <input type="text" value="{{cycle.name}}"></div>
+				<div class=sectionarea>	
+					<div ng-repeat="suite in cycle.suites">		
+						<div>Suite name: <input type="text" value="{{suite.name}}"></div>
+						<div class=sectionarea>
+							Module <select>
+								<option value="1">Proposal Log</option>
+								<option value="2">Institutional Proposal</option>
+								<option value="3">Award</option>
+								<option value="4">Negotiations</option>
+							</select>
+							<div class=sectionarea>
+								Tab: <select>
+									<option value="1">Award</option>
+									<option value="">Contacts</option>
+									<option value="">Commitments</option>
+									<option value="">Budget Versions</option>
+									<option value="">Payment, Reports & Terms</option>
+									<option value="">Special Review</option>
+									<option value="">Custom Data</option>
+									<option value="">Comments, Notes, & Attachments</option>
+									<option value="">Award Actions</option>
+									<option value="">History</option>
+									<option value="">Medusa</option>
+								</select>
+							</div>
+						</div>
 					</div>
+					<input type="button" value="New">
 				</div>
-				<input type="button" value="New">
 			</div>
 		</div>
 	</div>

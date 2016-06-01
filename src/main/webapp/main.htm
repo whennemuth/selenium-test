@@ -8,6 +8,7 @@
 		<script src = "http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-sanitize.min.js"></script>
 		<script src = "js/configService.js"></script>
 		<script src = "js/navigationService.js"></script>
+		<script src = "js/cycleService.js"></script>
 	</head>
 	
 	<div ng-app="kitApp" ng-controller="kitAppController">
@@ -71,12 +72,13 @@
 		}]);
 
 		// 3) Set the controller for the application module and load its default model and event handlers
-		app.controller('kitAppController', function($scope, $routeParams, $location, configSvc, navSvc) {
+		app.controller('kitAppController', function($scope, $routeParams, $location, configSvc, navSvc, cycleSvc) {
 			
 			navSvc.setTabs($location.path());
 			$scope.servername = '';
 			$scope.serverurl = '';
 			$scope.action = '';
+			$scope.cycles = [];
 			
 			// Load in the existing configuration
 			configSvc.getConfig(false).then(
@@ -87,6 +89,18 @@
 						alert(error);
 					}
 				);
+			
+			// Load in an empty default cycle object
+			$scope.newCycle = function() {
+				cycleSvc.getCycle(null).then(
+					function(data) {
+						$scope.cycles[0] = data;
+					},
+					function(error) {
+						alert(error);
+					}
+				);
+			}
 			
 			// Define and event handler for the save button associated with updates to the configuration
 			$scope.setConfig = function(action) {
@@ -127,6 +141,7 @@
 		// 4) Setup injection for the various services.
 		app.factory("configSvc", configFactory);
 		app.factory("navSvc", navigationFactory);
+		app.factory("cycleSvc", cycleFactory);
 		
 	</script>
 </body>

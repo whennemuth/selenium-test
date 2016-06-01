@@ -1,8 +1,17 @@
 package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.Serializable;
-import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 
 /**
@@ -27,13 +36,8 @@ public class Cycle implements Serializable {
 	private int sequence;
 
 	//bi-directional many-to-one association to Suite
-	@ManyToOne
-	@JoinColumn(name="suite_id", nullable=false)
-	private Suite suite;
-
-	//bi-directional many-to-one association to Module
 	@OneToMany(mappedBy="cycle")
-	private List<Module> modules;
+	private List<Suite> suites = new ArrayList<Suite>();
 
 	public Cycle() {
 	}
@@ -62,34 +66,26 @@ public class Cycle implements Serializable {
 		this.sequence = sequence;
 	}
 
-	public Suite getSuite() {
-		return this.suite;
+	public List<Suite> getSuites() {
+		return this.suites;
 	}
 
-	public void setSuite(Suite suite) {
-		this.suite = suite;
+	public void setSuites(List<Suite> suites) {
+		this.suites = suites;
 	}
 
-	public List<Module> getModules() {
-		return this.modules;
+	public Suite addSuite(Suite suite) {
+		getSuites().add(suite);
+		suite.setCycle(this);
+
+		return suite;
 	}
 
-	public void setModules(List<Module> modules) {
-		this.modules = modules;
-	}
+	public Suite removeSuite(Suite suite) {
+		getSuites().remove(suite);
+		suite.setCycle(null);
 
-	public Module addModule(Module module) {
-		getModules().add(module);
-		module.setCycle(this);
-
-		return module;
-	}
-
-	public Module removeModule(Module module) {
-		getModules().remove(module);
-		module.setCycle(null);
-
-		return module;
+		return suite;
 	}
 
 }
