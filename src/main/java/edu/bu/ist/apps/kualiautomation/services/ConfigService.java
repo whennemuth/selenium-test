@@ -8,7 +8,7 @@ import javax.swing.JFileChooser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.bu.ist.apps.kualiautomation.Utils;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 import edu.bu.ist.apps.kualiautomation.model.Config;
 import edu.bu.ist.apps.kualiautomation.model.ConfigDefaults;
 import edu.bu.ist.apps.kualiautomation.model.Directory;

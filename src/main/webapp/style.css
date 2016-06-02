@@ -67,6 +67,10 @@ div.navigated a {
 	text-align: center;
 }
 
+.noborder {
+	border: none;
+}
+
 .fieldlabel {
 	padding: 2px;
 	font: normal normal 12px arial;
@@ -89,4 +93,9 @@ select {
 	margin-top: 20px;
 	margin-left: 20px;
 	width: 200px;
+}
+
+.cycleWrap {
+	padding: 5px;
+	font: normal normal 12px arial;
 }

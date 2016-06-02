@@ -1,8 +1,10 @@
 package edu.bu.ist.apps.kualiautomation.util;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
 
 public class Utils {
 
@@ -109,5 +111,21 @@ public class Utils {
 		}
 		return null;
 	}
+	
+	/**
+	 * Get the directory containing the jar file whose code is currently running.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public static File getRootDirectory() throws Exception {
+		String path = Utils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		String decodedPath = URLDecoder.decode(path, "UTF-8");
+		File f = new File(decodedPath);
+		if(f.isFile() && f.getName().endsWith(".jar")) {
+			return f.getParentFile();
+		}
+		return f;
+    }
 
 }

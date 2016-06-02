@@ -79,6 +79,7 @@
 			$scope.serverurl = '';
 			$scope.action = '';
 			$scope.cycles = [];
+			$scope.cycleTemplate = '';
 			
 			// Load in the existing configuration
 			configSvc.getConfig(false).then(
@@ -90,7 +91,7 @@
 					}
 				);
 			
-			// Load in an empty default cycle object
+			// Define an event handler to load in an empty default cycle object bound to a ng-repeat block for new cycles
 			$scope.newCycle = function() {
 				cycleSvc.getCycle(null).then(
 					function(data) {
@@ -100,9 +101,20 @@
 						alert(error);
 					}
 				);
-			}
+							}
 			
-			// Define and event handler for the save button associated with updates to the configuration
+			// Define an event handler to cancel the addition of a new cycle.
+			$scope.cancelNewCycle = function() {
+				$scope.cycles = [];
+			};
+			
+			$scope.newSuite = function() {
+				var suiteCount = $scope.cycles[0].suites.length;
+				var cycleTemplate = cycleSvc.getEmptyCycle();
+				$scope.cycles[0].suites[suiteCount] = cycleTemplate.suites[0];
+			};
+			
+			// Define an event handler for the save button associated with updates to the configuration
 			$scope.setConfig = function(action) {
 				$scope.action = action;
 				configSvc.saveConfig($scope).then(
@@ -120,7 +132,7 @@
 				);
 			};
 			
-			// Define and event handler for the save button associated with updates to the output directory
+			// Define an event handler for the save button associated with updates to the output directory
 			$scope.setOutputDir = function() {
 				configSvc.setOutputDirectory().then(
 					function(data) {

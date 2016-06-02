@@ -7,7 +7,7 @@
 			<div class=fieldlabel>Weblogin password</div>
 			<div><input type='password'></div>
 		</div>
-		<div class=sectionlabel>Test Scripts</div>
+		<div class=sectionlabel>Cycles</div>
 		<div class=sectionarea>
 			<select size="15" style="width:180px;"></select>
 			<div align=right style='margin: 5px;'>
@@ -17,38 +17,69 @@
 		</div>
 	</div>
 	<div class="section suite">
-		<div class=sectionlabel>Add/Edit Script</div>
-		<div class=sectionarea style="height:800px;">
+		<div class=sectionlabel>Add/Edit Cycle</div>
+		<div class="sectionarea" style="height:800px;">
 			<div ng-repeat="cycle in cycles">
-				<div>Cycle name: <input type="text" value="{{cycle.name}}"></div>
-				<div class=sectionarea>	
+				<div class="cycleWrap">
+					Cycle name: <input type="text" value="{{cycle.name}}">
+					<input type="button" value="Cancel" ng-click="cancelNewCycle();">					
+				</div>
+				<div class="sectionarea noborder">	
 					<div ng-repeat="suite in cycle.suites">		
-						<div>Suite name: <input type="text" value="{{suite.name}}"></div>
-						<div class=sectionarea>
-							Module <select>
-								<option value="1">Proposal Log</option>
-								<option value="2">Institutional Proposal</option>
-								<option value="3">Award</option>
-								<option value="4">Negotiations</option>
-							</select>
-							<div class=sectionarea>
-								Tab: <select>
-									<option value="1">Award</option>
-									<option value="">Contacts</option>
-									<option value="">Commitments</option>
-									<option value="">Budget Versions</option>
-									<option value="">Payment, Reports & Terms</option>
-									<option value="">Special Review</option>
-									<option value="">Custom Data</option>
-									<option value="">Comments, Notes, & Attachments</option>
-									<option value="">Award Actions</option>
-									<option value="">History</option>
-									<option value="">Medusa</option>
-								</select>
+						<div class="cycleWrap">
+							Suite name: <input type="text" value="{{suite.name}}">
+							<input type="button" value="remove" ng-click="removeSuite($index);">
+						</div>
+						<div  class="sectionarea">
+							<div ng-repeat="module in suite.modules"  style="background-color: #b3e0ff;">
+								<div class="cycleWrap">
+									Module: <select>
+										<option value="1">Proposal Log</option>
+										<option value="2">Institutional Proposal</option>
+										<option value="3">Award</option>
+										<option value="4">Negotiations</option>
+									</select>
+									<input type="button" value="remove" ng-click="removeModule($index);">
+								</div>
+								<div  class="sectionarea noborder">
+									<div ng-repeat="tab in module.tabs" style="background-color: #e6f5ff;">
+										<div class="cycleWrap">
+											Tab: <select>
+												<option value="1">Award</option>
+												<option value="2">Contacts</option>
+												<option value="3">Commitments</option>
+												<option value="4">Budget Versions</option>
+												<option value="5">Payment, Reports & Terms</option>
+												<option value="6">Special Review</option>
+												<option value="7">Custom Data</option>
+												<option value="8">Comments, Notes, & Attachments</option>
+												<option value="9">Award Actions</option>
+												<option value="10">History</option>
+												<option value="11">Medusa</option>
+											</select>
+											<input type="button" value="remove" ng-click="removeTab($index);">
+										</div>
+										<div ng-repeat="lv in tab.labelAndValues">
+											<div class="cycleWrap" style="padding-left:35px;"> input element: 
+												<select>
+													<option value="1">textbox</option>
+													<option value="2">listbox</option>
+													<option value="3">checkbox</option>
+													<option value="4">radio button</option>
+												</select>&nbsp;&nbsp;&nbsp;
+												value: <input type="text" value="{{lv.value}}">
+												<input type="button" value="remove" ng-click="removeLabelAndValue($index);">
+												<input type="button" value="add" ng-click="newLabelAndValue();" ng-show="$index == tab.labelAndValues.length -1">
+											</div>
+										</div>
+									</div>
+									<input type="button" value="New Tab" ng-click="newTab();" style="margin-top: 5px;">
+								</div>
 							</div>
+							<input type="button" value="New Module" ng-click="newModule();">
 						</div>
 					</div>
-					<input type="button" value="New">
+					<input type="button" value="New Suite" ng-click="newSuite();">
 				</div>
 			</div>
 		</div>

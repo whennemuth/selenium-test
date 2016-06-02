@@ -8,12 +8,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.entity.Module;
 import edu.bu.ist.apps.kualiautomation.entity.Suite;
 import edu.bu.ist.apps.kualiautomation.entity.Tab;
 import edu.bu.ist.apps.kualiautomation.entity.User;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -41,7 +44,8 @@ public class ScriptResource {
 		lv.setTab(tab);
 		tab.addLabelAndValue(lv);
 		
-		return Response.status(Status.OK).entity(cycle).build();
+		Response response = ServiceResponse.getResponse(cycle, Status.OK);
+		return response;
 		
 	}
 

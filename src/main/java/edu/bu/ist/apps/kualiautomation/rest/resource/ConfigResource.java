@@ -13,7 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import edu.bu.ist.apps.kualiautomation.Utils;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 import edu.bu.ist.apps.kualiautomation.model.Config;
 import edu.bu.ist.apps.kualiautomation.model.Directory;
 import edu.bu.ist.apps.kualiautomation.services.ConfigService;
