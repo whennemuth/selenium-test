@@ -34,8 +34,11 @@ public class Suite implements Serializable {
 	@Column(nullable=false, length=45)
 	private String name;
 
+	@Column(nullable=false)
+	private int sequence;
+
 	//bi-directional many-to-one association to Module
-	@OneToMany(mappedBy="suite")
+	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.LAZY, mappedBy="suite")
 	private List<Module> modules = new ArrayList<Module>();
 
 	//bi-directional many-to-one association to Cycle
@@ -65,6 +68,14 @@ public class Suite implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public int getSequence() {
+		return this.sequence;
+	}
+
+	public void setSequence(int sequence) {
+		this.sequence = sequence;
 	}
 
 	public List<Module> getModules() {

@@ -78,8 +78,8 @@
 			$scope.servername = '';
 			$scope.serverurl = '';
 			$scope.action = '';
+			$scope.cycle = '';
 			$scope.cycles = [];
-			$scope.cycleTemplate = '';
 			
 			// Load in the existing configuration
 			configSvc.getConfig(false).then(
@@ -95,24 +95,71 @@
 			$scope.newCycle = function() {
 				cycleSvc.getCycle(null).then(
 					function(data) {
-						$scope.cycles[0] = data;
+						$scope.cycle = data;
 					},
 					function(error) {
 						alert(error);
 					}
 				);
-							}
+			}
+			
+			$scope.saveCycle = function() {
+				cycleSvc.saveCycle($scope.cycle).then(
+					function(serviceResponse) {
+						if(serviceResponse.message) {							
+							// alert(serviceResponse.message);
+						}
+						if(!$scope.cycle.id) {
+							$scope.cycles[$scope.cycles.length] = serviceResponse.data;
+						}
+						// $scope.cycle = serviceResponse.data;						
+						$scope.cycle = '';						
+					},
+					function(serviceResponse) {
+						if(serviceResponse != undefined && serviceResponse.message) {
+							alert(serviceResponse.message);
+						}
+						else {
+							alert(serviceResponse);
+						}
+					}
+				);
+			};
 			
 			// Define an event handler to cancel the addition of a new cycle.
 			$scope.cancelNewCycle = function() {
-				$scope.cycles = [];
+				$scope.cycle = '';
 			};
 			
-			$scope.newSuite = function() {
-				var suiteCount = $scope.cycles[0].suites.length;
+			$scope.getBlankObject = function(objectType) {
 				var cycleTemplate = cycleSvc.getEmptyCycle();
-				$scope.cycles[0].suites[suiteCount] = cycleTemplate.suites[0];
+				switch(objectType) {
+				case 'suite': return cycleTemplate.suites[0];
+				case 'module': return cycleTemplate.suites[0].modules[0];
+				case 'tab': return cycleTemplate.suites[0].modules[0].tabs[0];
+				case 'lv': return cycleTemplate.suites[0].modules[0].tabs[0].labelAndValues[0];
+				}
+			}
+			
+			$scope.newSuite = function(suiteIdx) {
+				var cycleTemplate = cycleSvc.getEmptyCycle();
+				$scope.cycle.suites[suiteIdx+1] = cycleTemplate.suites[0];
 			};
+			
+			$scope.newModule = function(modules, moduleIdx) {
+				var cycleTemplate = cycleSvc.getEmptyCycle();
+				$scope.cycle.suites[suiteIdx].modules[moduleIdx+1] = cycleTemplate.suites[0].modules[0];
+			};
+			
+			$scope.newTab = function(suiteIdx, moduleIdx, tabIdx) {
+				var cycleTemplate = cycleSvc.getEmptyCycle();
+				$scope.cycle.suites[suiteIdx].modules[moduleIdx].tabs[tabIdx+1] = cycleTemplate.suites[0].modules[0].tabs[0];
+			};
+			
+			$scope.newLabelAndValue = function(suiteIdx, moduleIdx, tabIdx, lvIdx) {
+				var cycleTemplate = cycleSvc.getEmptyCycle();
+				$scope.cycle.suites[suiteIdx].modules[moduleIdx].tabs[tabIdx].labelAndValues[lvIdx+1] = cycleTemplate.suites[0].modules[0].tabs[0].labelAndValues[0];
+			}
 			
 			// Define an event handler for the save button associated with updates to the configuration
 			$scope.setConfig = function(action) {

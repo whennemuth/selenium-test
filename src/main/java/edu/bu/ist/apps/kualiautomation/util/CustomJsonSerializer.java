@@ -35,7 +35,14 @@ public class CustomJsonSerializer <T> {
 		}
 		
 		Integer id = getId(obj);
-		generator.writeObject(id == null ? "detached" : id);
+		if(id == null) {
+			generator.writeNull();
+		}
+		else {
+			generator.writeStartObject();
+			generator.writeNumberField("id", id);
+			generator.writeEndObject();
+		}
 	}
 
 	public void serialize(

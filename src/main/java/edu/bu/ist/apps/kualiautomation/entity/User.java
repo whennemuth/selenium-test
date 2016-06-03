@@ -2,6 +2,8 @@ package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,8 +29,8 @@ public class User implements Serializable {
 	private String lastName;
 
 	//bi-directional many-to-one association to Suite
-	@OneToMany(mappedBy="user")
-	private List<Suite> suites;
+	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.LAZY, mappedBy="user")
+	private List<Suite> suites = new ArrayList<Suite>();
 
 	public User() {
 	}

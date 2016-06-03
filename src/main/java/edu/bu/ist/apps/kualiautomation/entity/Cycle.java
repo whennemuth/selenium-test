@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -36,7 +38,7 @@ public class Cycle implements Serializable {
 	private int sequence;
 
 	//bi-directional many-to-one association to Suite
-	@OneToMany(mappedBy="cycle")
+	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.LAZY, mappedBy="cycle")
 	private List<Suite> suites = new ArrayList<Suite>();
 
 	public Cycle() {

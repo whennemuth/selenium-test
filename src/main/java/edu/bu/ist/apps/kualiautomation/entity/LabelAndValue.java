@@ -37,8 +37,8 @@ public class LabelAndValue implements Serializable {
 	@Column(unique=true, nullable=false)
 	private int id;
 
-	@Column(name="input_element", nullable=false, length=45)
-	private String inputElement;
+	@Column(nullable=false, length=45)
+	private String label;
 
 	@Column(nullable=false)
 	private int sequence;
@@ -62,12 +62,12 @@ public class LabelAndValue implements Serializable {
 		this.id = id;
 	}
 
-	public String getInputElement() {
-		return this.inputElement;
+	public String getLabel() {
+		return this.label;
 	}
 
-	public void setInputElement(String inputElement) {
-		this.inputElement = inputElement;
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	public int getSequence() {
