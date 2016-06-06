@@ -38,18 +38,13 @@ public class Suite implements Serializable {
 	private int sequence;
 
 	//bi-directional many-to-one association to Module
-	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.LAZY, mappedBy="suite")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="suite")
 	private List<Module> modules = new ArrayList<Module>();
 
 	//bi-directional many-to-one association to Cycle
 	@ManyToOne
 	@JoinColumn(name="cycle_id", nullable=false)
 	private Cycle cycle;
-
-	//bi-directional many-to-one association to User
-	@ManyToOne
-	@JoinColumn(name="user_id", nullable=false)
-	private User user;
 
 	public Suite() {
 	}
@@ -107,14 +102,6 @@ public class Suite implements Serializable {
 
 	public void setCycle(Cycle cycle) {
 		this.cycle = cycle;
-	}
-
-	public User getUser() {
-		return this.user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 	
 	public static class CycleFieldSerializer extends JsonSerializer<Cycle> {

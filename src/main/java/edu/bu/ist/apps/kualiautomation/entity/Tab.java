@@ -49,7 +49,7 @@ public class Tab implements Serializable {
 	private int sequence;
 
 	//bi-directional many-to-one association to LabelAndValue
-	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.LAZY, mappedBy="tab")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="tab")
 	private List<LabelAndValue> labelAndValues = new ArrayList<LabelAndValue>();
 
 	//bi-directional many-to-one association to Module

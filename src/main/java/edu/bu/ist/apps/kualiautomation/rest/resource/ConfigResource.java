@@ -14,9 +14,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import edu.bu.ist.apps.kualiautomation.util.Utils;
-import edu.bu.ist.apps.kualiautomation.model.Config;
+import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.model.Directory;
 import edu.bu.ist.apps.kualiautomation.services.ConfigService;
+import edu.bu.ist.apps.kualiautomation.services.ConfigService2;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -54,7 +55,7 @@ public class ConfigResource {
 	public Response updateOutputDirectory() throws Exception {
 		try {
 			ConfigService svc = new ConfigService();
-			Config cfg = svc.setOutputDirectory();
+			edu.bu.ist.apps.kualiautomation.model.Config cfg = svc.setOutputDirectory();
 			if(cfg == null)
 				return Response.status(Status.CONFLICT).entity(cfg).build();
 			else
@@ -68,8 +69,8 @@ public class ConfigResource {
 	@GET
 	@Path("/config")
 	public Response getConfig() throws Exception {
-		ConfigService svc = new ConfigService();
-		Config cfg = svc.getConfig();
+		ConfigService2 svc = new ConfigService2();
+		Config cfg = svc.getConfig(null);
 		return Response.status(Status.OK).entity(cfg).build();
 	}
 	
@@ -77,8 +78,8 @@ public class ConfigResource {
 	@Path("/config/save")
 	public Response setConfig(Config cfg) {
 		try {
-			ConfigService svc = new ConfigService();
-			svc.saveConfig(cfg);
+			ConfigService2 svc = new ConfigService2();
+			cfg = svc.saveConfig(cfg);
 			return Response.status(Status.OK).entity(cfg).build();
 		} 
 		catch (Exception e) {

@@ -19,8 +19,7 @@ public class ScriptResource {
 
 	@GET
 	@Path("/cycle/empty")
-	public Response getEmptyCycle() throws Exception {
-		
+	public Response getEmptyCycle() throws Exception {		
 		Response response = ServiceResponse.getResponse((new ScriptService()).getEmptyCycle(), Status.OK);
 		return response;		
 	}
@@ -28,8 +27,19 @@ public class ScriptResource {
 	@POST
 	@Path("/cycle/save")
 	public Response saveCycle(Cycle cycle) throws Exception {
-		Response response = ServiceResponse.getResponse(cycle, Status.OK);
-		return response;		
+		try {
+			ScriptService svc = new ScriptService();
+			if(cycle.getId() == 0)
+				cycle = svc.addCycle(cycle);
+			else 
+				cycle = svc.saveCycle(cycle);
+			
+			return ServiceResponse.getResponse(cycle, Status.OK);
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+			return ServiceResponse.getExceptionResponse(e);
+		}		
 	}
 
 }

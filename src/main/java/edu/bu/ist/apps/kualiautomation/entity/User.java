@@ -2,7 +2,6 @@ package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.Serializable;
 import javax.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +28,12 @@ public class User implements Serializable {
 	private String lastName;
 
 	//bi-directional many-to-one association to Suite
-	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.LAZY, mappedBy="user")
-	private List<Suite> suites = new ArrayList<Suite>();
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="user", orphanRemoval=true)
+	private List<Cycle> cycles = new ArrayList<Cycle>();
+
+	//bi-directional many-to-one association to Config
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="user", orphanRemoval=true)
+	private List<Config> configs = new ArrayList<Config>();
 
 	public User() {
 	}
@@ -59,26 +62,47 @@ public class User implements Serializable {
 		this.lastName = lastName;
 	}
 
-	public List<Suite> getSuites() {
-		return this.suites;
+	public List<Cycle> getCycles() {
+		return this.cycles;
 	}
 
-	public void setSuites(List<Suite> suites) {
-		this.suites = suites;
+	public void setCycles(List<Cycle> cycles) {
+		this.cycles = cycles;
 	}
 
-	public Suite addSuite(Suite suite) {
-		getSuites().add(suite);
-		suite.setUser(this);
+	public Cycle addCycle(Cycle cycle) {
+		getCycles().add(cycle);
+		cycle.setUser(this);
 
-		return suite;
+		return cycle;
 	}
 
-	public Suite removeSuite(Suite suite) {
-		getSuites().remove(suite);
-		suite.setUser(null);
+	public Cycle removeCycle(Cycle cycle) {
+		getCycles().remove(cycle);
+		cycle.setUser(null);
 
-		return suite;
+		return cycle;
+	}
+	public List<Config> getConfigs() {
+		return this.configs;
+	}
+
+	public void setConfigs(List<Config> configs) {
+		this.configs = configs;
+	}
+
+	public Config addConfig(Config config) {
+		getConfigs().add(config);
+		config.setUser(this);
+
+		return config;
+	}
+
+	public Config removeConfig(Config config) {
+		getConfigs().remove(config);
+		config.setUser(null);
+
+		return config;
 	}
 
 }

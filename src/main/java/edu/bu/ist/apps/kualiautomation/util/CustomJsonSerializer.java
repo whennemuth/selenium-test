@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 /**
  * Due to bi-directional references between entity classes, the json ObjectMapper gets stuck in a 
  * recursion loop when serializing them to json. This custom serializer will avoid this by only
- * serializing the id of the tournament field.
+ * serializing the id of the child object field.
  * 
  * @author Warren
  *
@@ -35,7 +35,7 @@ public class CustomJsonSerializer <T> {
 		}
 		
 		Integer id = getId(obj);
-		if(id == null) {
+		if(id == null || id == 0) {
 			generator.writeNull();
 		}
 		else {

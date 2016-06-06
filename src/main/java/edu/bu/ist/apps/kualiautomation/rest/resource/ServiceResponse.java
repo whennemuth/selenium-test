@@ -54,4 +54,13 @@ public class ServiceResponse {
 	public static Response getResponse(Object data, Status status) {
 		return getResponse(data, status.getReasonPhrase(), status);
 	}
+	public static Response getErrorResponse(String message) {
+		return getResponse(null, message, Status.INTERNAL_SERVER_ERROR);
+	}
+	public static Response getInvalidResponse(String message, Status status) {
+		return getResponse(null, message, status);
+	}
+	public static Response getExceptionResponse(Throwable e) {
+		return getResponse(Utils.stackTraceToString(e), e.getMessage(), Status.INTERNAL_SERVER_ERROR);
+	}
 }

@@ -54,7 +54,7 @@ public class Module implements Serializable {
 	private Suite suite;
 
 	//bi-directional many-to-one association to Tab
-	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.LAZY, mappedBy="module")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="module")
 	private List<Tab> tabs = new ArrayList<Tab>();
 
 	public Module() {

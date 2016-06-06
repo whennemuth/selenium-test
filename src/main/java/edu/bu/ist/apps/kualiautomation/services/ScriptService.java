@@ -4,8 +4,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.transaction.Transaction;
-
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.entity.Module;
@@ -16,8 +14,30 @@ import edu.bu.ist.apps.kualiautomation.entity.User;
 public class ScriptService {
 
 	public Cycle addCycle(Cycle cycle) {
-		// TODO: Have the suite populated with an id as if persisted with JPA and receiving an auto-incremented value from the db
-		return cycle;
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory("kualiautomation-embedded");
+        EntityManager em = factory.createEntityManager();
+        EntityTransaction trans = null;
+        try {
+		    trans = em.getTransaction();
+		    trans.begin();
+//		    em.merge(cycle);
+		    em.persist(cycle);
+		    trans.commit();
+			return cycle;
+		} 
+        catch(Exception e) {
+        	e.printStackTrace(System.out);
+        	if(trans.isActive()) {
+        		trans.rollback();
+        	}
+        	throw e;
+        }
+	    finally {
+	    	if(em != null && em.isOpen())
+	    		em.close();
+	    	if(factory != null && factory.isOpen())
+	    		factory.close();
+		}
 	}
 	
 	public Cycle saveCycle(Cycle cycle) {
@@ -33,7 +53,7 @@ public class ScriptService {
 		LabelAndValue lv = new LabelAndValue();
 		
 		suite.setCycle(cycle);
-		suite.setUser(user);
+		cycle.setUser(user);
 		cycle.addSuite(suite);
 		module.setSuite(suite);
 		suite.addModule(module);
@@ -55,20 +75,21 @@ public class ScriptService {
 				System.out.println("Cycle not found, will create...");
 			    EntityTransaction trans = em.getTransaction();
 			    trans.begin();
-			    cycle = new Cycle();
-			    cycle.setName("TEST CYCLE");
-			    cycle.setSequence(1);
-			    em.persist(cycle);
 			    
 			    User user = new User();
 			    user.setFirstName("Warren");
 			    user.setLastName("Hennemuth");
 			    em.persist(user);
 			    
+			    cycle = new Cycle();
+			    cycle.setName("TEST CYCLE");
+			    cycle.setSequence(1);
+			    cycle.setUser(user);
+			    em.persist(cycle);
+			    
 			    Suite suite = new Suite();
 			    suite.setName("my suite");
 			    suite.setSequence(1);
-			    suite.setUser(user);
 			    cycle.addSuite(suite);
 			    em.persist(suite);
 			    
@@ -97,7 +118,7 @@ public class ScriptService {
 				System.out.println("Cycle found");
 				System.out.println("cycle name: " + cycle.getName());
 				System.out.println("suite name: " + cycle.getSuites().get(0).getName());
-				System.out.println("user name: " + cycle.getSuites().get(0).getUser().getFirstName());
+				System.out.println("user name: " + cycle.getUser().getFirstName());
 				System.out.println("module name: " + cycle.getSuites().get(0).getModules().get(0).getName());
 				System.out.println("tab name: " + cycle.getSuites().get(0).getModules().get(0).getTabs().get(0).getName());
 				System.out.println("label name/value: " + 

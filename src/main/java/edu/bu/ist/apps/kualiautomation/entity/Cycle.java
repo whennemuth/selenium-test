@@ -11,6 +11,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -38,8 +40,13 @@ public class Cycle implements Serializable {
 	private int sequence;
 
 	//bi-directional many-to-one association to Suite
-	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.LAZY, mappedBy="cycle")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="cycle")
 	private List<Suite> suites = new ArrayList<Suite>();
+
+	//bi-directional many-to-one association to User
+	@ManyToOne
+	@JoinColumn(name="user_id", nullable=false)
+	private User user;
 
 	public Cycle() {
 	}
@@ -66,6 +73,14 @@ public class Cycle implements Serializable {
 
 	public void setSequence(int sequence) {
 		this.sequence = sequence;
+	}
+
+	public User getUser() {
+		return this.user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public List<Suite> getSuites() {
