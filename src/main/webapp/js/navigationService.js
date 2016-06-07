@@ -19,7 +19,7 @@ var navigationFactory = function($http, $q) {
 			return tabCache;
 		},
 		setTabs : function(path) {
-			var p = path.replace("/", "");
+			var p = path.replace(/\//g, "");
 			tabCache = new tabs();
 			eval("tabCache." + p + "Class = 'navigation navigated'");
 		}

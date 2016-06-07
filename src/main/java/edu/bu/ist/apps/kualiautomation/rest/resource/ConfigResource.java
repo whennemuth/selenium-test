@@ -13,11 +13,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import edu.bu.ist.apps.kualiautomation.util.Utils;
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.model.Directory;
-import edu.bu.ist.apps.kualiautomation.services.ConfigService;
 import edu.bu.ist.apps.kualiautomation.services.ConfigService2;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -50,26 +49,14 @@ public class ConfigResource {
 		}
 	}
 	
-	@POST
-	@Path("/config/relocate")
-	public Response updateOutputDirectory() throws Exception {
-		try {
-			ConfigService svc = new ConfigService();
-			edu.bu.ist.apps.kualiautomation.model.Config cfg = svc.setOutputDirectory();
-			if(cfg == null)
-				return Response.status(Status.CONFLICT).entity(cfg).build();
-			else
-				return Response.status(Status.OK).entity(cfg).build();
-		} 
-		catch (Exception e) {
-			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e).build();
-		}
-	}
-	
 	@GET
 	@Path("/config")
 	public Response getConfig() throws Exception {
 		ConfigService2 svc = new ConfigService2();
+		/**
+		 * null below means omit the user because we want the config for the first - and, because we 
+		 * are ostensibly running from a jar and not a war - the only user.
+		 */
 		Config cfg = svc.getConfig(null);
 		return Response.status(Status.OK).entity(cfg).build();
 	}

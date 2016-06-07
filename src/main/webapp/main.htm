@@ -11,34 +11,24 @@
 		<script src = "js/cycleService.js"></script>
 	</head>
 	
-	<div ng-app="kitApp" ng-controller="kitAppController">
+	<div ng-app="kitApp" ng-controller="kitNavController">
 		
 		<div class=navstrip>
 			<div class="{{getTabs().configClass}}">
-				<a href="#/config">config</a>
+				<a href="#/config/">config</a>
 			</div>
 			<div class="{{getTabs().homeClass}}">
-				<a href="#/home">home</a>
+				<a href="#/home/">home</a>
 			</div>
 			<div class="{{getTabs().helpClass}}">
-				<a href="#/help">help</a>
+				<a href="#/help/">help</a>
 			</div>
 			<div class=navigation>
-				<a href="#" onclick="document.location.href = 'main.htm';">refresh</a>
+				<a href="#" onclick="document.location.href = 'main.htm#/home/';">refresh</a>
 			</div>
 		</div>
 		
 		<div ng-view></div>
-	
-		<!-- 
-		<script type="text/ng-template" id="default.htm">
-			default.htm
-		</script>
-		
-		<script type="text/ng-template" id="help.htm">
-			help.htm
-		</script>
-		-->
 	</div>
 	
 	<script>
@@ -48,48 +38,60 @@
 
 		// 2) Configure the application module by defining how its routeProvider service will operate.
 		//    (NOTE: Like other core Angular identifiers, built-in services always start with $ (e.g. $http)).
+		//    (NOTE: .when('/name/'), NOT .when('/name') - (use trailing "/"))
 		app.config(['$routeProvider', function routeProvider($routeProvider) {
 			$routeProvider
-				.when('/home', {
+				.when('/home/', {
 					templateUrl: 'default.htm',
 					controller: 'kitAppController'
 				})
-				.when('/help', {
+				.when('/help/', {
 					templateUrl: 'help.htm',
 					controller: 'kitAppController'
 				})
-				.when('/suite', {
+				.when('/suite/', {
 					templateUrl: 'suite.htm',
 					controller: 'kitAppController'
 				})
-				.when('/config', {
+				.when('/config/', {
 					templateUrl: 'config.htm',
 					controller: 'kitAppController'
 				})
 				.otherwise({
-					redirectTo: '/home'
+					redirectTo: '/home/'
 				});
 		}]);
 
 		// 3) Set the controller for the application module and load its default model and event handlers
-		app.controller('kitAppController', function($scope, $routeParams, $location, configSvc, navSvc, cycleSvc) {
-			
+		app.controller('kitNavController', function($scope, $routeParams, $location, navSvc) {			
+			console.log("Configuring navigation controller scope");
 			navSvc.setTabs($location.path());
-			$scope.servername = '';
-			$scope.serverurl = '';
+			$scope.getTabs = function() {
+				return navSvc.getTabs();
+			}
+		});
+
+			// 3) Set the controller for the application module and load its default model and event handlers
+		app.controller('kitAppController', function($scope, $routeParams, $location, configSvc, cycleSvc, navSvc) {
+			
+			console.log("Configuring application controller scope");
+			navSvc.setTabs($location.path());
+			$scope.config = '';
 			$scope.action = '';
 			$scope.cycle = '';
 			$scope.cycles = [];
 			
 			// Load in the existing configuration
-			configSvc.getConfig(false).then(
-					function(data) {
-						$scope.config = data;
-					},
-					function(error) {
-						alert(error);
-					}
-				);
+			if(!$scope.config) {
+				configSvc.getConfig(false).then(
+						function(data) {
+							$scope.config = data;
+						},
+						function(error) {
+							alert("Configuration retrieval error!\n" + error);
+						}
+					);
+			}
 			
 			// Define an event handler to load in an empty default cycle object bound to a ng-repeat block for new cycles
 			$scope.newCycle = function() {
@@ -98,7 +100,7 @@
 						$scope.cycle = data;
 					},
 					function(error) {
-						alert(error);
+						alert("Cycle retrieval error!\n" + error);
 					}
 				);
 			}
@@ -120,7 +122,7 @@
 							alert(serviceResponse.message);
 						}
 						else {
-							alert(serviceResponse);
+							alert('Cycle saving error:\n' + serviceResponse);
 						}
 					}
 				);
@@ -167,11 +169,6 @@
 				configSvc.saveConfig($scope).then(
 					function(data) {
 						$scope.config = data.config.data;
-						if(data.config.data.currentEnvironment != undefined) {
-							// Make the 2 text boxes reflect the selection in the listbox
-							$scope.servername = data.config.data.currentEnvironment.name;
-							$scope.serverurl = data.config.data.currentEnvironment.url;
-						}
 					},
 					function(error) {
 						alert(error);
@@ -191,10 +188,6 @@
 					}
 				);
 			};
-			
-			$scope.getTabs = function() {
-				return navSvc.getTabs();
-			}
 		});
 		
 		// 4) Setup injection for the various services.

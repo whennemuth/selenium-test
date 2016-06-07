@@ -65,7 +65,7 @@ public class Config implements Serializable {
 
 	//bi-directional many-to-one association to ConfigModule
 	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="config", orphanRemoval=true)
-	private List<ConfigModule> configModules;
+	private List<ConfigModule> configModules = new ArrayList<ConfigModule>();
 
 	public Config() {
 	}

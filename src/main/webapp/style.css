@@ -95,6 +95,10 @@ select {
 	width: 200px;
 }
 
+.width300 {
+	width: 300px;
+}
+
 .cycleWrap {
 	padding: 5px;
 	font: normal normal 12px arial;

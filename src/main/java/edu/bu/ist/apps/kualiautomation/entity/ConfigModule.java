@@ -1,11 +1,29 @@
 package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.Serializable;
-import javax.persistence.*;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment.ConfigFieldSerializer;
 
 
 /**
@@ -28,7 +46,7 @@ public class ConfigModule implements Serializable {
 	private Date createdDate;
 
 	@Column(nullable=false)
-	private byte include;
+	private Byte include;
 
 	@Column(nullable=false, length=45)
 	private String label;
@@ -41,7 +59,18 @@ public class ConfigModule implements Serializable {
 	@ManyToOne
 	@JoinColumn(name="config_id", nullable=false)
 	private Config config;
-
+	
+	/**
+	 * JPA lifecycle callback methods
+	 */
+	@PrePersist
+	public void prePersist() {
+		if(include == null) {
+			include = new Byte((byte)1);
+		}
+		createdDate = new Date(System.currentTimeMillis());
+	}
+	
 	public ConfigModule() {
 	}
 
@@ -62,11 +91,14 @@ public class ConfigModule implements Serializable {
 	}
 
 	public byte getInclude() {
+		if(include == null) {
+			return new Byte((byte)0);
+		}
 		return this.include;
 	}
 
 	public void setInclude(byte include) {
-		this.include = include;
+		this.include = new Byte(include);
 	}
 
 	public String getLabel() {
@@ -99,6 +131,7 @@ public class ConfigModule implements Serializable {
 		return configTab;
 	}
 
+	@JsonSerialize(using=ConfigFieldSerializer.class)
 	public Config getConfig() {
 		return this.config;
 	}
@@ -106,4 +139,5 @@ public class ConfigModule implements Serializable {
 	public void setConfig(Config config) {
 		this.config = config;
 	}
+
 }

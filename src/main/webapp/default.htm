@@ -42,7 +42,7 @@
 			<div class="sectionarea noborder">	
 				<div ng-repeat="suite in cycle.suites">		
 					<div class="cycleWrap">
-						Suite name: <input type="text" value="{{suite.name}}" ng-model="suite.name" ng-blur="alert('hello');">
+						Suite name: <input type="text" value="{{suite.name}}" ng-model="suite.name"">
 						<input type="button" value="add" ng-click="cycle.suites.splice($index+1, 0, getBlankObject('suite'));">
 						<input type="button" value="remove" ng-click="cycle.suites.splice($index, 1);">
 					</div>

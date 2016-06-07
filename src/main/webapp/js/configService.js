@@ -21,21 +21,6 @@ var configFactory = function($http, $q) {
 	return {
 		
 		/**
-		 * Call a webservice that brings up a FileChooser so the user can specify a directory
-		 * on their file system. A new configuration (as json) is returned reflecting the new directory.
-		 */
-		setOutputDirectory : function() {
-			var deferred = $q.defer();
-			$http.post(SET_DIR_URL)
-			.success(function(response){
-				deferred.resolve(response);
-			}).error(function(response){
-				deferred.reject(response);
-			});
-			return deferred.promise;
-		},
-		
-		/**
 		 * Call a webservice that returns the configuration for the application as json.
 		 * The configuration is obtained from a .cfg file located near the jar file.
 		 */
@@ -65,31 +50,33 @@ var configFactory = function($http, $q) {
 			
 			if(scope.action) {
 				if(scope.action == 'addserver') {
+					var envName = scope.config.currentEnvironment.name;
+					var envUrl = scope.config.currentEnvironment.url;
 					
 					// Validate by ensuring the name and or url are not already present in config.environments
-					for(var e in scope.config.environments) {
-						var env = scope.config.environments[e];
-						if(areEqualIgnoreCase(scope.servername, env.name)) {
-							deferred.reject(scope.servername + ' already used!');
+					for(var e in scope.config.configEnvironments) {
+						var env = scope.config.configEnvironments[e];
+						if(areEqualIgnoreCase(envName, env.name)) {
+							deferred.reject(envName + ' already used!');
 							return deferred.promise;
 						}
-						if(areEqualIgnoreCase(scope.serverurl, env.url)) {
-							deferred.reject(scope.serverurl + ' already used!');
+						if(areEqualIgnoreCase(envUrl, env.url)) {
+							deferred.reject(envUrl + ' already used!');
 							return deferred.promise;
 						}
 					}
 
 					// Validation success, so add a new environment to the collection in config object
-					scope.config.environments[scope.config.environments.length] = {
-						name: scope.servername,
-						url:  scope.serverurl
+					scope.config.environments[scope.config.configEnvironments.length] = {
+						name: envName,
+						url:  envUrl
 					};
 				}
 				else if(scope.action == 'removeserver') {
-					for(var i=0; i< scope.config.environments.length; i++) {
-						var env = scope.config.environments[i];
-						if(areEqualIgnoreCase(scope.servername, env.name)) {
-							scope.config.environments.splice(i, 1);
+					for(var i=0; i< scope.config.configEnvironments.length; i++) {
+						var env = scope.config.configEnvironments[i];
+						if(areEqualIgnoreCase(envName, env.name)) {
+							scope.config.configEnvironments.splice(i, 1);
 						}
 					}
 				}

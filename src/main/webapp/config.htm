@@ -12,7 +12,7 @@
 				ng-change="setConfig();"
 				ng-model="config.currentEnvironment"
 				ng-options="environment.name 
-							for environment in config.environments 
+							for environment in config.configEnvironments 
 							track by environment.url">
 			</select>
 		</div>
@@ -22,7 +22,7 @@
 				required 
 				name="servername" 
 				type='text' 
-				ng-model="servername" >
+				ng-model="config.currentEnvironment.name" >
 		</div>
 		<div class=fieldlabel>URL</div>
 		<div>
@@ -30,7 +30,7 @@
 				required 
 				name="serverurl" 
 				type='text' 
-				ng-model="serverurl">
+				ng-model="config.currentEnvironment.url">
 		</div>
 		<div align=right style='margin: 5px;'>
 			<input 
@@ -51,19 +51,7 @@
 	</div>
 </div>
 
-<div class=floatingbox>
-	<div class=sectionlabel>Script output</div>
-	<div class=sectionarea>
-		<div class=fieldlabel>Directory</div>
-		<div><input type='text' ng-model="config.outputDir"></div>
-		<div align=right style='margin: 5px;'>
-			<input 
-				type='button' 
-				value=' browse... ' 
-				style='padding:5px;'
-				ng-click="setOutputDir();">
-		</div>
-	</div>
+<div class="floatingbox width300">
 	<div class=sectionlabel>Head selection</div>
 	<div class=sectionarea>
 		<div class="fieldlabel"><input 
@@ -78,6 +66,20 @@
 			ng-model="config.headless"
 			ng-value="true"
 			ng-click="setConfig();">Headless Mode</div>
+	</div>
+	<div class=sectionlabel>Module definitions</div>
+	<div class=sectionarea>
+		<div ng-repeat="m in config.configModules" style="padding-top:5px">
+			<input id="configModule{{$index}}" type="checkbox"> 
+			<input type="text" style="width:100px" value="{{m.label}}"> 
+	    	<input type="button" value="add" ng-click="config.configModules.splice($index+1, 0, getBlankConfigModule());">		    
+			<input type="button" value="remove" ng-click="config.configModules.splice($index, 1);">
+			<div ng-repeat="t in m.configTabs" style="padding-left:50px" ng-show="angular.element('configModule'+$parent.$index).attr('checked')">
+				<input type="text" style="width:100px" value="{{t.label}}"> 
+	    		<input type="button" value="add" ng-click="config.configModules.splice($index+1, 0, getBlankConfigModule().configTabs[0]);">		    
+				<input type="button" value="remove" ng-click="t.configTabs.splice($index, 1);">
+			</div>
+		</div>
 	</div>
 </div>
 

@@ -26,7 +26,7 @@
 			<property name="hibernate.archive.autodetection" value="class,hbm" /> 
 			-->
 			<property name="hibernate.archive.autodetection" value="" />
-			<property name="hibernate.hbm2ddl.auto" value="create" />
+			<property name="hibernate.hbm2ddl.auto" value="update" />
 			<property name="hibernate.show_sql" value="true" />
 		</properties>
 		

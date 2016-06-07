@@ -36,7 +36,7 @@ public class ConfigTab implements Serializable {
 	private Date createdDate;
 
 	@Column(nullable=false)
-	private byte include;
+	private Byte include;
 
 	@Column(nullable=false, length=45)
 	private String label;
@@ -45,6 +45,17 @@ public class ConfigTab implements Serializable {
 	@ManyToOne
 	@JoinColumn(name="config_module_id", nullable=false)
 	private ConfigModule configModule;
+	
+	/**
+	 * JPA lifecycle callback methods
+	 */
+	@PrePersist
+	public void prePersist() {
+		if(include == null) {
+			include = new Byte((byte)1);
+		}
+		createdDate = new Date(System.currentTimeMillis());
+	}
 
 	public ConfigTab() {
 	}
@@ -66,11 +77,14 @@ public class ConfigTab implements Serializable {
 	}
 
 	public byte getInclude() {
+		if(include == null) {
+			return new Byte((byte)0);
+		}
 		return this.include;
 	}
 
 	public void setInclude(byte include) {
-		this.include = include;
+		this.include = new Byte(include);
 	}
 
 	public String getLabel() {
@@ -81,7 +95,7 @@ public class ConfigTab implements Serializable {
 		this.label = label;
 	}
 
-	@JsonSerialize(using=UserFieldSerializer.class)
+	@JsonSerialize(using=ConfigModuleFieldSerializer.class)
 	public ConfigModule getConfigModule() {
 		return this.configModule;
 	}
