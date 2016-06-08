@@ -69,12 +69,15 @@
 	</div>
 	<div class=sectionlabel>Module definitions</div>
 	<div class=sectionarea>
-		<div ng-repeat="m in config.configModules" style="padding-top:5px">
-			<input id="configModule{{$index}}" type="checkbox"> 
+		<div ng-repeat="m in config.configModules" style="padding-top:5px;">
+			<input id="configModule{{$index}}" type="checkbox" ng-model="config.configModules[$index].checked"> 
 			<input type="text" style="width:100px" value="{{m.label}}"> 
 	    	<input type="button" value="add" ng-click="config.configModules.splice($index+1, 0, getBlankConfigModule());">		    
 			<input type="button" value="remove" ng-click="config.configModules.splice($index, 1);">
-			<div ng-repeat="t in m.configTabs" style="padding-left:50px" ng-show="angular.element('configModule'+$parent.$index).attr('checked')">
+			<div 
+				ng-repeat="t in m.configTabs" 
+				style="padding-left:50px; padding-top: {{$index==0 ? '5px;' : '0px;'}}" 
+				ng-show="config.configModules[$parent.$index].checked">
 				<input type="text" style="width:100px" value="{{t.label}}"> 
 	    		<input type="button" value="add" ng-click="config.configModules.splice($index+1, 0, getBlankConfigModule().configTabs[0]);">		    
 				<input type="button" value="remove" ng-click="t.configTabs.splice($index, 1);">

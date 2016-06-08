@@ -20,6 +20,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -140,4 +141,17 @@ public class ConfigModule implements Serializable {
 		this.config = config;
 	}
 
+	/**
+	 * This is a hack. I'm adding this property to be included into the json object created
+	 * from an instance of this class for convenience in angularjs 2-way binding UI manipulation.
+	 */
+	@Transient
+	private boolean checked;
+	public boolean isChecked() {
+		return checked;
+	}
+	public void setChecked(boolean checked) {
+		this.checked = checked;
+	}
+	
 }
