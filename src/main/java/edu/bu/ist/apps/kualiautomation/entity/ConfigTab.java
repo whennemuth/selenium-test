@@ -2,7 +2,20 @@ package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.IOException;
 import java.io.Serializable;
-import javax.persistence.*;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,10 +23,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import edu.bu.ist.apps.kualiautomation.entity.Config.UserFieldSerializer;
 import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
-
-import java.util.Date;
 
 
 /**
@@ -29,7 +39,7 @@ public class ConfigTab implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(unique=true, nullable=false)
-	private int id;
+	private Integer id;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="created_date", nullable=false)
@@ -43,7 +53,7 @@ public class ConfigTab implements Serializable {
 
 	//bi-directional many-to-one association to ConfigModule
 	@ManyToOne
-	@JoinColumn(name="config_module_id", nullable=false)
+	@JoinColumn(name="config_module_id"/*, nullable=false*/)
 	private ConfigModule configModule;
 	
 	/**
@@ -60,11 +70,11 @@ public class ConfigTab implements Serializable {
 	public ConfigTab() {
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

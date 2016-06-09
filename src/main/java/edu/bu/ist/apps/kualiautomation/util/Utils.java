@@ -35,6 +35,25 @@ public class Utils {
 	}
 	
 	/**
+	 * Determine if given method is a mutator.
+	 * The method must have one parameter and its name must be of either get[Xxxx...] or is[Xxxx...] formats
+	 * @param setterMethod
+	 * @return
+	 */
+	public static boolean isAccessor(Method m) {
+		if(m == null)
+			return false;
+		if(m.getReturnType() == null)
+			return false;
+		if(!m.getName().matches("((get)|(is))[A-Z].*")) 
+			return false;
+		if(m.getParameterTypes().length != 0)
+			return false;
+		
+		return true;
+	}
+	
+	/**
 	 * From the name of an accessor or a mutator, get the name of the target field (remove "set" or "get" and lowercase the first character of the result)
 	 * @param methodName
 	 * @return
@@ -89,6 +108,38 @@ public class Utils {
 			return m;
 		}
 		return null;
+	}
+	
+	/**
+	 * Get the name of the corresponding mutator method given the accessor method.
+	 * The accessor must have no parameters and must be of either get[Xxxx...] or is[Xxxx...] formats.
+	 * The mutator must follow the set[Xxxx...] naming format and must have one parameter.
+	 * 
+	 * @param setterMethod
+	 * @return
+	 */
+	public static Method getMutator(Method getterMethod, @SuppressWarnings("rawtypes") Class mutatorClass) {
+		
+		if(!isAccessor(getterMethod))
+			return null;
+		
+		String setterName = null;
+		if("boolean".equalsIgnoreCase(getterMethod.getReturnType().getSimpleName())) {
+			setterName = getterMethod.getName().replaceFirst("is", "set");
+		}
+		else {
+			setterName = getterMethod.getName().replaceFirst("get", "set");
+		}
+		try {
+			Method mutator = getMutatorMethod(setterName, mutatorClass);
+			if(mutator.getParameterTypes().length != 1) {
+				return null;
+			}
+			return mutator;
+		} 
+		catch (Exception e) {
+			return null;
+		}
 	}
 
 	/**

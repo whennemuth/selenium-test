@@ -70,7 +70,8 @@ public class ConfigResource {
 			return Response.status(Status.OK).entity(cfg).build();
 		} 
 		catch (Exception e) {
-			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e).build();
+			e.printStackTrace(System.out);
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(Utils.stackTraceToString(e)).build();
 		}
 	}
 }

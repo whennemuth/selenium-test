@@ -1,9 +1,9 @@
 package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -40,7 +40,7 @@ public class ConfigModule implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(unique=true, nullable=false)
-	private int id;
+	private Integer id;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="created_date", nullable=false)
@@ -52,13 +52,19 @@ public class ConfigModule implements Serializable {
 	@Column(nullable=false, length=45)
 	private String label;
 
+	/**
+	 * NOTE: This is a class whose counterpart on the other side of the @OneToMany relationship itself also
+	 * has an eagerly fetched collection. For some reason, JPA imposes a restriction in filling up the "bag"
+	 * to one level of eager fetching - nested fetching is restricted unless the bag is based on a Set collection, not a list.
+	 * If this collection were a list you would see a MultipleBagFetchException thrown when fetching is triggered.
+	 */
 	//bi-directional many-to-one association to ConfigTab
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="configModule")
-	private List<ConfigTab> configTabs = new ArrayList<ConfigTab>();
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="configModule")
+	private Set<ConfigTab> configTabs = new LinkedHashSet<ConfigTab>();
 
 	//bi-directional many-to-one association to Config
 	@ManyToOne
-	@JoinColumn(name="config_id", nullable=false)
+	@JoinColumn(name="config_id"/*, nullable=false*/)
 	private Config config;
 	
 	/**
@@ -75,11 +81,11 @@ public class ConfigModule implements Serializable {
 	public ConfigModule() {
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -110,11 +116,11 @@ public class ConfigModule implements Serializable {
 		this.label = label;
 	}
 
-	public List<ConfigTab> getConfigTabs() {
+	public Set<ConfigTab> getConfigTabs() {
 		return this.configTabs;
 	}
 
-	public void setConfigTabs(List<ConfigTab> configTabs) {
+	public void setConfigTabs(Set<ConfigTab> configTabs) {
 		this.configTabs = configTabs;
 	}
 

@@ -50,7 +50,7 @@ public class ConfigEnvironment implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(unique=true, nullable=false)
-	private int id;
+	private Integer id;
 
 	@Column(nullable=false, length=45)
 	private String name;
@@ -60,21 +60,21 @@ public class ConfigEnvironment implements Serializable {
 
 	//bi-directional many-to-one association to Config
 	@ManyToOne
-	@JoinColumn(name="config_id", nullable=false)
+	@JoinColumn(name="config_id"/*, nullable=false*/)
 	private Config parentConfig;
 	
 	@OneToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-	@JoinColumn(name="config_id", nullable=false, insertable=false, updatable=false)
+	@JoinColumn(name="config_id"/*, nullable=false*/, insertable=false, updatable=false)
 	private Config configWhoIamCurrentFor;
 
 	public ConfigEnvironment() {
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

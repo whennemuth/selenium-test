@@ -48,8 +48,13 @@ div.navigated a {
 	width: calc(100% - 244px)
 }
 
-.help {
+.basicfont {
 	font: normal normal 10px arial;
+}
+
+.bigbutton {
+	padding: 15px;
+	font: bold normal 14px arial;
 }
 
 .sectionarea {

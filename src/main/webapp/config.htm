@@ -1,5 +1,20 @@
 <form name="configfrm" action="" method="post" novalidate>
 <div class=floatingbox>
+	<div class=sectionlabel>Current User</div>
+	<div class=sectionarea>
+		<div class=fieldlabel align="right">
+			User ID: {{config.user.id}}
+		</div>
+		<div class=fieldlabel>First name</div>
+		<div style="padding-bottom: 5px;">
+			<input required name="firstname" type="text" ng-model="config.user.firstName">
+		</div>
+		<div class=fieldlabel>Last name</div>
+		<div style="padding-bottom: 5px;">
+			<input required name="lastname" type="text" ng-model="config.user.lastName">
+		</div>
+	</div>
+	
 	<div class=sectionlabel>Environments</div>
 	<div class=sectionarea>
 		<div class=fieldlabel>Servers</div>
@@ -39,17 +54,18 @@
 				style='padding:5px;'
 				ng-disabled="configfrm.servername.$error.required || 
 							 configfrm.serverurl.$error.required"
-				ng-click="setConfig('addserver');">
+				ng-click="setConfig('add environment');">
 				
 			<input 
 				type='button' 
 				value=' Remove ' 
 				style='padding:5px;'
 				ng-disabled="configfrm.server.$error.required" 
-				ng-click="setConfig('removeserver');">
+				ng-click="setConfig('remove environment');">
 		</div>
-	</div>
+	</div>	
 </div>
+
 
 <div class="floatingbox width300">
 	<div class=sectionlabel>Head selection</div>
@@ -70,24 +86,53 @@
 	<div class=sectionlabel>Module definitions</div>
 	<div class=sectionarea>
 		<div ng-repeat="m in config.configModules" style="padding-top:5px;">
-			<input id="configModule{{$index}}" type="checkbox" ng-model="config.configModules[$index].checked"> 
-			<input type="text" style="width:100px" value="{{m.label}}"> 
-	    	<input type="button" value="add" ng-click="config.configModules.splice($index+1, 0, getBlankConfigModule());">		    
-			<input type="button" value="remove" ng-click="config.configModules.splice($index, 1);">
+			<input 
+				type="checkbox" 
+				ng-model="config.configModules[$index].checked"> 
+			<input 
+				type="text" 
+				style="width:100px" 
+				ng-model="m.label"> 
+	    	<input 
+	    		type="button" 
+	    		value="add"
+	    		ng-disabled="!m.label" 
+	    		ng-click="config.configModules.splice($index+1, 0, getBlankConfigModule());">		    
+			<input 
+				type="button" 
+				value="remove" 
+				ng-click="config.configModules.splice($index, 1);">
 			<div 
 				ng-repeat="t in m.configTabs" 
 				style="padding-left:50px; padding-top: {{$index==0 ? '5px;' : '0px;'}}" 
 				ng-show="config.configModules[$parent.$index].checked">
-				<input type="text" style="width:100px" value="{{t.label}}"> 
-	    		<input type="button" value="add" ng-click="config.configModules.splice($index+1, 0, getBlankConfigModule().configTabs[0]);">		    
-				<input type="button" value="remove" ng-click="t.configTabs.splice($index, 1);">
+				<input 
+					type="text" 
+					style="width:100px" 
+					ng-model="t.label"> 
+	    		<input 
+	    			type="button" value="add" 
+	    			ng-disabled="!t.label" 
+	    			ng-click="config.configModules.splice($index+1, 0, getBlankConfigModule().configTabs[0]);">		    
+				<input 
+					type="button" 
+					value="remove" 
+					ng-click="t.configTabs.splice($index, 1);">
 			</div>
 		</div>
 	</div>
+	<div class=sectionarea align="right" style="border:none;">
+		<input 
+			type="button" 
+			value=" SAVE " 
+			class="bigbutton"
+			ng-disabled="configfrm.firstname.$error.required || 
+						 configfrm.lastname.$error.required" 
+			ng-click="setConfig('save config');">
+	</div>
 </div>
 
-<div style="padding: 20px; float:left; clear:both; font: normal normal 10px arial;">
-	last updated: 
-	{{config.lastUpdated}}
+<div class=floatingbox style="clear:both">
+	<textarea cols="80" rows=20>{{config}}</textarea>
 </div>
 </form>

@@ -3,7 +3,9 @@ package edu.bu.ist.apps.kualiautomation.entity;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -45,14 +47,14 @@ public class Config implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(unique=true, nullable=false)
-	private int id;
+	private Integer id;
 
 	@Column(nullable=false)
 	private boolean headless;
 
 	//bi-directional many-to-one association to User
 	@ManyToOne
-	@JoinColumn(name="user_id", nullable=false)
+	@JoinColumn(name="user_id"/*, nullable=false*/)
 	private User user;
 
 	//One of the environments "owned" by this config - the currently selected environment
@@ -61,20 +63,20 @@ public class Config implements Serializable {
 	
 	//bi-directional many-to-one association to configEnvironment (all the environments "owned" by this config.
 	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="parentConfig", orphanRemoval=true)
-	private List<ConfigEnvironment> configEnvironments = new ArrayList<ConfigEnvironment>();
+	private Set<ConfigEnvironment> configEnvironments = new LinkedHashSet<ConfigEnvironment>();
 
 	//bi-directional many-to-one association to ConfigModule
 	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="config", orphanRemoval=true)
-	private List<ConfigModule> configModules = new ArrayList<ConfigModule>();
+	private Set<ConfigModule> configModules = new LinkedHashSet<ConfigModule>();
 
 	public Config() {
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -95,11 +97,11 @@ public class Config implements Serializable {
 		this.user = user;
 	}
 
-	public List<ConfigEnvironment> getConfigEnvironments() {
+	public Set<ConfigEnvironment> getConfigEnvironments() {
 		return this.configEnvironments;
 	}
 
-	public void setConfigEnvironments(List<ConfigEnvironment> configEnvironments) {
+	public void setConfigEnvironments(Set<ConfigEnvironment> configEnvironments) {
 		this.configEnvironments = configEnvironments;
 	}
 
@@ -124,11 +126,11 @@ public class Config implements Serializable {
 	public void setCurrentEnvironment(ConfigEnvironment currentEnvironment) {
 		this.currentEnvironment = currentEnvironment;
 	}
-	public List<ConfigModule> getConfigModules() {
+	public Set<ConfigModule> getConfigModules() {
 		return this.configModules;
 	}
 
-	public void setConfigModules(List<ConfigModule> configModules) {
+	public void setConfigModules(Set<ConfigModule> configModules) {
 		this.configModules = configModules;
 	}
 

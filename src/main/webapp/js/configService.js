@@ -10,7 +10,7 @@
  * stored as service properties and is restored on the $scope variable each time the controller is run/re-run.
  * The stored state in this case is the configCache variable.
  */
-var configFactory = function($http, $q) {
+var configSvcFactory = function($http, $q) {
 
 	var GET_URL = '/rest/config';
 	var SAVE_URL = '/rest/config/save';
@@ -49,10 +49,10 @@ var configFactory = function($http, $q) {
 			var deferred = $q.defer();
 			
 			if(scope.action) {
-				if(scope.action == 'addserver') {
-					var envName = scope.config.currentEnvironment.name;
-					var envUrl = scope.config.currentEnvironment.url;
-					
+				var envName = scope.config.currentEnvironment.name;
+				var envUrl = scope.config.currentEnvironment.url;
+				
+				if(scope.action == 'add environment') {
 					// Validate by ensuring the name and or url are not already present in config.environments
 					for(var e in scope.config.configEnvironments) {
 						var env = scope.config.configEnvironments[e];
@@ -67,35 +67,38 @@ var configFactory = function($http, $q) {
 					}
 
 					// Validation success, so add a new environment to the collection in config object
-					scope.config.environments[scope.config.configEnvironments.length] = {
+					scope.config.configEnvironments[scope.config.configEnvironments.length] = {
 						name: envName,
 						url:  envUrl
 					};
+					return deferred.promise;
 				}
-				else if(scope.action == 'removeserver') {
+				else if(scope.action == 'remove environment') {
 					for(var i=0; i< scope.config.configEnvironments.length; i++) {
 						var env = scope.config.configEnvironments[i];
 						if(areEqualIgnoreCase(envName, env.name)) {
 							scope.config.configEnvironments.splice(i, 1);
 						}
 					}
+					return deferred.promise;
+				}
+				else if(scope.action == 'save config') {					
+					$http({
+						method: 'POST',
+						url: SAVE_URL,
+						data: scope.config
+					}).then(
+						function successCallback(response){
+							configCache = response;
+							deferred.resolve(configCache);
+						}, 
+						function errorCallback(response){
+							deferred.reject(response);
+						}
+					);
+					return deferred.promise;
 				}
 			}
-
-			$http({
-				method: 'POST',
-				url: SAVE_URL,
-				data: scope.config
-			}).then(
-				function successCallback(response){
-					configCache = response;
-					deferred.resolve(configCache);
-				}, 
-				function errorCallback(response){
-					deferred.reject(response);
-				}
-			);
-			return deferred.promise;
 		}
 	};
 };

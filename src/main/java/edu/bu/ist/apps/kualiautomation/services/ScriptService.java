@@ -13,8 +13,10 @@ import edu.bu.ist.apps.kualiautomation.entity.User;
 
 public class ScriptService {
 
+	public static final String PERSISTENCE_NAME = "kualiautomation-HSQLDB";
+	
 	public Cycle addCycle(Cycle cycle) {
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("kualiautomation-embedded");
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
         EntityManager em = factory.createEntityManager();
         EntityTransaction trans = null;
         try {
@@ -66,7 +68,7 @@ public class ScriptService {
 	}
 	
 	public static void main(String[] args) {
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("kualiautomation-embedded");
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
         EntityManager em = factory.createEntityManager();
         
         try {

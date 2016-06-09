@@ -46,7 +46,7 @@ public class Module implements Serializable {
 	private String name;
 
 	@Column(nullable=false)
-	private int sequence;
+	private Integer sequence;
 
 	//bi-directional many-to-one association to Suite
 	@ManyToOne
@@ -60,11 +60,11 @@ public class Module implements Serializable {
 	public Module() {
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

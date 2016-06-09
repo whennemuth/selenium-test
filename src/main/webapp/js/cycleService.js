@@ -3,7 +3,7 @@ var GET_EMPTY_CYCLE_URL = '/rest/cycle/empty';
 var GET_CYCLE_BY_ID_URL = '/rest/cycle/lookup/';	// tack id on to the end as a path variable
 var SAVE_CYCLE_URL = '/rest/cycle/save';
 
-var cycleFactory = function($http, $q) {
+var cycleSvcFactory = function($http, $q) {
 	
 	var emptyCycleJson;
 	var thisCycle;
