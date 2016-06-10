@@ -3,6 +3,8 @@ package edu.bu.ist.apps.kualiautomation.util;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,7 +104,11 @@ public class EntityInspector {
 		}
 		return primaryKeyType;
 	}
-	
+
+	public Field getPrimaryKeyField() {
+		return getAnnotatedField(inspectableClass, Id.class);
+	}
+
 	/**
 	 * Iterate over fields and methods of the 
 	 * @param annotationClass
@@ -131,9 +137,9 @@ public class EntityInspector {
 	 * @param annotationClass
 	 * @return
 	 */
-	private Field getAnnotatedField(Class<?> clazz, Class<Annotation> annotationClass) {
+	private Field getAnnotatedField(Class<?> clazz, Class<?> annotationClass) {
 		for(Field f : clazz.getDeclaredFields()) {
-			Annotation a = f.getAnnotation(annotationClass);
+			Annotation a = f.getAnnotation((Class<Annotation>) annotationClass);
 			if(a != null && a.annotationType().equals(annotationClass)) {
 				return f;
 			}
@@ -151,9 +157,9 @@ public class EntityInspector {
 	 * @param annotationClass
 	 * @return
 	 */
-	private Method getAnnotatedMethod(Class<?> clazz, Class<Annotation> annotationClass) {
+	private Method getAnnotatedMethod(Class<?> clazz, Class<?> annotationClass) {
 		for(Method m : clazz.getMethods()) {
-			Annotation a = m.getAnnotation(annotationClass);
+			Annotation a = m.getAnnotation((Class<Annotation>) annotationClass);
 			if(a != null && a.annotationType().equals(annotationClass)) {
 				return m;
 			}
@@ -174,5 +180,55 @@ public class EntityInspector {
 		return a != null;
 	}
 	
+	public static boolean isEntity(Class<?> clazz) {
+		if(clazz == null)
+			return false;
+		try {
+			EntityInspector ei = new EntityInspector(clazz);
+			return ei.isEntity();
+		}
+		catch(Exception e) {
+			return false;
+		}
+	}
+		
+	public static boolean isEntity(Object o) {
+		if(o == null)
+			return false;
+		try {
+			EntityInspector ei = new EntityInspector(o);
+			return ei.isEntity();
+		}
+		catch(Exception e) {
+			return false;
+		}
+	}
+	
+	public static boolean returnsEntity(Method m) {
+		if(m.getReturnType() == null)
+			return false;
+		return isEntity(m.getReturnType());
+	}
+
+	public static boolean returnsEntityCollection(Method getterMethod) {
+		Type type = getCollectionType(getterMethod);
+		if(type == null)
+			return false;
+		else
+			return isEntity(type.getClass());
+	}
+
+	public static Type getCollectionType(Method getterMethod) {
+		Type type = getterMethod.getGenericReturnType();
+		if(getterMethod != null) {			
+			if(type instanceof ParameterizedType) {
+				ParameterizedType pt = (ParameterizedType) type;
+				if(pt.getActualTypeArguments().length == 1) {
+					return pt.getActualTypeArguments()[0];
+				}
+			}
+		}
+		return null;
+	}
 }
 

@@ -1,6 +1,9 @@
 package edu.bu.ist.apps.kualiautomation.util;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
+
+import edu.bu.ist.apps.kualiautomation.entity.User;
 
 /**
  * Populate a bean through its setters from the getters of another bean.
@@ -13,11 +16,17 @@ import java.lang.reflect.Method;
 public class SimpleBeanPopulator {
 	
 	private boolean ignoreEmpties;
+	private EntityPopulator entityPopulator;
 	
 	public SimpleBeanPopulator() { }
 		
 	public SimpleBeanPopulator(boolean ignoreEmpties) {
 		this.ignoreEmpties = ignoreEmpties;
+	}
+	
+	public SimpleBeanPopulator(EntityPopulator entityPopulator, boolean ignoreEmpties) {
+		this.ignoreEmpties = ignoreEmpties;
+		this.entityPopulator = entityPopulator;
 	}
 		
 	public void populate(Object beanToPopulate, Object sourceBean) {
@@ -33,7 +42,22 @@ public class SimpleBeanPopulator {
 				}
 				
 				Object val = getterMethod.invoke(sourceBean);
+				
+				if(handleAsEntity(val)) {
+					boolean populated = entityPopulator.populate(beanToPopulate, getterMethod.getName(), val);
+					if(populated)
+						continue;
+				}
+				
+				if(handleAsEntityCollection(val, getterMethod)) {
+					Collection<?> sourceCollection = (Collection<?>) val;
+					Collection<?> targetCollection = (Collection<?>) Utils.getAccessorValue(val.getClass(), getterMethod.getName());
+					entityPopulator.populateCollection(targetCollection, getterMethod, sourceCollection);
+					continue;
+				}
+				
 				val = getConvertedValue(val, getterMethod, setterMethod.getParameterTypes()[0]);
+				
 				if(val == null) {
 					continue;	// Insufficient functionality to convert the accessor output to the mutator parameter type.
 								// More work can be done to increase conversion capability, but it captures the common scenarios.
@@ -47,6 +71,7 @@ public class SimpleBeanPopulator {
 				setterMethod.invoke(beanToPopulate, val);
 			} 
 			catch (Exception e) {
+				e.printStackTrace(System.out);
 				if(errors.length() > 0)
 					errors.append(", ");
 				errors.append(getterMethod.getName());
@@ -56,6 +81,19 @@ public class SimpleBeanPopulator {
 		if(errors.length() > 0) {
 			System.out.println("Field setter failures for " + beanToPopulate.getClass().getName() + ": " + errors);
 		}
+	}
+	
+	private boolean handleAsEntity(Object val) {
+		return EntityInspector.isEntity(val) && entityPopulator != null;
+	}
+	
+	private boolean handleAsEntityCollection(Object val, Method getterMethod) throws Exception {
+		if(val instanceof Collection) {
+			if(EntityInspector.returnsEntityCollection(getterMethod)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -70,7 +108,6 @@ public class SimpleBeanPopulator {
 	 * @throws Exception
 	 */
 	private Object getConvertedValue(Object val, Method getterMethod, Class<?> targetClass) throws Exception {
-		
 		if(val == null) {
 			return null;
 		}
@@ -143,7 +180,13 @@ public class SimpleBeanPopulator {
 			// For future enhancement. May require injecting in a field/date expression map.
 			break;
 		}
-// RESUME NEXT: Add case for Object recursion		
+
 		return null;
+	}
+	
+	public static void main(String[] args) {
+		User user1 = new User();
+		User user2 = new User();
+		(new SimpleBeanPopulator()).populate(user1, user2);
 	}
 }

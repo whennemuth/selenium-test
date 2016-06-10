@@ -15,6 +15,7 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigModule;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
 import edu.bu.ist.apps.kualiautomation.entity.User;
 import edu.bu.ist.apps.kualiautomation.util.BeanPopulator;
+import edu.bu.ist.apps.kualiautomation.util.EntityPopulator;
 import edu.bu.ist.apps.kualiautomation.util.SimpleBeanPopulator;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
@@ -105,13 +106,15 @@ public class ConfigService2 {
 		    }
 		    else {
 		    	cfgEntity = em.find(Config.class, cfg.getId());
-		    	SimpleBeanPopulator populator = new SimpleBeanPopulator(true);
+		    	EntityPopulator ep = new EntityPopulator(em, true);
+		    	SimpleBeanPopulator populator = new SimpleBeanPopulator(ep, true);
 		    	populator.populate(cfgEntity, cfg);
 		    	em.merge(cfgEntity);
 		    }
 		    
 		    System.out.println("Committing...");
-		    trans.commit();
+		    //trans.commit();
+		    trans.rollback();
 			
 		    if(cfgEntity == null)
 		    	return cfg;

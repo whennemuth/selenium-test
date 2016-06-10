@@ -29,9 +29,15 @@ public class Utils {
 	public static String getMutatorName(String fldName) {
 		if(fldName == null)
 			return null;
-		String setter = new String(fldName);
-		if(!fldName.startsWith("set")) {
-			setter = "set" + setter.substring(0, 1).toUpperCase() + setter.substring(1);
+		String setter = null;
+		if(fldName.matches("((get)|(is))[A-Z].*")) {
+			setter = new String(fldName.replaceFirst("get", "set"));
+		}
+		else if(fldName.matches("(set)[A-Z].*")) {
+			setter = new String(fldName);
+		}
+		else {
+			setter = new String("set" + fldName.substring(0, 1).toUpperCase() + fldName.substring(1));
 		}
 		return setter;
 	}

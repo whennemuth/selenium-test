@@ -101,7 +101,7 @@ public class BeanPopulator {
 				}
 					
 				Object fv = null;
-				if(isEntity(o))
+				if(EntityInspector.isEntity(o))
 					fv = o;
 				else 
 					fv = valueFilter.convertStringValue(m.getParameterTypes()[0], stringValue, methodName, valueFilter);
@@ -113,18 +113,6 @@ public class BeanPopulator {
 					m.invoke(bean, fv);
 				}
 			}
-		}
-	}
-	
-	private boolean isEntity(Object o) {
-		if(o == null)
-			return false;
-		try {
-			EntityInspector ei = new EntityInspector(o);
-			return ei.isEntity();
-		}
-		catch(Exception e) {
-			return false;
 		}
 	}
 	
