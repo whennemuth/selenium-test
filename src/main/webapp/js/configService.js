@@ -32,11 +32,11 @@ var configSvcFactory = function($http, $q) {
 			}
 			else {
 				$http.get(GET_URL)
-				.success(function(response) {
-					configCache = response
+				.success(function(ServiceResponse) {
+					configCache = ServiceResponse.data;
 					deferred.resolve(configCache);
-				}).error(function(response){
-					deferred.reject(response);
+				}).error(function(ServiceResponse){
+					deferred.reject(ServiceResponse);
 				});
 			}
 			return deferred.promise;
@@ -88,12 +88,12 @@ var configSvcFactory = function($http, $q) {
 						url: SAVE_URL,
 						data: scope.config
 					}).then(
-						function successCallback(response){
-							configCache = response;
+						function successCallback(ServiceResponse){
+							configCache = ServiceResponse.data.data;
 							deferred.resolve(configCache);
 						}, 
-						function errorCallback(response){
-							deferred.reject(response);
+						function errorCallback(ServiceResponse){
+							deferred.reject(ServiceResponse);
 						}
 					);
 					return deferred.promise;

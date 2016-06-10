@@ -16,6 +16,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -32,6 +34,7 @@ import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
 @Entity
 @Table(name="config_environment")
 @NamedQuery(name="ConfigEnvironment.findAll", query="SELECT c FROM ConfigEnvironment c")
+//@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope=ConfigEnvironment.class) // Avoids infinite loop in bidirectional joins
 public class ConfigEnvironment implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -60,11 +63,11 @@ public class ConfigEnvironment implements Serializable {
 
 	//bi-directional many-to-one association to Config
 	@ManyToOne
-	@JoinColumn(name="config_id"/*, nullable=false*/)
+	@JoinColumn(name="config_id", nullable=false)
 	private Config parentConfig;
 	
 	@OneToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-	@JoinColumn(name="config_id"/*, nullable=false*/, insertable=false, updatable=false)
+	@JoinColumn(name="config_id", nullable=false, insertable=false, updatable=false)
 	private Config configWhoIamCurrentFor;
 
 	public ConfigEnvironment() {

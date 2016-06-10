@@ -2,9 +2,7 @@ package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -22,10 +20,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
@@ -41,6 +42,7 @@ import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
 	@NamedQuery(name="Config.findAll", query="SELECT c FROM Config c"),
 	@NamedQuery(name="Config.findByUserId", query="SELECT c FROM Config c where c.user.id = :userid")
 })
+//@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Config.class) // Avoids infinite loop in bidirectional joins
 public class Config implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -54,11 +56,11 @@ public class Config implements Serializable {
 
 	//bi-directional many-to-one association to User
 	@ManyToOne
-	@JoinColumn(name="user_id"/*, nullable=false*/)
+	@JoinColumn(name="user_id", nullable=false)
 	private User user;
 
 	//One of the environments "owned" by this config - the currently selected environment
-	@OneToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="configWhoIamCurrentFor", orphanRemoval=true)
+	@OneToOne(cascade={CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.PERSIST}, fetch=FetchType.EAGER, mappedBy="configWhoIamCurrentFor", orphanRemoval=true)
 	ConfigEnvironment currentEnvironment;
 	
 	//bi-directional many-to-one association to configEnvironment (all the environments "owned" by this config.
@@ -149,12 +151,34 @@ public class Config implements Serializable {
 	}
 
 	public static class UserFieldSerializer extends JsonSerializer<User> {
+
 		@Override public void serialize(
 				User user, 
 				JsonGenerator generator, 
 				SerializerProvider provider) throws IOException, JsonProcessingException {
 			
-			(new CustomJsonSerializer<User>()).serialize(user, generator, provider);
+			generator.writeStartObject();
+			generator.writeNumberField("id", user.getId());
+			generator.writeStringField("firstName", user.getFirstName());
+			generator.writeStringField("lastName", user.getLastName());
+			
+			generator.writeArrayFieldStart("cycles");
+			for(Cycle c : user.getCycles()) {
+				generator.writeObject(c);
+			}			
+			generator.writeEndArray();
+			
+			generator.writeArrayFieldStart("configs");
+			for(Config c : user.getConfigs()) {
+				generator.writeStartObject();
+				generator.writeNumberField("id", c.getId());
+				generator.writeEndObject();
+			}
+			generator.writeEndArray();
+			
+			generator.writeEndObject();
+
+//			(new CustomJsonSerializer<User>()).serialize(user, generator, provider);
 		}
 	}
 

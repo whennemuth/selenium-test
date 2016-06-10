@@ -22,6 +22,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment.ConfigFieldSerializer;
@@ -34,6 +36,7 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment.ConfigFieldSeria
 @Entity
 @Table(name="config_module")
 @NamedQuery(name="ConfigModule.findAll", query="SELECT c FROM ConfigModule c")
+//@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope=ConfigModule.class) // Avoids infinite loop in bidirectional joins
 public class ConfigModule implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -64,7 +67,7 @@ public class ConfigModule implements Serializable {
 
 	//bi-directional many-to-one association to Config
 	@ManyToOne
-	@JoinColumn(name="config_id"/*, nullable=false*/)
+	@JoinColumn(name="config_id", nullable=false)
 	private Config config;
 	
 	/**

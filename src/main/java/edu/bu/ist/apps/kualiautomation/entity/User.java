@@ -1,9 +1,22 @@
 package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.Serializable;
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 
 /**
@@ -13,6 +26,7 @@ import java.util.List;
 @Entity
 @Table(name="user")
 @NamedQuery(name="User.findAll", query="SELECT u FROM User u")
+//@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope=User.class) // Avoids infinite loop in bidirectional joins
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -28,12 +42,12 @@ public class User implements Serializable {
 	private String lastName;
 
 	//bi-directional many-to-one association to Suite
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="user", orphanRemoval=true)
-	private List<Cycle> cycles = new ArrayList<Cycle>();
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="user", orphanRemoval=true)
+	private Set<Cycle> cycles = new LinkedHashSet<Cycle>();
 
 	//bi-directional many-to-one association to Config
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="user", orphanRemoval=true)
-	private List<Config> configs = new ArrayList<Config>();
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="user", orphanRemoval=true)
+	private Set<Config> configs = new LinkedHashSet<Config>();
 
 	public User() {
 	}
@@ -62,11 +76,11 @@ public class User implements Serializable {
 		this.lastName = lastName;
 	}
 
-	public List<Cycle> getCycles() {
+	public Set<Cycle> getCycles() {
 		return this.cycles;
 	}
 
-	public void setCycles(List<Cycle> cycles) {
+	public void setCycles(Set<Cycle> cycles) {
 		this.cycles = cycles;
 	}
 
@@ -83,11 +97,12 @@ public class User implements Serializable {
 
 		return cycle;
 	}
-	public List<Config> getConfigs() {
+	
+	public Set<Config> getConfigs() {
 		return this.configs;
 	}
 
-	public void setConfigs(List<Config> configs) {
+	public void setConfigs(Set<Config> configs) {
 		this.configs = configs;
 	}
 

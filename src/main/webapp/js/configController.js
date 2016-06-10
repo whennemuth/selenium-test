@@ -11,11 +11,22 @@ var configCtrlFactory = function() {
 			// Load in the existing configuration
 			if(!scope.config) {
 				configSvc.getConfig(false).then(
-						function(data) {
-							scope.config = data;
+						function(config) {
+							scope.config = config;
 						},
 						function(error) {
-							alert("Configuration retrieval error!\n" + error);
+							if(error.message) {
+								alert(
+									"Configuration retrieval error!\n\n" + 
+									error.message + '\n\n' + 
+									error.data);
+							}
+							else if(error.data) {
+								alert(error.data);
+							}
+							else {
+								alert(error);
+							}
 						}
 					);
 			}
@@ -24,11 +35,22 @@ var configCtrlFactory = function() {
 			scope.setConfig = function(action) {
 				scope.action = action;
 				configSvc.saveConfig(scope).then(
-					function(data) {
-						scope.config = data.config.data;
+					function(config) {
+						scope.config = config;
 					},
 					function(error) {
-						alert(error);
+						if(error.message) {
+							alert(
+								"Configuration save error!\n\n" + 
+								error.message + '\n\n' + 
+								error.data);
+						}
+						else if(error.data) {
+							alert(error.data);
+						}
+						else {
+							alert(error);
+						}
 					}
 				);
 			};

@@ -17,6 +17,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -33,6 +35,7 @@ import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
 @Entity
 @Table(name="config_tab")
 @NamedQuery(name="ConfigTab.findAll", query="SELECT c FROM ConfigTab c")
+//@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope=ConfigTab.class) // Avoids infinite loop in bidirectional joins
 public class ConfigTab implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -53,7 +56,7 @@ public class ConfigTab implements Serializable {
 
 	//bi-directional many-to-one association to ConfigModule
 	@ManyToOne
-	@JoinColumn(name="config_module_id"/*, nullable=false*/)
+	@JoinColumn(name="config_module_id", nullable=false)
 	private ConfigModule configModule;
 	
 	/**

@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Utils {
 
@@ -126,6 +128,9 @@ public class Utils {
 		String setterName = null;
 		if("boolean".equalsIgnoreCase(getterMethod.getReturnType().getSimpleName())) {
 			setterName = getterMethod.getName().replaceFirst("is", "set");
+			if(setterName.startsWith("get")) {
+				setterName = setterName.replaceFirst("get", "set");
+			}
 		}
 		else {
 			setterName = getterMethod.getName().replaceFirst("get", "set");
@@ -161,6 +166,59 @@ public class Utils {
 			}
 		}
 		return null;
+	}
+	
+	public static boolean isEmpty(String val) {
+		return (val == null || val.trim().length() == 0);
+	}
+	
+	public static boolean isEmpty(Object val) {
+		try {
+			return (val == null || val.toString().length() == 0);
+		} catch (Exception e) {
+			return String.valueOf(val).length() == 0;
+		}
+	}
+	
+	public static boolean anyEmpty(String... vals) {
+		for(int i=0; i<vals.length; i++) {
+			if(isEmpty(vals[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean isNumeric(String val) {
+		if(isEmpty(val))
+			return false;
+		return val.matches("\\d+");
+	}
+	
+	public static boolean isEmpty(Object o, String fldName) throws Exception {
+		Object value = getAccessorValue(o, fldName);
+		return isEmpty(value);
+	}
+
+	/**
+	 * Turn a bean into a Map
+	 * @param bean
+	 * @return
+	 * @throws Exception
+	 */
+	public static Map<String, Object> beanToMap(Object bean) throws Exception {
+		Map<String, Object> map  = new HashMap<String, Object>();		
+		Method[] methods = bean.getClass().getMethods();
+		for(Method method : methods) {
+			if(method.getName().startsWith("get")) {
+				if(method.getParameterTypes().length == 0) {
+					String fldName = getFieldName(method.getName());
+					Object fldVal = method.invoke(bean, (Object[]) null);
+					map.put(fldName, fldVal);
+				}
+			}
+		}
+		return map;
 	}
 	
 	/**

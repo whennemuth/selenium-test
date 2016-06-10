@@ -34,31 +34,37 @@ public class ConfigResource {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 			    File file = fc.getSelectedFile();
 			    dir = new Directory(file);
-				return Response.status(Status.OK).entity(dir).build();
+			    return ServiceResponse.getSuccessResponse(dir);
 			} 
 			else {
 			    dir = new Directory();
-				return Response.status(Status.CONFLICT).entity(dir).build();
+			    return ServiceResponse.getResponse(dir, Status.CONFLICT);
 			}
 		}
 		catch (HeadlessException e) {
 			dir = new Directory();
 			dir.setError(Utils.stackTraceToString(e));
 			e.printStackTrace();
-			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(dir).build();
+			return ServiceResponse.getResponse(dir, Status.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
 	@GET
 	@Path("/config")
 	public Response getConfig() throws Exception {
-		ConfigService2 svc = new ConfigService2();
-		/**
-		 * null below means omit the user because we want the config for the first - and, because we 
-		 * are ostensibly running from a jar and not a war - the only user.
-		 */
-		Config cfg = svc.getConfig(null);
-		return Response.status(Status.OK).entity(cfg).build();
+		try {
+			ConfigService2 svc = new ConfigService2();
+			/**
+			 * null below means omit the user because we want the config for the first - and, because we 
+			 * are ostensibly running from a jar and not a war - the only user.
+			 */
+			Config cfg = svc.getConfig(null);
+			return ServiceResponse.getSuccessResponse(cfg);
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+			return ServiceResponse.getExceptionResponse(e);
+		}
 	}
 	
 	@POST
@@ -67,11 +73,11 @@ public class ConfigResource {
 		try {
 			ConfigService2 svc = new ConfigService2();
 			cfg = svc.saveConfig(cfg);
-			return Response.status(Status.OK).entity(cfg).build();
+			return ServiceResponse.getSuccessResponse(cfg);
 		} 
 		catch (Exception e) {
 			e.printStackTrace(System.out);
-			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(Utils.stackTraceToString(e)).build();
+			return ServiceResponse.getExceptionResponse(e);
 		}
 	}
 }

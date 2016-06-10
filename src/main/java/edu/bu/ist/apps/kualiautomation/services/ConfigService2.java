@@ -14,7 +14,9 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigModule;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
 import edu.bu.ist.apps.kualiautomation.entity.User;
-import edu.bu.ist.apps.kualiautomation.util.EntityPersister;
+import edu.bu.ist.apps.kualiautomation.util.BeanPopulator;
+import edu.bu.ist.apps.kualiautomation.util.SimpleBeanPopulator;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 public class ConfigService2 {
 
@@ -25,9 +27,11 @@ public class ConfigService2 {
 	}
 	
 	public Config getConfig(User user) {
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
-        EntityManager em = factory.createEntityManager();
+        EntityManagerFactory factory = null;
+        EntityManager em = null;
         try {
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            em = factory.createEntityManager();
         	List<Config> configs = new ArrayList<Config>();
         	if(user == null) {
     			TypedQuery<Config> query = em.createNamedQuery("Config.findAll", Config.class);
@@ -72,54 +76,83 @@ public class ConfigService2 {
 	}
 
 	public Config saveConfig(Config cfg) throws Exception {
-		if(cfg.getUser() == null || cfg.getUser().getId() == null) {
-			
-//			EntityPersister ep = new EntityPersister(PERSISTENCE_NAME);
-//			ep.persist(cfg.getUser(), false);
-//			ep.persist(cfg, true);
-	        EntityManagerFactory factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
-	        EntityManager em = factory.createEntityManager();
-	        EntityTransaction trans = null;
-	        try {
-			    trans = em.getTransaction();
-			    trans.begin();
-			    em.persist(cfg.getUser());	
-			    
-			    
-			    for(ConfigEnvironment env : cfg.getConfigEnvironments()) {
-			    	env.setParentConfig(cfg);
-			    }
-			    cfg.getCurrentEnvironment().setParentConfig(cfg);
-			    
-			    for(ConfigModule mdl : cfg.getConfigModules()) {
-			    	mdl.setConfig(cfg);
-			    	for(ConfigTab tab : mdl.getConfigTabs()) {
-			    		tab.setConfigModule(mdl);
-			    	}
-			    }
-			    
-			    
+        EntityManagerFactory factory = null;
+        EntityManager em = null;
+        EntityTransaction trans = null;
+        try {
+    		boolean persist = cfg.getUser() == null || cfg.getUser().getId() == null;
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            em = factory.createEntityManager();
+            Config cfgEntity = null;
+            
+		    trans = em.getTransaction();
+		    trans.begin();
+		    
+		    if(persist) {
+		    	// Must null out the currentEnvironment as it will be persisted twice since it also exists in the environments collection.
+		    	if(cfg.getCurrentEnvironment() != null && cfg.getCurrentEnvironment().getId() == null) {
+		    		cfg.setCurrentEnvironment(null);
+		    	}
+			    em.persist(cfg.getUser());
+			    fixBidirectionalFields(cfg);
 			    em.persist(cfg);
-			    System.out.println("Committing...");
-			    trans.commit();
-				return cfg;
-			} 
-	        catch(Exception e) {
-	        	e.printStackTrace(System.out);
-	        	if(trans.isActive()) {
-	        		System.out.println("Rolling back!!!");
-	        		trans.rollback();
-	        	}
-	        	throw e;
-	        }
-		    finally {
-		    	if(em != null && em.isOpen())
-		    		em.close();
-		    	if(factory != null && factory.isOpen())
-		    		factory.close();
-			}			
-		}
-		return cfg;
+			    if(!cfg.getConfigEnvironments().isEmpty()) {
+			    	cfg.setCurrentEnvironment((ConfigEnvironment) cfg.getConfigEnvironments().toArray()[0]);
+			    	cfg.getCurrentEnvironment().setParentConfig(cfg);
+			    	em.merge(cfg);
+			    	System.out.println("NUMBER OF CONFIGS: " + cfg.getUser().getConfigs().size());
+			    }			    
+		    }
+		    else {
+		    	cfgEntity = em.find(Config.class, cfg.getId());
+		    	SimpleBeanPopulator populator = new SimpleBeanPopulator(true);
+		    	populator.populate(cfgEntity, cfg);
+		    	em.merge(cfgEntity);
+		    }
+		    
+		    System.out.println("Committing...");
+		    trans.commit();
+			
+		    if(cfgEntity == null)
+		    	return cfg;
+		    else
+		    	return cfgEntity;
+		} 
+        catch(Exception e) {
+        	e.printStackTrace(System.out);
+        	if(trans.isActive()) {
+        		System.out.println("Rolling back!!!");
+        		trans.rollback();
+        	}
+        	throw e;
+        }
+	    finally {
+	    	if(em != null && em.isOpen())
+	    		em.close();
+	    	if(factory != null && factory.isOpen())
+	    		factory.close();
+		}			
+	}
+	
+	/**
+	 * The config entity may have been constituted by jersey de-serialization of json at web service resource endpoints
+	 * and @ManyToOne annotated fields may be null to avoid Jackson parsing recursion issues and need to be reset.
+	 * 
+	 * @param cfg
+	 */
+	private void fixBidirectionalFields(Config cfg) {
+	    for(ConfigEnvironment env : cfg.getConfigEnvironments()) {
+	    	env.setParentConfig(cfg);
+	    }
+	    
+	    for(ConfigModule mdl : cfg.getConfigModules()) {
+	    	if(mdl.getConfig() == null)
+	    		mdl.setConfig(cfg);
+	    	for(ConfigTab tab : mdl.getConfigTabs()) {
+	    		if(tab.getConfigModule() == null)
+	    			tab.setConfigModule(mdl);
+	    	}
+	    }		
 	}
 	
 	private void setDummyModules(Config cfg) {

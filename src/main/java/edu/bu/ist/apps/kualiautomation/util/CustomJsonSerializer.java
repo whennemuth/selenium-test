@@ -25,23 +25,29 @@ public class CustomJsonSerializer <T> {
 			JsonGenerator generator, 
 			SerializerProvider provider) throws IOException, JsonProcessingException {
 
-		if(obj == null) {
-			generator.writeObject(null);
-			return;
-		}
-		else if(obj instanceof Collection) {
-			serialize((Collection<T>) obj, generator, provider);
-			return;
-		}
-		
-		Integer id = getId(obj);
-		if(id == null || id == 0) {
-			generator.writeNull();
-		}
-		else {
-			generator.writeStartObject();
-			generator.writeNumberField("id", id);
-			generator.writeEndObject();
+		try {
+			if(obj == null) {
+				generator.writeObject(null);
+				return;
+			}
+			else if(obj instanceof Collection) {
+				serialize((Collection<T>) obj, generator, provider);
+				return;
+			}
+			
+			Integer id = getId(obj);
+			
+			if(id == null || id == 0) {
+				generator.writeNull();
+			}
+			else {
+				generator.writeStartObject();
+				generator.writeNumberField("id", id);
+				generator.writeEndObject();
+			}
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -50,18 +56,23 @@ public class CustomJsonSerializer <T> {
 			JsonGenerator generator, 
 			SerializerProvider provider) throws IOException, JsonProcessingException {
 
-		if(collection == null) {
-			generator.writeObject(null);
-			return;
+		try {
+			if(collection == null) {
+				generator.writeObject(null);
+				return;
+			}
+			
+			List<Integer> ids = new ArrayList<Integer>();
+			for(T obj : collection) {
+				ids.add(getId(obj));
+			}
+			generator.writeObject(ids);
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
 		}
-		
-		List<Integer> ids = new ArrayList<Integer>();
-		for(T obj : collection) {
-			ids.add(getId(obj));
-		}
-		generator.writeObject(ids);
 	}
-
+	
 	private Integer getId(T obj) {		
 		Integer id = null;
 		try {
