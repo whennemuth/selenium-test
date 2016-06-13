@@ -43,6 +43,7 @@ public class CustomJsonSerializer <T> {
 			else {
 				generator.writeStartObject();
 				generator.writeNumberField("id", id);
+				generator.writeBooleanField("transitory", true);
 				generator.writeEndObject();
 			}
 		} 

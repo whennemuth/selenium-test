@@ -22,7 +22,7 @@ public class Utils {
 	}
 	
 	/**
-	 * Convert a field name to the standard mutator method name, ie: "name" becomes "setName"
+	 * Convert a field name to the standard mutator method name, ie: "name" or "getName" becomes "setName"
 	 * @param fldName
 	 * @return
 	 */
@@ -116,6 +116,11 @@ public class Utils {
 			return m;
 		}
 		return null;
+	}
+	
+	public static Method getMutator(String name, @SuppressWarnings("rawtypes") Class mutatorClass) {
+		name = getMutatorName(name);
+		return getMutatorMethod(name, mutatorClass);
 	}
 	
 	/**

@@ -37,7 +37,7 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment.ConfigFieldSeria
 @Table(name="config_module")
 @NamedQuery(name="ConfigModule.findAll", query="SELECT c FROM ConfigModule c")
 //@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope=ConfigModule.class) // Avoids infinite loop in bidirectional joins
-public class ConfigModule implements Serializable {
+public class ConfigModule extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id

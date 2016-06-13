@@ -113,8 +113,7 @@ public class ConfigService2 {
 		    }
 		    
 		    System.out.println("Committing...");
-		    //trans.commit();
-		    trans.rollback();
+		    trans.commit();
 			
 		    if(cfgEntity == null)
 		    	return cfg;

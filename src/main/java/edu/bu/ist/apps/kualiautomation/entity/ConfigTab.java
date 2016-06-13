@@ -36,7 +36,7 @@ import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
 @Table(name="config_tab")
 @NamedQuery(name="ConfigTab.findAll", query="SELECT c FROM ConfigTab c")
 //@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope=ConfigTab.class) // Avoids infinite loop in bidirectional joins
-public class ConfigTab implements Serializable {
+public class ConfigTab extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id

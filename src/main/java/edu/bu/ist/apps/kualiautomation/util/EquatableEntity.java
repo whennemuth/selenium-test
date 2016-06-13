@@ -7,7 +7,7 @@ public abstract class EquatableEntity {
 	
 	/**
 	 * This factory method is for an instance that will equate one entity with another 
-	 * entity if they share the primary key value (are the same entity).
+	 * entity if they share the same primary key value (are the same entity).
 	 * 
 	 * @param em
 	 * @param ignoreEmpties
@@ -44,7 +44,7 @@ public abstract class EquatableEntity {
 	 * @param ignoreEmpties
 	 * @param matcher
 	 */
-	public static EquatableEntity getInstance(Object entity, ObjectMatcher matcher) {
+	public static EquatableEntity getInstance(final Object entity, final ObjectMatcher matcher) {
 		EquatableEntity equatable = new EquatableEntity() {
 			@Override public boolean isEqualTo(EquatableEntity otherEquatable) {
 				try {

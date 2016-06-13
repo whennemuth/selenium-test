@@ -2,6 +2,7 @@ package edu.bu.ist.apps.kualiautomation.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -108,6 +109,23 @@ public class EntityInspector {
 	public Field getPrimaryKeyField() {
 		return getAnnotatedField(inspectableClass, Id.class);
 	}
+	
+	public Object getPrimaryKeyValue() throws Exception {
+		if(inspectableObj == null)
+			return null;
+		Field idFld = getPrimaryKeyField();
+		if(idFld == null)
+			return null;
+		try {
+			Object id = idFld.get(inspectableObj);
+			return id;
+		} 
+		catch (IllegalAccessException e) {
+			// The id field is private, so try the getter
+			Object id = Utils.getAccessorValue(inspectableObj, idFld.getName());
+			return id;
+		}
+	}
 
 	/**
 	 * Iterate over fields and methods of the 
@@ -212,10 +230,19 @@ public class EntityInspector {
 
 	public static boolean returnsEntityCollection(Method getterMethod) {
 		Type type = getCollectionType(getterMethod);
-		if(type == null)
+		Class<?> clazz = null;
+		if(type == null) {
 			return false;
-		else
-			return isEntity(type.getClass());
+		}
+		else {
+			try {
+				clazz = Class.forName(type.getTypeName());
+			} 
+			catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+			return isEntity(clazz);
+		}
 	}
 
 	public static Type getCollectionType(Method getterMethod) {

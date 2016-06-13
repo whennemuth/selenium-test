@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 @Table(name="user")
 @NamedQuery(name="User.findAll", query="SELECT u FROM User u")
 //@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope=User.class) // Avoids infinite loop in bidirectional joins
-public class User implements Serializable {
+public class User extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id

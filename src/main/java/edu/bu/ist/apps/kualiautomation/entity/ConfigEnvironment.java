@@ -35,7 +35,7 @@ import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
 @Table(name="config_environment")
 @NamedQuery(name="ConfigEnvironment.findAll", query="SELECT c FROM ConfigEnvironment c")
 //@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope=ConfigEnvironment.class) // Avoids infinite loop in bidirectional joins
-public class ConfigEnvironment implements Serializable {
+public class ConfigEnvironment extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	public static enum Defaults {

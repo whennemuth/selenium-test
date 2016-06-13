@@ -42,8 +42,11 @@ import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
 	@NamedQuery(name="Config.findAll", query="SELECT c FROM Config c"),
 	@NamedQuery(name="Config.findByUserId", query="SELECT c FROM Config c where c.user.id = :userid")
 })
+// NOTE: Cannot use this annotation to handle the bi-directional relationship infinite loop issue because it serializes foreign key objects
+// by their primary key values as primitives and not as a field of a containing object. This causes issues with JPA merges and persists
+// that expect objects where it finds primitives. There may be a way to compensate for this, but I don't have time.
 //@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Config.class) // Avoids infinite loop in bidirectional joins
-public class Config implements Serializable {
+public class Config extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -60,7 +63,7 @@ public class Config implements Serializable {
 	private User user;
 
 	//One of the environments "owned" by this config - the currently selected environment
-	@OneToOne(cascade={CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.PERSIST}, fetch=FetchType.EAGER, mappedBy="configWhoIamCurrentFor", orphanRemoval=true)
+	@OneToOne(cascade={CascadeType.ALL}, fetch=FetchType.EAGER, mappedBy="configWhoIamCurrentFor")
 	ConfigEnvironment currentEnvironment;
 	
 	//bi-directional many-to-one association to configEnvironment (all the environments "owned" by this config.
@@ -150,6 +153,14 @@ public class Config implements Serializable {
 		return configModule;
 	}
 
+	/**
+	 * This CustomJsonSerializer would serialize the user field with its id only to avoid the familiar
+	 * bi-directional relationship infinite loop issue. However, other fields that are not involved in
+	 * bi-direction are also skipped. This serizalizer includes those field (firstName, lastName, etc.).
+	 * 
+	 * @author Warren
+	 *
+	 */
 	public static class UserFieldSerializer extends JsonSerializer<User> {
 
 		@Override public void serialize(
@@ -172,13 +183,14 @@ public class Config implements Serializable {
 			for(Config c : user.getConfigs()) {
 				generator.writeStartObject();
 				generator.writeNumberField("id", c.getId());
+				generator.writeBooleanField("transitory", true);
 				generator.writeEndObject();
 			}
 			generator.writeEndArray();
 			
 			generator.writeEndObject();
 
-//			(new CustomJsonSerializer<User>()).serialize(user, generator, provider);
+			// (new CustomJsonSerializer<User>()).serialize(user, generator, provider);
 		}
 	}
 
