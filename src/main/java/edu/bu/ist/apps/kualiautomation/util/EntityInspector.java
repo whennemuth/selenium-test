@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 /**
  * This class wraps and entity class and provides for reflective analysis on its fields, methods and annotations
@@ -114,19 +115,23 @@ public class EntityInspector {
 		if(inspectableObj == null)
 			return null;
 		Field idFld = getPrimaryKeyField();
-		if(idFld == null)
+		return getValue(idFld);
+	}
+
+	public Object getValue(Field f) throws Exception {
+		if(f == null)
 			return null;
 		try {
-			Object id = idFld.get(inspectableObj);
+			Object id = f.get(inspectableObj);
 			return id;
 		} 
 		catch (IllegalAccessException e) {
 			// The id field is private, so try the getter
-			Object id = Utils.getAccessorValue(inspectableObj, idFld.getName());
+			Object id = Utils.getAccessorValue(inspectableObj, f.getName());
 			return id;
 		}
 	}
-
+	
 	/**
 	 * Iterate over fields and methods of the 
 	 * @param annotationClass
@@ -166,6 +171,24 @@ public class EntityInspector {
 			return getAnnotatedField(clazz.getSuperclass(),  annotationClass);
 		}
 		return null;
+	}
+	
+	public List<Field> getAnnotatedFields(Class<?> clazz, Class<?> annotationClass) {
+		List<Field> flds = new ArrayList<Field>();
+		for(Field f : clazz.getDeclaredFields()) {
+			Annotation a = f.getAnnotation((Class<Annotation>) annotationClass);
+			if(a != null && a.annotationType().equals(annotationClass)) {
+				flds.add(f);
+			}
+		}
+		if(clazz.getSuperclass() != null && clazz.getSuperclass().equals(Object.class) == false) {
+			flds.add(getAnnotatedField(clazz.getSuperclass(),  annotationClass));
+		}
+		return null;
+	}
+	
+	public List<Field> getOneToManyFields() {
+		return getAnnotatedFields(inspectableClass, OneToMany.class);
 	}
 	
 	/**

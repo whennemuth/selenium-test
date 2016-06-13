@@ -8,12 +8,15 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
+import edu.bu.ist.apps.kualiautomation.entity.ConfigModule;
+import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
 import edu.bu.ist.apps.kualiautomation.model.Directory;
 import edu.bu.ist.apps.kualiautomation.services.ConfigService2;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
@@ -66,6 +69,21 @@ public class ConfigResource {
 			return ServiceResponse.getExceptionResponse(e);
 		}
 	}
+		
+	@GET
+	@Path("/config/module/empty/{configId}")
+	public Response getEmptyModule(@PathParam("configId") Integer configId) throws Exception {
+		ConfigModule mdl = new ConfigModule();
+		Config cfg = new Config();
+		cfg.setId(configId);
+		cfg.setTransitory(true);
+		mdl.setConfig(cfg);
+		mdl.setLabel("");
+		ConfigTab tab = new ConfigTab();
+		tab.setLabel("");
+		mdl.addConfigTab(tab);
+		return ServiceResponse.getSuccessResponse(mdl);
+	}	
 	
 	@POST
 	@Path("/config/save")

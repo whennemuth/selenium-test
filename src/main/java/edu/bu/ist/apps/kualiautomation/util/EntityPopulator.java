@@ -1,5 +1,6 @@
 package edu.bu.ist.apps.kualiautomation.util;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 
 import edu.bu.ist.apps.kualiautomation.util.EquatableEntity.ObjectMatcher;
 
@@ -47,14 +49,7 @@ public class EntityPopulator {
 		}
 		else {
 			// Set the sourceEntity, but don't assume it is managed - getting a managed version first if it is not.
-			Object managedSource = null;
-			if(em.contains(sourceEntity)) {
-				managedSource = sourceEntity;
-			}
-			else {
-				Object id = (new EntityInspector(source.getEntity())).getPrimaryKeyValue();
-				managedSource = em.find(sourceEntity.getClass(), id);
-			}
+			Object managedSource = getManagedEntity(sourceEntity);
 			if(managedSource != null) {
 				Method setterMethod = Utils.getMutator(getterMethodName, objectToPopulate.getClass());
 				setterMethod.invoke(objectToPopulate, managedSource);
@@ -112,7 +107,7 @@ public class EntityPopulator {
 						System.out.println("End populating entity [" + target.getEntity().getClass().getSimpleName() + "]...");
 						// Assuming calling process will call merge on the EntityManager for an entity 
 						// further up the parent hierchy. NOTE: This requires CascadeType=MERGE or CascadeType=ALL
-						// em.persist(parentEntity);
+						// em.merge(parentEntity);
 					}
 				}
 			}
@@ -122,12 +117,33 @@ public class EntityPopulator {
 				System.out.println("Invoking method: " + adderMethod.getName() + " [" + 
 						source.getEntity().getClass().getSimpleName() + " to " + 
 						parentEntity.getClass().getSimpleName() + "]");
+				Object managedSource = getManagedEntity(source.getEntity());
+				if(managedSource == null) {
+					
+					em.persist(source.getEntity());
+					
+					EntityInspector inspector = new EntityInspector(source.getEntity());
+					for(Field collectionFld : inspector.getOneToManyFields()) {
+						Collection<?> entities = (Collection<?>) inspector.getValue(collectionFld);
+// RESUME NEXT: Figure out a way to remove the collection from source.getEntity() and add back again one by one with recursion of this function
+						for(Object entity : entities) {
+							
+						}
+					}
+				}
+				else {
+					// Assuming calling process will call merge on the EntityManager for an entity 
+					// further up the parent hierchy. NOTE: This requires CascadeType=MERGE or CascadeType=ALL					
+				}
 				adderMethod.invoke(parentEntity, source.getEntity());
-				// Assuming calling process will call persist on the EntityManager for an entity 
-				// further up the parent hierchy. NOTE: This requires CascadeType=PERSIST or CascadeType=ALL
-				// em.merge(parentEntity);
 			}
 		}
+		
+//		if(persisted) {
+//			// The targetCollection now has one or more new members. However, these may themselves need to have their
+//			// own collections increased, so run the targetCollection through this function again as the sourceCollection
+//			populateCollection(parentEntity, getterMethod, targetCollection);
+//		}
 
 		// 5) Perform entity removals from the target collection
 		for (Iterator<EquatableEntity> iterator = targets.iterator(); iterator.hasNext();) {
@@ -140,6 +156,26 @@ public class EntityPopulator {
 				em.remove(target.getEntity());
 			}
 		}	
+	}
+	
+	/**
+	 * The provided entity may not be managed by the entity manager. If so, get a managed copy from a lookup based on the primary key value.
+	 * @param entity
+	 * @return
+	 * @throws Exception
+	 */
+	private Object getManagedEntity(Object entity) throws Exception {
+		Object mangedEntity = null;
+		if(em.contains(entity)) {
+			mangedEntity = entity;
+		}
+		else {
+			Object id = (new EntityInspector(entity)).getPrimaryKeyValue();
+			if(id != null) {
+				mangedEntity = em.find(entity.getClass(), id);
+			}
+		}
+		return mangedEntity;
 	}
 	
 	private Method getAddRemoveFromGetter(Object parentEntity, Method getterMethod, String action) throws Exception {
@@ -166,5 +202,41 @@ public class EntityPopulator {
 				em.merge(o);
 			}
 		}
+	}
+
+	public void rollback() {
+		if(em == null)
+			return;
+	    if(em.isOpen()) {
+            if(em.isJoinedToTransaction()) {
+                EntityTransaction tx = em.getTransaction();
+                if(tx.isActive()) {
+                    if(!tx.getRollbackOnly()) {
+                        System.out.println("About to rollback transaction, but transaction is already set to rollbackOnly");
+                    }
+                    try {
+                    	System.out.println("Entity populator rolling back!!!");
+                        tx.rollback();
+                    }
+                    catch( Exception e ) {
+                       e.printStackTrace(System.out);
+                    }
+                }
+            }
+	    }
+	}
+
+	public boolean isActive() {
+		if(em != null && em.isOpen()) {
+			if(em.isJoinedToTransaction()) {
+                EntityTransaction tx = em.getTransaction();
+                if(tx.isActive()) {
+                    if(!tx.getRollbackOnly()) {
+                    	return true;
+                    }
+                }
+			}
+		}
+		return false;
 	}
 }

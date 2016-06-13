@@ -20,16 +20,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
 
 
 /**
@@ -63,15 +58,15 @@ public class Config extends AbstractEntity implements Serializable {
 	private User user;
 
 	//One of the environments "owned" by this config - the currently selected environment
-	@OneToOne(cascade={CascadeType.ALL}, fetch=FetchType.EAGER, mappedBy="configWhoIamCurrentFor")
+	@OneToOne(cascade={CascadeType.MERGE}, fetch=FetchType.EAGER, mappedBy="configWhoIamCurrentFor")
 	ConfigEnvironment currentEnvironment;
 	
 	//bi-directional many-to-one association to configEnvironment (all the environments "owned" by this config.
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="parentConfig", orphanRemoval=true)
+	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.EAGER, mappedBy="parentConfig")
 	private Set<ConfigEnvironment> configEnvironments = new LinkedHashSet<ConfigEnvironment>();
 
 	//bi-directional many-to-one association to ConfigModule
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="config", orphanRemoval=true)
+	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.EAGER, mappedBy="config")
 	private Set<ConfigModule> configModules = new LinkedHashSet<ConfigModule>();
 
 	public Config() {

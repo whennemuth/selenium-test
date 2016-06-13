@@ -15,7 +15,9 @@ var configSvcFactory = function($http, $q) {
 	var GET_URL = '/rest/config';
 	var SAVE_URL = '/rest/config/save';
 	var SET_DIR_URL = '/rest/config/relocate';
+	var GET_EMPTY_MODULE_URL = '/rest/config/module/empty';
 	
+	var emptyModuleJson;
 	var configCache;
 	
 	return {
@@ -42,6 +44,27 @@ var configSvcFactory = function($http, $q) {
 			return deferred.promise;
 		},
 		
+		getEmptyConfigModule : function(configId) {
+			var deferred = $q.defer();
+			if(emptyModuleJson) {
+				var module = null;
+				eval("module = " + angular.toJson(emptyModuleJson));
+				deferred.resolve(module);				
+			}
+			else {
+				$http.get(GET_EMPTY_MODULE_URL + "/" + configId)
+				.success(function(ServiceResponse) {
+					emptyModuleJson = ServiceResponse.data;
+					var module = null;
+					eval("module = " + angular.toJson(emptyModuleJson));
+					deferred.resolve(module);
+				}).error(function(ServiceResponse){
+					deferred.reject(ServiceResponse);
+				});				
+			}
+			return deferred.promise;
+		},
+		
 		/**
 		 * 
 		 */
@@ -49,8 +72,10 @@ var configSvcFactory = function($http, $q) {
 			var deferred = $q.defer();
 			
 			if(scope.action) {
-				var envName = scope.config.currentEnvironment.name;
-				var envUrl = scope.config.currentEnvironment.url;
+				if(scope.config.currentEnvironment) {
+					var envName = scope.config.currentEnvironment.name;
+					var envUrl = scope.config.currentEnvironment.url;
+				}
 				
 				if(scope.action == 'add environment') {
 					// Validate by ensuring the name and or url are not already present in config.environments
@@ -69,8 +94,22 @@ var configSvcFactory = function($http, $q) {
 					// Validation success, so add a new environment to the collection in config object
 					scope.config.configEnvironments[scope.config.configEnvironments.length] = {
 						name: envName,
-						url:  envUrl
+						url:  envUrl,
+						parentConfig: {id: scope.config.id, transitory: true}
 					};
+					// Avoids repeating persistence for the same new environment when it is present in the environments list and as the currentEnvironment
+					// Alternatively you could set currentEnvironment equal to one of the pre-existing environments if any exist.
+					scope.config.currentEnvironment = null;
+					return deferred.promise;
+				}
+				else if(scope.action == 'edit environment') {
+					for(var i=0; i< scope.config.configEnvironments.length; i++) {
+						var env = scope.config.configEnvironments[i];
+						if(scope.config.currentEnvironment.id == env.id) {
+							env.name = scope.config.currentEnvironment.name;
+							env.url = scope.config.currentEnvironment.url;
+						}
+					}
 					return deferred.promise;
 				}
 				else if(scope.action == 'remove environment') {
@@ -98,6 +137,9 @@ var configSvcFactory = function($http, $q) {
 					);
 					return deferred.promise;
 				}
+			}
+			else {
+				return deferred.promise;
 			}
 		}
 	};

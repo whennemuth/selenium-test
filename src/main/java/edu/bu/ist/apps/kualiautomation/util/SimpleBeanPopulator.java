@@ -30,6 +30,12 @@ public class SimpleBeanPopulator {
 	}
 		
 	public void populate(Object beanToPopulate, Object sourceBean) {
+		
+		if(entityPopulator != null && entityPopulator.isActive() == false) {
+			System.out.println("No active transaction! Cancelling bean population");
+			return;
+		}
+		
 		StringBuilder errors = new StringBuilder();
 		
 		for(Method getterMethod : sourceBean.getClass().getMethods()) {
@@ -74,6 +80,10 @@ public class SimpleBeanPopulator {
 				if(errors.length() > 0)
 					errors.append(", ");
 				errors.append(getterMethod.getName());
+				if(entityPopulator != null) {
+					entityPopulator.rollback();
+					break;
+				}
 			}
 		}
 		

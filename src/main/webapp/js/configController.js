@@ -55,6 +55,49 @@ var configCtrlFactory = function() {
 				);
 			};
 			
+			scope.insertNewModule = function(index) {
+				configSvc.getEmptyConfigModule(scope.config.id).then(
+					function(blankModule) {
+						scope.config.configModules.splice(index+1, 0, blankModule);
+					},
+					function(error) {
+						if(error.message) {
+							alert(
+								"Blank module lookup error!\n\n" + 
+								error.message + '\n\n' + 
+								error.data);
+						}
+						else if(error.data) {
+							alert(error.data);
+						}
+						else {
+							alert(error);
+						}
+					}
+				)
+			};
+			
+			scope.insertNewTab = function(parentIndex, index) {
+				configSvc.getEmptyConfigModule(scope.config.id).then(
+					function(blankModule) {
+						scope.config.configModules[parentIndex].configTabs.splice(index+1, 0, blankModule.configTabs[0]);
+					},
+					function(error) {
+						if(error.message) {
+							alert(
+								"Blank tab lookup error!\n\n" + 
+								error.message + '\n\n' + 
+								error.data);
+						}
+						else if(error.data) {
+							alert(error.data);
+						}
+						else {
+							alert(error);
+						}
+					}
+				)
+			};
 		}
 	};
 };

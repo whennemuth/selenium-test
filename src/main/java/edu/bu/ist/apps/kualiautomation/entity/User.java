@@ -42,11 +42,11 @@ public class User extends AbstractEntity implements Serializable {
 	private String lastName;
 
 	//bi-directional many-to-one association to Suite
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="user", orphanRemoval=true)
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="user")
 	private Set<Cycle> cycles = new LinkedHashSet<Cycle>();
 
 	//bi-directional many-to-one association to Config
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="user", orphanRemoval=true)
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="user")
 	private Set<Config> configs = new LinkedHashSet<Config>();
 
 	public User() {

@@ -112,8 +112,10 @@ public class ConfigService2 {
 		    	em.merge(cfgEntity);
 		    }
 		    
-		    System.out.println("Committing...");
-		    trans.commit();
+		    if(trans.isActive()) {
+			    System.out.println("Committing...");
+			    trans.commit();
+		    }
 			
 		    if(cfgEntity == null)
 		    	return cfg;
@@ -123,7 +125,7 @@ public class ConfigService2 {
         catch(Exception e) {
         	e.printStackTrace(System.out);
         	if(trans.isActive()) {
-        		System.out.println("Rolling back!!!");
+        		System.out.println("Config Service rolling back!!!");
         		trans.rollback();
         	}
         	throw e;

@@ -50,7 +50,7 @@
 		<div align=right style='margin: 5px;'>
 			<input 
 				type='button' 
-				value=' Add/Edit ' 
+				value='Add' 
 				style='padding:5px;'
 				ng-disabled="configfrm.servername.$error.required || 
 							 configfrm.serverurl.$error.required"
@@ -58,7 +58,15 @@
 				
 			<input 
 				type='button' 
-				value=' Remove ' 
+				value='Edit' 
+				style='padding:5px;'
+				ng-disabled="configfrm.servername.$error.required || 
+							 configfrm.serverurl.$error.required"
+				ng-click="setConfig('edit environment');">
+				
+			<input 
+				type='button' 
+				value='Remove' 
 				style='padding:5px;'
 				ng-disabled="configfrm.server.$error.required" 
 				ng-click="setConfig('remove environment');">
@@ -97,7 +105,7 @@
 	    		type="button" 
 	    		value="add"
 	    		ng-disabled="!m.label" 
-	    		ng-click="config.configModules.splice($index+1, 0, getBlankConfigModule());">		    
+	    		ng-click="insertNewModule($index);">		    
 			<input 
 				type="button" 
 				value="remove" 
@@ -113,11 +121,11 @@
 	    		<input 
 	    			type="button" value="add" 
 	    			ng-disabled="!t.label" 
-	    			ng-click="config.configModules.splice($index+1, 0, getBlankConfigModule().configTabs[0]);">		    
+	    			ng-click="insertNewTab($parent.$index, $index);">		    
 				<input 
 					type="button" 
 					value="remove" 
-					ng-click="t.configTabs.splice($index, 1);">
+					ng-click="config.configModules[$parent.$index].configTabs.splice($index, 1);">
 			</div>
 		</div>
 	</div>
