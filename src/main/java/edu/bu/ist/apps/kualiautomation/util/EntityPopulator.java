@@ -1,8 +1,6 @@
 package edu.bu.ist.apps.kualiautomation.util;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -116,20 +114,19 @@ public class EntityPopulator {
 				// BIG ASSUMPTION: the target parent entity will have an "add" method for adding to corresponding collection.
 				System.out.println("Invoking method: " + adderMethod.getName() + " [" + 
 						source.getEntity().getClass().getSimpleName() + " to " + 
-						parentEntity.getClass().getSimpleName() + "]");
+						parentEntity.getClass().getSimpleName() + "]");				
+				adderMethod.invoke(parentEntity, source.getEntity());
+				
+				// 4c) Handle the @OneToMany fields of the entity
 				Object managedSource = getManagedEntity(source.getEntity());
-				if(managedSource == null) {
-					
+				if(managedSource == null) {					
 					EntitySaver saver = new EntitySaver(em, source.getEntity());
 					saver.persist();
-					
-					throw new RuntimeException("STOPPING HERE");
 				}
 				else {
 					// Assuming calling process will call merge on the EntityManager for an entity 
 					// further up the parent hierchy. NOTE: This requires CascadeType=MERGE or CascadeType=ALL					
 				}
-				adderMethod.invoke(parentEntity, source.getEntity());
 			}
 		}
 		
@@ -215,4 +212,10 @@ public class EntityPopulator {
 		}
 		return false;
 	}
+
+	public EntityManager getEntityManager() {
+		return em;
+	}
+	
+	
 }

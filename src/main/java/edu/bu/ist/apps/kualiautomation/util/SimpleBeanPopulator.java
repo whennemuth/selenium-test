@@ -109,7 +109,7 @@ public class SimpleBeanPopulator {
 	}
 	
 	private boolean handledAsEntityCollection(Object beanToPopulate, Object val, Method getterMethod, Object sourceBean) throws Exception {
-		if(val instanceof Collection) {
+		if(val instanceof Collection) { System.out.println("hello");
 			if(EntityInspector.returnsEntityCollection(getterMethod)) {
 				if(!isTransitory(sourceBean)) {
 					Collection<?> sourceCollection = (Collection<?>) val;
@@ -122,7 +122,7 @@ public class SimpleBeanPopulator {
 	}
 	
 	private boolean isTransitory(Object bean) throws Exception {
-		Boolean transitory = (Boolean) Utils.getAccessorValue(bean, "isTransitory");
+		Boolean transitory = (Boolean) Utils.getAccessorValue(bean, "transitory");
 		if(transitory == null)
 			return false;
 		return transitory;

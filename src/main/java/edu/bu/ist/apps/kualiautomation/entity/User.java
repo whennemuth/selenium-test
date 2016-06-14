@@ -46,6 +46,7 @@ public class User extends AbstractEntity implements Serializable {
 	private Set<Cycle> cycles = new LinkedHashSet<Cycle>();
 
 	//bi-directional many-to-one association to Config
+//	@OneToMany(/*cascade=CascadeType.ALL,*/ fetch=FetchType.EAGER, mappedBy="user")
 	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="user")
 	private Set<Config> configs = new LinkedHashSet<Config>();
 

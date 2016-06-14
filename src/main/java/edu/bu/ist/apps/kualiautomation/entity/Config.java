@@ -53,13 +53,14 @@ public class Config extends AbstractEntity implements Serializable {
 	private boolean headless;
 
 	//bi-directional many-to-one association to User
+//	@ManyToOne(cascade=CascadeType.MERGE)
 	@ManyToOne
 	@JoinColumn(name="user_id", nullable=false)
 	private User user;
 
 	//One of the environments "owned" by this config - the currently selected environment
-	@OneToOne(cascade={CascadeType.MERGE}, fetch=FetchType.EAGER, mappedBy="configWhoIamCurrentFor")
-	ConfigEnvironment currentEnvironment;
+//	@OneToOne(cascade={CascadeType.MERGE}, fetch=FetchType.EAGER, mappedBy="configWhoIamCurrentFor")
+//	ConfigEnvironment currentEnvironment;
 	
 	//bi-directional many-to-one association to configEnvironment (all the environments "owned" by this config.
 	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.EAGER, mappedBy="parentConfig")
@@ -120,11 +121,14 @@ public class Config extends AbstractEntity implements Serializable {
 	}
 	
 	public ConfigEnvironment getCurrentEnvironment() {
-		return currentEnvironment;
+		if(configEnvironments.isEmpty()) {
+			return null;
+		}
+		return (ConfigEnvironment) configEnvironments.toArray()[0];
 	}
 
 	public void setCurrentEnvironment(ConfigEnvironment currentEnvironment) {
-		this.currentEnvironment = currentEnvironment;
+		//this.currentEnvironment = currentEnvironment;
 	}
 	public Set<ConfigModule> getConfigModules() {
 		return this.configModules;

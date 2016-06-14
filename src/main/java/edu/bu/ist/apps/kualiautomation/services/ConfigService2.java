@@ -106,6 +106,8 @@ public class ConfigService2 {
 		    }
 		    else {
 		    	cfgEntity = em.find(Config.class, cfg.getId());
+//		    	User user = em.merge(cfg.getUser());
+//		    	cfgEntity = em.merge(cfg);
 		    	EntityPopulator ep = new EntityPopulator(em, true);
 		    	SimpleBeanPopulator populator = new SimpleBeanPopulator(ep, true);
 		    	populator.populate(cfgEntity, cfg);

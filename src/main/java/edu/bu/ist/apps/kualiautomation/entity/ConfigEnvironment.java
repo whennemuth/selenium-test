@@ -66,9 +66,9 @@ public class ConfigEnvironment extends AbstractEntity implements Serializable {
 	@JoinColumn(name="config_id", nullable=false)
 	private Config parentConfig;
 	
-	@OneToOne(cascade=CascadeType.MERGE, fetch=FetchType.EAGER)
-	@JoinColumn(name="config_id", nullable=false, insertable=false, updatable=false)
-	private Config configWhoIamCurrentFor;
+//	@OneToOne(cascade=CascadeType.MERGE, fetch=FetchType.EAGER)
+//	@JoinColumn(name="config_id", nullable=false, insertable=false, updatable=false)
+//	private Config configWhoIamCurrentFor;
 
 	public ConfigEnvironment() {
 	}

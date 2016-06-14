@@ -98,6 +98,10 @@ var configCtrlFactory = function() {
 					}
 				)
 			};
+			
+			scope.removeTab = function(parentIndex, index) {
+				
+			}
 		}
 	};
 };

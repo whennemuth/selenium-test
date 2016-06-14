@@ -3,6 +3,8 @@ package edu.bu.ist.apps.kualiautomation.util;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URLDecoder;
@@ -54,11 +56,19 @@ public class Utils {
 			return false;
 		if(m.getReturnType() == null)
 			return false;
-		if(!m.getName().matches("((get)|(is))[A-Z].*")) 
+		if(!isAccessorName(m.getName())) 
 			return false;
 		if(m.getParameterTypes().length != 0)
 			return false;
 		
+		return true;
+	}
+	
+	public static boolean isAccessorName(String methodName) {
+		if(methodName == null)
+			return false;
+		if(!methodName.matches("((get)|(is))[A-Z].*")) 
+			return false;
 		return true;
 	}
 	
@@ -71,10 +81,21 @@ public class Utils {
 		return methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
 	}
 		
-	public static String getAccessorName(String fldName) {
+	public static String getAccessorName(String fldName, boolean isBoolean) {
+		String prefix = isBoolean ? "is" : "get";
 		if(fldName == null)
 			return null;
-		return getMutatorName(fldName).replaceFirst("set", "get");
+		String retval = null;
+		if(fldName.matches("(set)[A-Z].*")) {
+			retval = new String(fldName.replaceFirst("set", "get"));
+		}
+		else if(fldName.matches("(" + prefix + ")[A-Z].*")) {
+			retval = new String(fldName);
+		}
+		else {
+			retval = new String(prefix + fldName.substring(0, 1).toUpperCase() + fldName.substring(1));
+		}
+		return retval;
 	}
 	
 	public static Object getAccessorValue(Object o, String fldName) throws Exception {
@@ -95,13 +116,25 @@ public class Utils {
 		if(fldName == null || o == null)
 			return null;
 		Object val = null;
-		String methodName = getAccessorName(fldName);
+		boolean isBoolean = false;
+		Field fld = getField(fldName, o.getClass());
+		if(fld != null)
+			isBoolean = fld.getType().getName().toLowerCase().matches("boolean");
+		String methodName = getAccessorName(fldName, isBoolean);
 		Method method = getMethod(methodName, o.getClass(), true);
 		if(method != null) {
 			val = method.invoke(o);
 		}
 		return val;
-	}	
+	}
+	
+	public static Method getAccessorMethod(Object o, Field fld) {
+		if(o == null || fld == null)
+			return null;
+		boolean isBoolean = fld.getClass().getSimpleName().toLowerCase().matches("boolean");
+		String methodName = getAccessorName(fld.getName(), isBoolean);
+		return getMethod(methodName, o.getClass());
+	}
 	
 	/**
 	 * This method is an alternative to using the getMethod(String name, Class... parameterTypes) method
@@ -202,6 +235,18 @@ public class Utils {
 			if(m.getName().equals(methodName) || (ignorecase && m.getName().equalsIgnoreCase(methodName))) {
 				return m;
 			}
+		}
+		return null;
+	}
+	
+	public static Field getField(String fldname, Class<?> clazz) {
+		for(Field f : clazz.getDeclaredFields()) {
+			if(f.getName().equals(fldname)) {
+				return f;
+			}
+		}
+		if(clazz.getSuperclass() != null && clazz.getSuperclass().equals(Object.class) == false) {
+			return getField(fldname, clazz.getSuperclass());
 		}
 		return null;
 	}
