@@ -14,5 +14,6 @@ public class AbstractEntity {
 	public void setTransitory(boolean transitory) {
 		this.transitory = transitory;
 	}
-	
+
+	// http://stackoverflow.com/questions/1795649/jpa-persisting-a-one-to-many-relationship
 }
