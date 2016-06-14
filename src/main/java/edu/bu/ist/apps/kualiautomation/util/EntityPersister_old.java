@@ -30,7 +30,7 @@ import javax.persistence.Persistence;
  * @author wrh
  *
  */
-public class EntityPersister {
+public class EntityPersister_old {
 	
 	private String persistenceName;
     private EntityManagerFactory factory;
@@ -38,7 +38,7 @@ public class EntityPersister {
     private EntityTransaction trans;
     private boolean error;
 	
-	public EntityPersister(String persistenceName) {
+	public EntityPersister_old(String persistenceName) {
 		this.persistenceName = persistenceName;
 	}
 

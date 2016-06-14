@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -156,6 +157,32 @@ public class Utils {
 		catch (Exception e) {
 			return null;
 		}
+	}
+	
+	/**
+	 * Obtains and "add" or "remove" mutator method.
+	 * @param parent the object that has the mutator.
+	 * @param getterMethod Can be an accessor that returns an instance of type required by add OR a collection of same type.
+	 * @param action "add" or "remove"
+	 * @return
+	 * @throws Exception
+	 */
+	public static Method getMutator(Object parent, Method getterMethod, String action) throws Exception {
+		String methodName = getterMethod.getName().replaceFirst("get", action);
+		if(methodName.endsWith("s")) {
+			methodName = methodName.substring(0, methodName.length() - 1);
+		}
+		Method method = Utils.getMethod(methodName, parent.getClass());
+		Type collectionType = EntityInspector.getCollectionType(getterMethod);
+		Class<?> collectionClass = Class.forName(collectionType.getTypeName());
+		Type adderParmType = method.getParameterTypes()[0];
+		Class<?> adderParmClass = Class.forName(adderParmType.getTypeName());
+		if(!collectionClass.equals(adderParmClass)) {
+			// failed check that adder method must take a class that is equal to the one returned by the getter method
+			method = null;
+		}
+		
+		return method;
 	}
 
 	/**

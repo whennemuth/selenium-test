@@ -77,9 +77,9 @@ public class EntityPopulator {
 		List<EquatableEntity> targets = new ArrayList<EquatableEntity>();
 		
 		// 1) Get the method to use to add entities to the parentEntity
-		Method adderMethod = getAddRemoveFromGetter(parentEntity, getterMethod, "add");
+		Method adderMethod = Utils.getMutator(parentEntity, getterMethod, "add");
 		
-		Method removeMethod = getAddRemoveFromGetter(parentEntity, getterMethod, "remove");
+		Method removeMethod = Utils.getMutator(parentEntity, getterMethod, "remove");
 		
 		// 2) Get the collection that is to be updated
 		@SuppressWarnings("unchecked")
@@ -120,16 +120,10 @@ public class EntityPopulator {
 				Object managedSource = getManagedEntity(source.getEntity());
 				if(managedSource == null) {
 					
-					em.persist(source.getEntity());
+					EntitySaver saver = new EntitySaver(em, source.getEntity());
+					saver.persist();
 					
-					EntityInspector inspector = new EntityInspector(source.getEntity());
-					for(Field collectionFld : inspector.getOneToManyFields()) {
-						Collection<?> entities = (Collection<?>) inspector.getValue(collectionFld);
-// RESUME NEXT: Figure out a way to remove the collection from source.getEntity() and add back again one by one with recursion of this function
-						for(Object entity : entities) {
-							
-						}
-					}
+					throw new RuntimeException("STOPPING HERE");
 				}
 				else {
 					// Assuming calling process will call merge on the EntityManager for an entity 
@@ -176,24 +170,6 @@ public class EntityPopulator {
 			}
 		}
 		return mangedEntity;
-	}
-	
-	private Method getAddRemoveFromGetter(Object parentEntity, Method getterMethod, String action) throws Exception {
-		String methodName = getterMethod.getName().replaceFirst("get", action);
-		if(methodName.endsWith("s")) {
-			methodName = methodName.substring(0, methodName.length() - 1);
-		}
-		Method method = Utils.getMethod(methodName, parentEntity.getClass());
-		Type collectionType = EntityInspector.getCollectionType(getterMethod);
-		Class<?> collectionClass = Class.forName(collectionType.getTypeName());
-		Type adderParmType = method.getParameterTypes()[0];
-		Class<?> adderParmClass = Class.forName(adderParmType.getTypeName());
-		if(!collectionClass.equals(adderParmClass)) {
-			// failed check that adder method must take a class that is equal to the one returned by the getter method
-			method = null;
-		}
-		
-		return method;
 	}
 	
 	public void checkMerge(Object o) {

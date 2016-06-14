@@ -176,15 +176,18 @@ public class EntityInspector {
 	public List<Field> getAnnotatedFields(Class<?> clazz, Class<?> annotationClass) {
 		List<Field> flds = new ArrayList<Field>();
 		for(Field f : clazz.getDeclaredFields()) {
+			@SuppressWarnings("unchecked")
 			Annotation a = f.getAnnotation((Class<Annotation>) annotationClass);
 			if(a != null && a.annotationType().equals(annotationClass)) {
 				flds.add(f);
 			}
 		}
 		if(clazz.getSuperclass() != null && clazz.getSuperclass().equals(Object.class) == false) {
-			flds.add(getAnnotatedField(clazz.getSuperclass(),  annotationClass));
+			Field f = getAnnotatedField(clazz.getSuperclass(),  annotationClass);
+			if(f != null) 
+				flds.add(f);
 		}
-		return null;
+		return flds;
 	}
 	
 	public List<Field> getOneToManyFields() {
