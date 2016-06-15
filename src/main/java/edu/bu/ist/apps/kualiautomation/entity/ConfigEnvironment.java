@@ -3,28 +3,23 @@ package edu.bu.ist.apps.kualiautomation.entity;
 import java.io.IOException;
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
+import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
 
 
 /**
@@ -66,7 +61,7 @@ public class ConfigEnvironment extends AbstractEntity implements Serializable {
 	@JoinColumn(name="config_id", nullable=false)
 	private Config parentConfig;
 	
-//	@OneToOne(cascade=CascadeType.MERGE, fetch=FetchType.EAGER)
+//	@OneToOne(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER)
 //	@JoinColumn(name="config_id", nullable=false, insertable=false, updatable=false)
 //	private Config configWhoIamCurrentFor;
 

@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
+import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
 
 
 /**

@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.util;
+package edu.bu.ist.apps.kualiautomation.entity.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,6 +8,8 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializerProvider;
+
+import edu.bu.ist.apps.kualiautomation.util.ReflectionUtils;
 
 /**
  * Due to bi-directional references between entity classes, the json ObjectMapper gets stuck in a 
@@ -77,7 +79,7 @@ public class CustomJsonSerializer <T> {
 	private Integer getId(T obj) {		
 		Integer id = null;
 		try {
-			id = (Integer) Utils.getAccessorValue(obj, "id");
+			id = (Integer) ReflectionUtils.getAccessorValue(obj, "id");
 		} 
 		catch (Exception e) {
 			e.printStackTrace();

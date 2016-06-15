@@ -53,7 +53,6 @@ public class Config extends AbstractEntity implements Serializable {
 	private boolean headless;
 
 	//bi-directional many-to-one association to User
-//	@ManyToOne(cascade=CascadeType.MERGE)
 	@ManyToOne
 	@JoinColumn(name="user_id", nullable=false)
 	private User user;
@@ -63,11 +62,11 @@ public class Config extends AbstractEntity implements Serializable {
 //	ConfigEnvironment currentEnvironment;
 	
 	//bi-directional many-to-one association to configEnvironment (all the environments "owned" by this config.
-	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.EAGER, mappedBy="parentConfig")
+	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="parentConfig")
 	private Set<ConfigEnvironment> configEnvironments = new LinkedHashSet<ConfigEnvironment>();
 
 	//bi-directional many-to-one association to ConfigModule
-	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.EAGER, mappedBy="config")
+	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="config")
 	private Set<ConfigModule> configModules = new LinkedHashSet<ConfigModule>();
 
 	public Config() {

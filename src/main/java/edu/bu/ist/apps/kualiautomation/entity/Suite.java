@@ -2,6 +2,7 @@ package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.IOException;
 import java.io.Serializable;
+
 import javax.persistence.*;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -10,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
+import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.List;
 @Entity
 @Table(name="suite")
 @NamedQuery(name="Suite.findAll", query="SELECT s FROM Suite s")
-public class Suite implements Serializable {
+public class Suite extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -38,7 +39,7 @@ public class Suite implements Serializable {
 	private int sequence;
 
 	//bi-directional many-to-one association to Module
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="suite")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="suite")
 	private List<Module> modules = new ArrayList<Module>();
 
 	//bi-directional many-to-one association to Cycle

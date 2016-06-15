@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
+import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
 
 
 /**
@@ -30,7 +30,7 @@ import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
 @Entity
 @Table(name="label_and_value")
 @NamedQuery(name="LabelAndValue.findAll", query="SELECT l FROM LabelAndValue l")
-public class LabelAndValue implements Serializable {
+public class LabelAndValue extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id

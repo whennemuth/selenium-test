@@ -1,37 +1,46 @@
-package edu.bu.ist.apps.kualiautomation.util;
+package edu.bu.ist.apps.kualiautomation.entity.util;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
 
 import edu.bu.ist.apps.kualiautomation.entity.User;
+import edu.bu.ist.apps.kualiautomation.util.ReflectionUtils;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**
- * Populate a bean through its setters from the getters of another bean.
- * Where the setters of the bean to populate match the getters of the source bean, an attempt to set the value will be made if 
- * the data types are the same or both are one of the following: string, integer, or boolean (conversion will occur).
+ * This is the top-level class for populating an entity.
+ * Its done with reflection through its mutator methods with values of updated fields of a corresponding "shallow" version
+ * of the entity, probably de-serialized by Jersey/Jackson enroute through a web service endpoint.
+ * 
+ * Essentially the effect is to perform what you would expect of an entity with CascadeType=ALL set on all of
+ * its foreign key bi-directionally annotated fields. Problems occur attempting that approach with an entity
+ * that has a deep, parent, grandparent setup of contained entities, where edits, removals and additions can
+ * all have been made to any of them. In other words, standard cascading would work for simple single field 
+ * or entity changes. There may be a way to have native cascading functionality work for the more complex
+ * use-case, but it eludes me for now.
  * 
  * @author whennemuth
  *
  */
-public class SimpleBeanPopulator {
+public class EntityPopulator {
 	
 	private boolean ignoreEmpties;
-	private EntityPopulator entityPopulator;
+	private Entity entity;
 	
-	public SimpleBeanPopulator() { }
+	public EntityPopulator() { }
 		
-	public SimpleBeanPopulator(boolean ignoreEmpties) {
+	public EntityPopulator(boolean ignoreEmpties) {
 		this.ignoreEmpties = ignoreEmpties;
 	}
 	
-	public SimpleBeanPopulator(EntityPopulator entityPopulator, boolean ignoreEmpties) {
+	public EntityPopulator(Entity entityPopulator, boolean ignoreEmpties) {
 		this.ignoreEmpties = ignoreEmpties;
-		this.entityPopulator = entityPopulator;
+		this.entity = entityPopulator;
 	}
 		
 	public void populate(Object beanToPopulate, Object sourceBean) {
 		
-		if(entityPopulator != null && entityPopulator.isActive() == false) {
+		if(entity != null && entity.isTransactionActive() == false) {
 			System.out.println("No active transaction! Cancelling bean population");
 			return;
 		}
@@ -41,7 +50,7 @@ public class SimpleBeanPopulator {
 		for(Method getterMethod : sourceBean.getClass().getMethods()) {
 			
 			try {
-				Method setterMethod = Utils.getMutator(getterMethod, beanToPopulate.getClass());
+				Method setterMethod = ReflectionUtils.getMutator(getterMethod, beanToPopulate.getClass());
 				
 				if(setterMethod == null) {
 					continue;
@@ -80,8 +89,8 @@ public class SimpleBeanPopulator {
 				if(errors.length() > 0)
 					errors.append(", ");
 				errors.append(getterMethod.getName());
-				if(entityPopulator != null) {
-					entityPopulator.rollback();
+				if(entity != null) {
+					entity.rollback();
 					break;
 				}
 			}
@@ -95,11 +104,11 @@ public class SimpleBeanPopulator {
 	private boolean handledAsEntity(Object beanToPopulate, Object val, Method getterMethod, Method setterMethod) throws Exception {
 		if(EntityInspector.isEntity(val)) {
 			if(!isTransitory(val)) {
-				boolean populated = entityPopulator.populate(beanToPopulate, getterMethod.getName(), val);
+				boolean populated = entity.populate(beanToPopulate, getterMethod.getName(), val);
 				if(!populated) {
 					setterMethod.invoke(beanToPopulate, val);
-					if(entityPopulator != null) {
-						entityPopulator.checkMerge(val);
+					if(entity != null) {
+						entity.checkMerge(val);
 					}
 				}
 			}
@@ -113,7 +122,7 @@ public class SimpleBeanPopulator {
 			if(EntityInspector.returnsEntityCollection(getterMethod)) {
 				if(!isTransitory(sourceBean)) {
 					Collection<?> sourceCollection = (Collection<?>) val;
-					entityPopulator.populateCollection(beanToPopulate, getterMethod, sourceCollection);
+					entity.populateCollection(beanToPopulate, getterMethod, sourceCollection);
 					return true;
 				}
 			}
@@ -122,7 +131,7 @@ public class SimpleBeanPopulator {
 	}
 	
 	private boolean isTransitory(Object bean) throws Exception {
-		Boolean transitory = (Boolean) Utils.getAccessorValue(bean, "transitory");
+		Boolean transitory = (Boolean) ReflectionUtils.getAccessorValue(bean, "transitory");
 		if(transitory == null)
 			return false;
 		return transitory;
@@ -230,6 +239,6 @@ public class SimpleBeanPopulator {
 	public static void main(String[] args) {
 		User user1 = new User();
 		User user2 = new User();
-		(new SimpleBeanPopulator()).populate(user1, user2);
+		(new EntityPopulator()).populate(user1, user2);
 	}
 }

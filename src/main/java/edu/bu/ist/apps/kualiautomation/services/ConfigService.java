@@ -1,142 +1,213 @@
 package edu.bu.ist.apps.kualiautomation.services;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.JFileChooser;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.bu.ist.apps.kualiautomation.entity.Config;
+import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
+import edu.bu.ist.apps.kualiautomation.entity.ConfigModule;
+import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
+import edu.bu.ist.apps.kualiautomation.entity.User;
+import edu.bu.ist.apps.kualiautomation.entity.util.Entity;
+import edu.bu.ist.apps.kualiautomation.entity.util.EntityPopulator;
 
-import edu.bu.ist.apps.kualiautomation.util.Utils;
-import edu.bu.ist.apps.kualiautomation.model.Config;
-import edu.bu.ist.apps.kualiautomation.model.ConfigDefaults;
-import edu.bu.ist.apps.kualiautomation.model.Directory;
-
-/**
- * @author wrh
- *
- */
 public class ConfigService {
 
-	public static final String CFG_NAME = "kualiautomation.cfg";
+	public static final String PERSISTENCE_NAME = "kualiautomation-HSQLDB";
+
+	public List<Config> getConfigs() {
+		return null;
+	}
 	
-	/**
-	 * The content of the configuration file is all json which can be reverse mapped back to a Config instance.
-	 * @return The reverse mapped instance
-	 * @throws Exception
-	 */
-	public Config getConfig() throws Exception {
-		return getConfigInstance(getConfigFile());
+	public Config getConfig(User user) {
+        EntityManagerFactory factory = null;
+        EntityManager em = null;
+        try {
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            em = factory.createEntityManager();
+        	List<Config> configs = new ArrayList<Config>();
+        	if(user == null) {
+    			TypedQuery<Config> query = em.createNamedQuery("Config.findAll", Config.class);
+    			configs = query.getResultList();
+        	}
+        	else {
+    			TypedQuery<Config> query = em.createNamedQuery("Config.findByUserId", Config.class);
+    			query.setParameter("userid", user.getId());		
+    			configs = query.getResultList();		
+        	}
+			if(configs.isEmpty()) {
+				return getEmptyConfig(true);
+			}
+			else {
+				return configs.get(0);
+			}
+		} 
+	    finally {
+	    	if(em != null && em.isOpen())
+	    		em.close();
+	    	if(factory != null && factory.isOpen())
+	    		factory.close();
+		}
 	}
 
-	/**
-	 * The configuration file is located in a config directory next to the jar file for this application.
-	 * Create it (with default values) if it does not exist and return it.
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	private File getConfigFile() throws Exception {
-		File rootdir = Utils.getRootDirectory();
-		File cfgfile = null;
-		if(rootdir != null && rootdir.isDirectory()) {
-			File configdir = new File(rootdir, "config");
-			if(!configdir.isDirectory()) {
-				configdir.mkdir();
+	private Config getEmptyConfig(boolean defaultServers) {
+		Config cfg = new Config();
+		if(defaultServers) {
+			ConfigEnvironment currentEnv = null;
+			for(ConfigEnvironment.Defaults d : ConfigEnvironment.Defaults.values()) {
+				ConfigEnvironment env = new ConfigEnvironment();
+				env.setName(d.name());
+				env.setUrl(d.getUrl());
+				cfg.addConfigEnvironment(env);
+				if(currentEnv == null)
+					currentEnv = env;
 			}
-			
-			cfgfile = new File(configdir, CFG_NAME);
-			if(!cfgfile.isFile()) {
-				createDefaultConfigFile(cfgfile);
-			}
+			cfg.setCurrentEnvironment(currentEnv);
 		}
-		return cfgfile;
-	}
-	
-	/**
-	 * Read json from a file (entire file content) and convert to a Config instance.
-	 * 
-	 * @param cfgfile
-	 * @return
-	 * @throws Exception
-	 */
-	private Config getConfigInstance(File cfgfile) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		Config cfg = mapper.readValue(cfgfile, Config.class);
+		setDummyModules(cfg);
 		return cfg;
 	}
 
-	/**
-	 * Convert a Config instance to json and save that json to a file.
-	 * 
-	 * @param cfgfile
-	 * @throws Exception
-	 */
-	private void createDefaultConfigFile(File cfgfile) throws Exception {
-		Config cfg = new Config();			
-		ConfigDefaults.populate(cfg);
-		saveConfigFile(cfg, cfgfile);		
+	public Config saveConfig(Config cfg) throws Exception {
+        EntityManagerFactory factory = null;
+        EntityManager em = null;
+        EntityTransaction trans = null;
+        try {
+    		boolean persist = cfg.getUser() == null || cfg.getUser().getId() == null;
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            em = factory.createEntityManager();
+            Config cfgEntity = null;
+            
+		    trans = em.getTransaction();
+		    trans.begin();
+		    
+		    if(persist) {
+		    	// Must null out the currentEnvironment as it will be persisted twice since it also exists in the environments collection.
+		    	if(cfg.getCurrentEnvironment() != null && cfg.getCurrentEnvironment().getId() == null) {
+		    		cfg.setCurrentEnvironment(null);
+		    	}
+			    em.persist(cfg.getUser());
+			    fixBidirectionalFields(cfg);
+			    em.persist(cfg);
+			    if(!cfg.getConfigEnvironments().isEmpty()) {
+			    	cfg.setCurrentEnvironment((ConfigEnvironment) cfg.getConfigEnvironments().toArray()[0]);
+			    	cfg.getCurrentEnvironment().setParentConfig(cfg);
+			    	em.merge(cfg);
+			    	System.out.println("NUMBER OF CONFIGS: " + cfg.getUser().getConfigs().size());
+			    }			    
+		    }
+		    else {
+		    	cfgEntity = em.find(Config.class, cfg.getId());
+//		    	User user = em.merge(cfg.getUser());
+//		    	cfgEntity = em.merge(cfg);
+		    	Entity ep = new Entity(em, true);
+		    	EntityPopulator populator = new EntityPopulator(ep, true);
+		    	populator.populate(cfgEntity, cfg);
+		    	em.merge(cfgEntity);
+		    }
+		    
+		    if(trans.isActive()) {
+			    System.out.println("Committing...");
+			    trans.commit();
+		    }
+			
+		    if(cfgEntity == null)
+		    	return cfg;
+		    else
+		    	return cfgEntity;
+		} 
+        catch(Exception e) {
+        	e.printStackTrace(System.out);
+        	if(trans.isActive()) {
+        		System.out.println("Config Service rolling back!!!");
+        		trans.rollback();
+        	}
+        	throw e;
+        }
+	    finally {
+	    	if(em != null && em.isOpen())
+	    		em.close();
+	    	if(factory != null && factory.isOpen())
+	    		factory.close();
+		}			
 	}
 	
 	/**
-	 * Save a the Config instance as json to the specified file.
+	 * The config entity may have been constituted by jersey de-serialization of json at web service resource endpoints
+	 * and @ManyToOne annotated fields may be null to avoid Jackson parsing recursion issues and need to be reset.
 	 * 
 	 * @param cfg
-	 * @param cfgfile
-	 * @throws Exception
 	 */
-	private void saveConfigFile(Config cfg, File cfgfile) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		FileOutputStream out = null;
-		try {
-			out = new FileOutputStream(cfgfile);
-			mapper.writerWithDefaultPrettyPrinter().writeValue(out, cfg);
-			out.close();
-		} 
-		finally {
-			if(out != null) {
-				out.close();
-			}
-		}		
+	private void fixBidirectionalFields(Config cfg) {
+	    for(ConfigEnvironment env : cfg.getConfigEnvironments()) {
+	    	env.setParentConfig(cfg);
+	    }
+	    
+	    for(ConfigModule mdl : cfg.getConfigModules()) {
+	    	if(mdl.getConfig() == null)
+	    		mdl.setConfig(cfg);
+	    	for(ConfigTab tab : mdl.getConfigTabs()) {
+	    		if(tab.getConfigModule() == null)
+	    			tab.setConfigModule(mdl);
+	    	}
+	    }		
 	}
 	
-	public void saveConfig(Config cfg) throws Exception {
-		cfg.setLastUpdated(new Date(System.currentTimeMillis()).toString());
-		saveConfigFile(cfg, getConfigFile());
-	}
-
-	/**
-	 * Throw up a file chooser to get the user to pick a directory on their file system.
-	 * Once selected, the configuration for the app is updated with the path of this directory and returned.
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	public Config setOutputDirectory() throws Exception {
-		Directory dir = null;
-		final JFileChooser fc = new JFileChooser();
-		fc.setCurrentDirectory(new java.io.File("."));
-		fc.setDialogTitle("Where should you output files go?");
-		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	private void setDummyModules(Config cfg) {
+		ConfigTab tab1 = new ConfigTab();
+		tab1.setLabel("tab 1");
 		
-		int returnVal = fc.showOpenDialog(null);
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-		    File file = fc.getSelectedFile();
-		    dir = new Directory(file);
-			Config cfg = getConfig();
-			cfg.setOutputDir(dir.getFilepath());
-			saveConfig(cfg);
-			return cfg;
-		} 
-		else {
-		    return null;
-		}
-	}
-
-	public static void main(String[] args) throws Exception {
-		ConfigService svc = new ConfigService();
-		Config cfg = svc.getConfig();
-		System.out.println(cfg);
+		ConfigTab tab2 = new ConfigTab();
+		tab2.setLabel("tab 2");
+		
+		ConfigTab tab3 = new ConfigTab();
+		tab3.setLabel("tab 3");
+		
+		ConfigTab tab4 = new ConfigTab();
+		tab4.setLabel("tab 4");
+		
+		ConfigTab tab5 = new ConfigTab();
+		tab5.setLabel("tab 5");
+		
+		ConfigTab tab6 = new ConfigTab();
+		tab6.setLabel("tab 6");
+		
+		ConfigTab tab7 = new ConfigTab();
+		tab7.setLabel("tab 7");
+		
+		ConfigTab tab8 = new ConfigTab();
+		tab8.setLabel("tab 8");
+		
+		ConfigTab tab9 = new ConfigTab();
+		tab9.setLabel("tab 9");
+		tab9.setInclude((byte)0);
+		
+		ConfigModule m1 = new ConfigModule();
+		m1.setLabel("module 1");
+		m1.addConfigTab(tab1);
+		m1.addConfigTab(tab2);
+		m1.addConfigTab(tab3);
+		
+		ConfigModule m2 = new ConfigModule();
+		m2.setLabel("module 2");
+		m2.addConfigTab(tab4);
+		m2.addConfigTab(tab5);
+		m2.addConfigTab(tab6);
+		
+		ConfigModule m3 = new ConfigModule();
+		m3.setLabel("module 3");
+		m3.addConfigTab(tab7);
+		m3.addConfigTab(tab8);
+		m3.addConfigTab(tab9);
+		
+		cfg.addConfigModule(m1);
+		cfg.addConfigModule(m2);
+		cfg.addConfigModule(m3);
 	}
 }

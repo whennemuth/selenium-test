@@ -25,7 +25,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="cycle")
 @NamedQuery(name="Cycle.findAll", query="SELECT c FROM Cycle c")
-public class Cycle implements Serializable {
+public class Cycle extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -40,7 +40,7 @@ public class Cycle implements Serializable {
 	private int sequence;
 
 	//bi-directional many-to-one association to Suite
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="cycle")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="cycle")
 	private List<Suite> suites = new ArrayList<Suite>();
 
 	//bi-directional many-to-one association to User

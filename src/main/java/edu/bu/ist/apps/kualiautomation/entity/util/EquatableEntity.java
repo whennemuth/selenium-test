@@ -1,6 +1,8 @@
-package edu.bu.ist.apps.kualiautomation.util;
+package edu.bu.ist.apps.kualiautomation.entity.util;
 
 import java.lang.reflect.Field;
+
+import edu.bu.ist.apps.kualiautomation.util.ReflectionUtils;
 
 public abstract class EquatableEntity {
 	private Object entity;
@@ -68,7 +70,7 @@ public abstract class EquatableEntity {
 			pk = fld.get(entity);
 		}
 		else {
-			pk = Utils.getAccessorValue(entity, fld.getName());
+			pk = ReflectionUtils.getAccessorValue(entity, fld.getName());
 		}
 		return pk;
 	}

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
+import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
 
 
 /**
@@ -34,19 +34,19 @@ import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
 @Entity
 @Table(name="module")
 @NamedQuery(name="Module.findAll", query="SELECT m FROM Module m")
-public class Module implements Serializable {
+public class Module extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(unique=true, nullable=false)
-	private int id;
+	private Integer id;
 
 	@Column(nullable=false, length=45)
 	private String name;
 
 	@Column(nullable=false)
-	private Integer sequence;
+	private int sequence;
 
 	//bi-directional many-to-one association to Suite
 	@ManyToOne
@@ -54,7 +54,7 @@ public class Module implements Serializable {
 	private Suite suite;
 
 	//bi-directional many-to-one association to Tab
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="module")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="module")
 	private List<Tab> tabs = new ArrayList<Tab>();
 
 	public Module() {

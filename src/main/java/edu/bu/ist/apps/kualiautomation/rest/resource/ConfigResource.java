@@ -18,7 +18,7 @@ import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigModule;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
 import edu.bu.ist.apps.kualiautomation.model.Directory;
-import edu.bu.ist.apps.kualiautomation.services.ConfigService2;
+import edu.bu.ist.apps.kualiautomation.services.ConfigService;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 @Path("/")
@@ -56,7 +56,7 @@ public class ConfigResource {
 	@Path("/config")
 	public Response getConfig() throws Exception {
 		try {
-			ConfigService2 svc = new ConfigService2();
+			ConfigService svc = new ConfigService();
 			/**
 			 * null below means omit the user because we want the config for the first - and, because we 
 			 * are ostensibly running from a jar and not a war - the only user.
@@ -89,7 +89,7 @@ public class ConfigResource {
 	@Path("/config/save")
 	public Response setConfig(Config cfg) {
 		try {
-			ConfigService2 svc = new ConfigService2();
+			ConfigService svc = new ConfigService();
 			cfg = svc.saveConfig(cfg);
 			return ServiceResponse.getSuccessResponse(cfg);
 		} 

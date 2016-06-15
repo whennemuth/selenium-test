@@ -63,7 +63,7 @@ public class ConfigModule extends AbstractEntity implements Serializable {
 	 * If this collection were a list you would see a MultipleBagFetchException thrown when fetching is triggered.
 	 */
 	//bi-directional many-to-one association to ConfigTab
-	@OneToMany(cascade=CascadeType.MERGE, fetch=FetchType.EAGER, mappedBy="configModule")
+	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="configModule")
 	private Set<ConfigTab> configTabs = new LinkedHashSet<ConfigTab>();
 
 	//bi-directional many-to-one association to Config

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
+import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
 
 
 /**
@@ -34,7 +34,7 @@ import edu.bu.ist.apps.kualiautomation.util.CustomJsonSerializer;
 @Entity
 @Table(name="tab")
 @NamedQuery(name="Tab.findAll", query="SELECT t FROM Tab t")
-public class Tab implements Serializable {
+public class Tab extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -49,7 +49,7 @@ public class Tab implements Serializable {
 	private int sequence;
 
 	//bi-directional many-to-one association to LabelAndValue
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="tab")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="tab")
 	private List<LabelAndValue> labelAndValues = new ArrayList<LabelAndValue>();
 
 	//bi-directional many-to-one association to Module

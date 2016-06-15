@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.util;
+package edu.bu.ist.apps.kualiautomation.entity.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -12,6 +12,8 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+
+import edu.bu.ist.apps.kualiautomation.util.ReflectionUtils;
 
 /**
  * This class wraps and entity class and provides for reflective analysis on its fields, methods and annotations
@@ -42,7 +44,7 @@ public class EntityInspector {
 		List<Method> accessors = new ArrayList<Method>();
 		Method[] methods = inspectableClass.getMethods();
 		for(Method method : methods) {
-			if(Utils.isAccessor(method)) {
+			if(ReflectionUtils.isAccessor(method)) {
 				EntityInspector inspector = new EntityInspector(method.getReturnType());
 				if(inspector.isEntity() && inspector.hasPrimaryKey()) {
 					String setterName = method.getName().replaceFirst("get", "set");
@@ -63,7 +65,7 @@ public class EntityInspector {
 	 * @return
 	 */
 	public Class<?> getEntityParm(String setterMethodName) {
-		String setterName = Utils.getMutatorName(setterMethodName);
+		String setterName = ReflectionUtils.getMutatorName(setterMethodName);
 		Method[] methods = inspectableClass.getMethods();
 		for(Method method : methods) {
 			if(method.getName().equals(setterName)) {
@@ -127,7 +129,7 @@ public class EntityInspector {
 		} 
 		catch (IllegalAccessException e) {
 			// The id field is private, so try the getter
-			Object id = Utils.getAccessorValue(inspectableObj, f.getName());
+			Object id = ReflectionUtils.getAccessorValue(inspectableObj, f.getName());
 			return id;
 		}
 	}
