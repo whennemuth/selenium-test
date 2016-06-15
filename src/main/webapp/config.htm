@@ -47,6 +47,13 @@
 				type='text' 
 				ng-model="config.currentEnvironment.url">
 		</div>
+		
+		<!-- Need to include remaining environment attributes so that config.currentEnvironment will be fully binded -->
+		<input name="serverid" type='hidden' ng-model="config.currentEnvironment.id">
+		<input name="servertrans" type='hidden' ng-model="config.currentEnvironment.transitory">
+		<input name="servercurrent" type='hidden' ng-model="config.currentEnvironment.current">
+		<input name="parentConfig" type='hidden' ng-model="config.currentEnvironment.parentConfig">
+		
 		<div align=right style='margin: 5px;'>
 			<input 
 				type='button' 
@@ -75,7 +82,7 @@
 </div>
 
 
-<div class="floatingbox width300">
+<div class="floatingbox width400">
 	<div class=sectionlabel>Head selection</div>
 	<div class=sectionarea>
 		<div class="fieldlabel"><input 
@@ -99,7 +106,7 @@
 				ng-model="config.configModules[$index].checked"> 
 			<input 
 				type="text" 
-				style="width:100px" 
+				style="width:200px" 
 				ng-model="m.label"> 
 	    	<input 
 	    		type="button" 
@@ -116,7 +123,7 @@
 				ng-show="config.configModules[$parent.$index].checked">
 				<input 
 					type="text" 
-					style="width:100px" 
+					style="width:200px" 
 					ng-model="t.label"> 
 	    		<input 
 	    			type="button" value="add" 

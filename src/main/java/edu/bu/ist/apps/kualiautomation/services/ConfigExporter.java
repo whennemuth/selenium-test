@@ -8,8 +8,8 @@ import javax.swing.JFileChooser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
-import edu.bu.ist.apps.kualiautomation.model.Config;
 import edu.bu.ist.apps.kualiautomation.model.ConfigDefaults;
 import edu.bu.ist.apps.kualiautomation.model.Directory;
 
@@ -101,8 +101,8 @@ public class ConfigExporter {
 		}		
 	}
 	
-	public void saveConfig(Config cfg) throws Exception {
-		cfg.setLastUpdated(new Date(System.currentTimeMillis()).toString());
+	public void saveConfig(Config cfg, String filepath) throws Exception {
+		//cfg.setLastUpdated(new Date(System.currentTimeMillis()).toString());
 		saveConfigFile(cfg, getConfigFile());
 	}
 
@@ -125,8 +125,7 @@ public class ConfigExporter {
 		    File file = fc.getSelectedFile();
 		    dir = new Directory(file);
 			Config cfg = getConfig();
-			cfg.setOutputDir(dir.getFilepath());
-			saveConfig(cfg);
+			saveConfig(cfg, dir.getFilepath());
 			return cfg;
 		} 
 		else {

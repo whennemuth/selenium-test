@@ -52,7 +52,11 @@ var configSvcFactory = function($http, $q) {
 				deferred.resolve(module);				
 			}
 			else {
-				$http.get(GET_EMPTY_MODULE_URL + "/" + configId)
+				var url = GET_EMPTY_MODULE_URL + "/" + configId;
+				if(configId == undefined || configId == null)
+					url = GET_EMPTY_MODULE_URL + "/0";
+					
+				$http.get(url)
 				.success(function(ServiceResponse) {
 					emptyModuleJson = ServiceResponse.data;
 					var module = null;
@@ -72,9 +76,11 @@ var configSvcFactory = function($http, $q) {
 			var deferred = $q.defer();
 			
 			if(scope.action) {
+				var envName = null;
+				var envUrl = null;
 				if(scope.config.currentEnvironment) {
-					var envName = scope.config.currentEnvironment.name;
-					var envUrl = scope.config.currentEnvironment.url;
+					envName = scope.config.currentEnvironment.name;
+					envUrl = scope.config.currentEnvironment.url;
 				}
 				
 				if(scope.action == 'add environment') {

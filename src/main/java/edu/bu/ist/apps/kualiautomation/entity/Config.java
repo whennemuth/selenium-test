@@ -26,6 +26,8 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import edu.bu.ist.apps.kualiautomation.util.Utils;
+
 
 /**
  * The persistent class for the config database table.
@@ -56,10 +58,6 @@ public class Config extends AbstractEntity implements Serializable {
 	@ManyToOne
 	@JoinColumn(name="user_id", nullable=false)
 	private User user;
-
-	//One of the environments "owned" by this config - the currently selected environment
-//	@OneToOne(cascade={CascadeType.MERGE}, fetch=FetchType.EAGER, mappedBy="configWhoIamCurrentFor")
-//	ConfigEnvironment currentEnvironment;
 	
 	//bi-directional many-to-one association to configEnvironment (all the environments "owned" by this config.
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="parentConfig")
@@ -119,15 +117,31 @@ public class Config extends AbstractEntity implements Serializable {
 		return configEnvironment;
 	}
 	
+	/**
+	 * @return The first ConfigEnvironment in configEnvironments found marked as current, else the first configEnvironment found.
+	 */
 	public ConfigEnvironment getCurrentEnvironment() {
 		if(configEnvironments.isEmpty()) {
 			return null;
 		}
-		return (ConfigEnvironment) configEnvironments.toArray()[0];
+		for(ConfigEnvironment env : configEnvironments) {
+			if(env.isCurrent())
+				return env;
+		}
+		ConfigEnvironment env = (ConfigEnvironment) configEnvironments.toArray()[0];
+		env.setCurrent(true);
+		return env;
 	}
 
 	public void setCurrentEnvironment(ConfigEnvironment currentEnvironment) {
-		//this.currentEnvironment = currentEnvironment;
+		for(ConfigEnvironment env : configEnvironments) {
+			if(!Utils.isEmpty(env.getId())) {
+				if(env.getId().equals(currentEnvironment.getId()))
+					env.setCurrent(true);
+				else
+					env.setCurrent(false);
+			}
+		}
 	}
 	public Set<ConfigModule> getConfigModules() {
 		return this.configModules;

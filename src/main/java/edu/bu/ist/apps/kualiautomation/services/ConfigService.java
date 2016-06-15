@@ -16,6 +16,7 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
 import edu.bu.ist.apps.kualiautomation.entity.User;
 import edu.bu.ist.apps.kualiautomation.entity.util.Entity;
 import edu.bu.ist.apps.kualiautomation.entity.util.EntityPopulator;
+import edu.bu.ist.apps.kualiautomation.model.ConfigDefaults;
 
 public class ConfigService {
 
@@ -25,6 +26,17 @@ public class ConfigService {
 		return null;
 	}
 	
+	/**
+	 * Find a single configuration based on user id. If the user is null, then it is assumed that
+	 * the application is running on a desktop and there is only one user, so the first configuration
+	 * found is returned, else the first configuration bearing bearing the provided user id is returned.
+	 * 
+	 * NOTE: It is assumed that any user has only one configuration.
+	 *       While this one-to-one feature is functional, it is not enforced in the database schema.
+	 * 
+	 * @param user
+	 * @return
+	 */
 	public Config getConfig(User user) {
         EntityManagerFactory factory = null;
         EntityManager em = null;
@@ -55,23 +67,55 @@ public class ConfigService {
 	    		factory.close();
 		}
 	}
-
-	private Config getEmptyConfig(boolean defaultServers) {
-		Config cfg = new Config();
-		if(defaultServers) {
-			ConfigEnvironment currentEnv = null;
-			for(ConfigEnvironment.Defaults d : ConfigEnvironment.Defaults.values()) {
-				ConfigEnvironment env = new ConfigEnvironment();
-				env.setName(d.name());
-				env.setUrl(d.getUrl());
-				cfg.addConfigEnvironment(env);
-				if(currentEnv == null)
-					currentEnv = env;
-			}
-			cfg.setCurrentEnvironment(currentEnv);
+	
+	public Config getConfigById(Integer configId) {
+        EntityManagerFactory factory = null;
+        EntityManager em = null;
+        try {
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            em = factory.createEntityManager();
+        	Config cfg = em.find(Config.class, configId);
+        	return cfg;
+		} 
+	    finally {
+	    	if(em != null && em.isOpen())
+	    		em.close();
+	    	if(factory != null && factory.isOpen())
+	    		factory.close();
 		}
-		setDummyModules(cfg);
+	}
+
+	private Config getEmptyConfig(boolean defaultEnvironments) {
+		Config cfg = new Config();
+		ConfigDefaults.populate(cfg);
+//		if(defaultEnvironments) {
+//			ConfigEnvironment currentEnv = null;
+//			for(ConfigEnvironment.Defaults d : ConfigEnvironment.Defaults.values()) {
+//				ConfigEnvironment env = new ConfigEnvironment();
+//				env.setName(d.name());
+//				env.setUrl(d.getUrl());
+//				cfg.addConfigEnvironment(env);
+//				if(currentEnv == null)
+//					currentEnv = env;
+//			}
+//			cfg.setCurrentEnvironment(currentEnv);
+//		}
+//		setDummyModules(cfg);
 		return cfg;
+	}
+	
+	public ConfigModule getEmptyConfigModule(Integer configId) {
+		ConfigModule mdl = new ConfigModule();
+		Config cfg = new Config();
+		if(configId > 0)
+			cfg.setId(configId);
+		cfg.setTransitory(true);
+		mdl.setConfig(cfg);
+		mdl.setLabel("");
+		ConfigTab tab = new ConfigTab();
+		tab.setLabel("");
+		mdl.addConfigTab(tab);
+		return mdl;
 	}
 
 	public Config saveConfig(Config cfg) throws Exception {
@@ -88,26 +132,15 @@ public class ConfigService {
 		    trans.begin();
 		    
 		    if(persist) {
-		    	// Must null out the currentEnvironment as it will be persisted twice since it also exists in the environments collection.
-		    	if(cfg.getCurrentEnvironment() != null && cfg.getCurrentEnvironment().getId() == null) {
-		    		cfg.setCurrentEnvironment(null);
-		    	}
 			    em.persist(cfg.getUser());
 			    fixBidirectionalFields(cfg);
 			    em.persist(cfg);
-			    if(!cfg.getConfigEnvironments().isEmpty()) {
-			    	cfg.setCurrentEnvironment((ConfigEnvironment) cfg.getConfigEnvironments().toArray()[0]);
-			    	cfg.getCurrentEnvironment().setParentConfig(cfg);
-			    	em.merge(cfg);
-			    	System.out.println("NUMBER OF CONFIGS: " + cfg.getUser().getConfigs().size());
-			    }			    
+			    em.merge(cfg); // Causes child entities to be persisted as CascadeType does not include persist.
 		    }
 		    else {
 		    	cfgEntity = em.find(Config.class, cfg.getId());
-//		    	User user = em.merge(cfg.getUser());
-//		    	cfgEntity = em.merge(cfg);
-		    	Entity ep = new Entity(em, true);
-		    	EntityPopulator populator = new EntityPopulator(ep, true);
+		    	Entity entity = new Entity(em, true);
+		    	EntityPopulator populator = new EntityPopulator(entity, true);
 		    	populator.populate(cfgEntity, cfg);
 		    	em.merge(cfgEntity);
 		    }

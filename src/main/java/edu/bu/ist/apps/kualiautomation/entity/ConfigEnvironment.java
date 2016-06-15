@@ -56,14 +56,13 @@ public class ConfigEnvironment extends AbstractEntity implements Serializable {
 	@Column(nullable=false, length=1000)
 	private String url;
 
+	@Column(nullable=false)
+	private boolean current;
+
 	//bi-directional many-to-one association to Config
 	@ManyToOne
 	@JoinColumn(name="config_id", nullable=false)
 	private Config parentConfig;
-	
-//	@OneToOne(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER)
-//	@JoinColumn(name="config_id", nullable=false, insertable=false, updatable=false)
-//	private Config configWhoIamCurrentFor;
 
 	public ConfigEnvironment() {
 	}
@@ -90,6 +89,14 @@ public class ConfigEnvironment extends AbstractEntity implements Serializable {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public boolean isCurrent() {
+		return current;
+	}
+
+	public void setCurrent(boolean current) {
+		this.current = current;
 	}
 
 	@JsonSerialize(using=ConfigFieldSerializer.class)

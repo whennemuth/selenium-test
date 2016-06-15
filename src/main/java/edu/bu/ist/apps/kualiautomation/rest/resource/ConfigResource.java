@@ -69,19 +69,25 @@ public class ConfigResource {
 			return ServiceResponse.getExceptionResponse(e);
 		}
 	}
+	
+	@GET
+	@Path("/config/{configId}")
+	public Response getConfigById(@PathParam("configId") Integer configId) throws Exception {
+		try {
+			ConfigService svc = new ConfigService();
+			Config cfg = svc.getConfigById(configId);
+			return ServiceResponse.getSuccessResponse(cfg);
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+			return ServiceResponse.getExceptionResponse(e);
+		}
+	}
 		
 	@GET
 	@Path("/config/module/empty/{configId}")
 	public Response getEmptyModule(@PathParam("configId") Integer configId) throws Exception {
-		ConfigModule mdl = new ConfigModule();
-		Config cfg = new Config();
-		cfg.setId(configId);
-		cfg.setTransitory(true);
-		mdl.setConfig(cfg);
-		mdl.setLabel("");
-		ConfigTab tab = new ConfigTab();
-		tab.setLabel("");
-		mdl.addConfigTab(tab);
+		ConfigModule mdl = (new ConfigService()).getEmptyConfigModule(configId);
 		return ServiceResponse.getSuccessResponse(mdl);
 	}	
 	

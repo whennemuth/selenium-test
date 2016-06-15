@@ -44,42 +44,42 @@
 					<div class="cycleWrap">
 						Suite name: <input type="text" value="{{suite.name}}" ng-model="suite.name"">
 						<input type="button" value="add" ng-click="cycle.suites.splice($index+1, 0, getBlankObject('suite'));">
-						<input type="button" value="remove" ng-click="cycle.suites.splice($index, 1);">
+						<input 
+							type="button" 
+							value="remove" 
+							ng-show="cycle.suites.length > 1"
+							ng-click="cycle.suites.splice($index, 1);">
 					</div>
 					<div  class="sectionarea">
 						<div ng-repeat="module in suite.modules" style="background-color: #b3e0ff;" >
 							<div class="cycleWrap">
-								Module: <select ng-model="module.id" ng-options="mdl.name for mdl in [
-									{id:1, name:'Proposal Log'}, 
-									{id:2, name:'Institutional Proposal'}, 
-									{id:3, name:'Award'}, 
-									{id:4, name:'Negotiations'}] 
-									track by mdl.id">
+								Module: <select 
+											ng-model="module.id"
+											ng-change="$scope.$apply" 
+											ng-options="mdl.id as mdl.label for mdl in config.configModules track by mdl.id">
 									<option value=""><- Select One -></option>
 								</select>
 								<input type="button" value="add" ng-click="suite.modules.splice($index+1, 0, getBlankObject('module'));">
-								<input type="button" value="remove" ng-click="suite.modules.splice($index, 1);">
+								<input 
+									type="button" 
+									value="remove" 
+									ng-show="cycle.suites[$parent.$index].modules.length > 1"
+									ng-click="suite.modules.splice($index, 1);">
 							</div>
 							<div  class="sectionarea noborder">
 								<div ng-repeat="tab in module.tabs" style="background-color: #e6f5ff;">
 									<div class="cycleWrap">
-										Tab: <select ng-model="tab.id" ng-options="t.name for t in [
-											{id:1, name:'Award'}, 
-											{id:2, name:'Contacts'}, 
-											{id:3, name:'Commitments'}, 
-											{id:4, name:'Budget Versions'}, 
-											{id:5, name:'Payment, Reports & Terms'}, 
-											{id:6, name:'Special Review'}, 
-											{id:7, name:'Custom Data'}, 
-											{id:8, name:'Comments, Notes, & Attachments'}, 
-											{id:9, name:'Award Actions'}, 
-											{id:10, name:'History'}, 
-											{id:11, name:'Medusa'}] 
-											track by t.id">
+										Tab: <select 
+												ng-model="tab.id" 
+												ng-options="t.label for t in getTabs($parent.$parent.$index, $parent.$index) track by t.id">
 											<option value=""><- Select One -></option>
 										</select>
 										<input type="button" value="add" ng-click="module.tabs.splice($index+1, 0, getBlankObject('tab'));">
-										<input type="button" value="remove" ng-click="module.tabs.splice($index, 1);">
+										<input 
+											type="button" 
+											value="remove" 
+											ng-show="cycle.suites[$parent.$parent.$index].modules[$parent.$index].tabs.length > 1"
+											ng-click="module.tabs.splice($index, 1);">
 									</div>
 									<div ng-repeat="lv in tab.labelAndValues">
 										<div class="cycleWrap" style="padding-left:35px;">
@@ -93,6 +93,7 @@
 											<input 
 												type="button" 
 												value="remove" 
+												ng-show="cycle.suites[$parent.$parent.$parent.$index].modules[$parent.$parent.$index].tabs[$parent.$index].labelAndValues.length > 1"
 												ng-click="tab.labelAndValues.splice($index, 1);">
 										</div>
 									</div>

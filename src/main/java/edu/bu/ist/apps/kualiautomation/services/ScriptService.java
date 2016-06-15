@@ -4,36 +4,30 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.entity.Module;
 import edu.bu.ist.apps.kualiautomation.entity.Suite;
 import edu.bu.ist.apps.kualiautomation.entity.Tab;
 import edu.bu.ist.apps.kualiautomation.entity.User;
+import edu.bu.ist.apps.kualiautomation.entity.util.Entity;
+import edu.bu.ist.apps.kualiautomation.entity.util.EntityPopulator;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 public class ScriptService {
 
 	public static final String PERSISTENCE_NAME = "kualiautomation-HSQLDB";
-	
-	public Cycle addCycle(Cycle cycle) {
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
-        EntityManager em = factory.createEntityManager();
-        EntityTransaction trans = null;
+
+	public Cycle getCycle(Integer cycleId) {
+        EntityManagerFactory factory = null;
+        EntityManager em = null;
         try {
-		    trans = em.getTransaction();
-		    trans.begin();
-//		    em.merge(cycle);
-		    em.persist(cycle);
-		    trans.commit();
-			return cycle;
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            em = factory.createEntityManager();
+        	Cycle cycle = em.find(Cycle.class, cycleId);
+        	return cycle;
 		} 
-        catch(Exception e) {
-        	e.printStackTrace(System.out);
-        	if(trans.isActive()) {
-        		trans.rollback();
-        	}
-        	throw e;
-        }
 	    finally {
 	    	if(em != null && em.isOpen())
 	    		em.close();
@@ -43,7 +37,54 @@ public class ScriptService {
 	}
 	
 	public Cycle saveCycle(Cycle cycle) {
-		return cycle;
+        EntityManagerFactory factory = null;
+        EntityManager em = null;
+        EntityTransaction trans = null;
+        try {
+        	boolean persist = Utils.isEmpty(cycle.getId()) || cycle.getId() == 0;
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            em = factory.createEntityManager();
+            Cycle cycleEntity = null;
+            
+		    trans = em.getTransaction();
+		    trans.begin();
+		    
+		    if(persist) {
+			    em.persist(cycle);
+			    em.merge(cycle); // Causes child entities to be persisted as CascadeType does not include persist.
+		    }
+		    else {
+		    	cycleEntity = em.find(Cycle.class, cycle.getId());
+		    	Entity ep = new Entity(em, true);
+		    	EntityPopulator populator = new EntityPopulator(ep, true);
+		    	populator.populate(cycleEntity, cycle);
+		    	em.merge(cycleEntity);
+		    }
+		    
+		    if(trans.isActive()) {
+			    System.out.println("Committing...");
+			    trans.commit();
+		    }
+			
+		    if(cycleEntity == null)
+		    	return cycle;
+		    else
+		    	return cycleEntity;
+		} 
+        catch(Exception e) {
+        	e.printStackTrace(System.out);
+        	if(trans.isActive()) {
+        		System.out.println("Config Service rolling back!!!");
+        		trans.rollback();
+        	}
+        	throw e;
+        }
+	    finally {
+	    	if(em != null && em.isOpen())
+	    		em.close();
+	    	if(factory != null && factory.isOpen())
+	    		factory.close();
+		}			
 	}
 	
 	public Cycle getEmptyCycle() {

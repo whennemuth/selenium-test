@@ -34,6 +34,7 @@ var configCtrlFactory = function() {
 			// Define an event handler for the save button associated with updates to the configuration
 			scope.setConfig = function(action) {
 				scope.action = action;
+				scope.config.currentEnvironment.current = true;
 				configSvc.saveConfig(scope).then(
 					function(config) {
 						scope.config = config;
@@ -98,10 +99,6 @@ var configCtrlFactory = function() {
 					}
 				)
 			};
-			
-			scope.removeTab = function(parentIndex, index) {
-				
-			}
 		}
 	};
 };

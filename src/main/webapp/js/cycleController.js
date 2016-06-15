@@ -73,6 +73,18 @@ var cycleCtrlFactory = function() {
 				scope.cycle.suites[suiteIdx].modules[moduleIdx].tabs[tabIdx].labelAndValues[lvIdx+1] = cycleTemplate.suites[0].modules[0].tabs[0].labelAndValues[0];
 			}
 			
+			scope.getTabs = function(suiteIdx, moduleIdx) {
+				var moduleId = scope.cycle.suites[suiteIdx].modules[moduleIdx].id;
+				console.log(suiteIdx + ', ' + moduleIdx + ' = ' + moduleId + '');
+				for(var i=0; i<scope.config.configModules.length; i++) {
+					var cfgMdl = scope.config.configModules[i];
+					if(moduleId == cfgMdl.id) {
+						return cfgMdl.configTabs;
+					}
+				}
+				return [];
+			};
+			
 		}
 	};
 };
