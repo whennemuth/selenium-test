@@ -81,7 +81,7 @@
 			
 			navSvc.setTabs($location.path());
 			
-			configCtrl.setScope($scope, configSvc);
+			configCtrl.setScope($scope, configSvc, cycleSvc);
 			
 			cycleCtrl.setScope($scope, cycleSvc);
 		});

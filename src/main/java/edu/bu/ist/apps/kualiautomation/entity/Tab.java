@@ -2,8 +2,9 @@ package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -49,8 +50,11 @@ public class Tab extends AbstractEntity implements Serializable {
 	private int sequence;
 
 	//bi-directional many-to-one association to LabelAndValue
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="tab")
-	private List<LabelAndValue> labelAndValues = new ArrayList<LabelAndValue>();
+	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="tab")
+	private Set<LabelAndValue> labelAndValues = new TreeSet<LabelAndValue>(new Comparator<LabelAndValue>() {
+		@Override public int compare(LabelAndValue lv1, LabelAndValue lv2) {
+			return lv1.getSequence() - lv2.getSequence();
+		}});
 
 	//bi-directional many-to-one association to Module
 	@ManyToOne
@@ -84,11 +88,11 @@ public class Tab extends AbstractEntity implements Serializable {
 		this.sequence = sequence;
 	}
 
-	public List<LabelAndValue> getLabelAndValues() {
+	public Set<LabelAndValue> getLabelAndValues() {
 		return this.labelAndValues;
 	}
 
-	public void setLabelAndValues(List<LabelAndValue> labelAndValues) {
+	public void setLabelAndValues(Set<LabelAndValue> labelAndValues) {
 		this.labelAndValues = labelAndValues;
 	}
 

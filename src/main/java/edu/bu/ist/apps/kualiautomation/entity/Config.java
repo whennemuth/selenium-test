@@ -187,7 +187,10 @@ public class Config extends AbstractEntity implements Serializable {
 			
 			generator.writeArrayFieldStart("cycles");
 			for(Cycle c : user.getCycles()) {
-				generator.writeObject(c);
+				generator.writeStartObject();
+				generator.writeNumberField("id", c.getId());
+				generator.writeBooleanField("transitory", true);
+				generator.writeEndObject();
 			}			
 			generator.writeEndArray();
 			

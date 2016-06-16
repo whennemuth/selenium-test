@@ -1,5 +1,7 @@
 package edu.bu.ist.apps.kualiautomation.rest.resource;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -10,11 +12,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
-import edu.bu.ist.apps.kualiautomation.services.ConfigService;
 import edu.bu.ist.apps.kualiautomation.services.ScriptService;
-import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -22,9 +21,9 @@ import edu.bu.ist.apps.kualiautomation.util.Utils;
 public class ScriptResource {
 
 	@GET
-	@Path("/cycle/empty")
-	public Response getEmptyCycle() throws Exception {		
-		Response response = ServiceResponse.getResponse((new ScriptService()).getEmptyCycle(), Status.OK);
+	@Path("/cycle/empty/{userId}")
+	public Response getEmptyCycle(@PathParam("userId") Integer userId) throws Exception {		
+		Response response = ServiceResponse.getResponse((new ScriptService()).getEmptyCycle(userId), Status.OK);
 		return response;		
 	}
 	
@@ -41,14 +40,28 @@ public class ScriptResource {
 			return ServiceResponse.getExceptionResponse(e);
 		}
 	}
+	
+	@GET
+	@Path("/cycles/{userId}")
+	public Response getCycles(@PathParam("userId") Integer userId) throws Exception {
+		try {
+			ScriptService svc = new ScriptService();
+			List<Cycle> cycles = svc.getCycles(userId);
+			return ServiceResponse.getSuccessResponse(cycles);
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+			return ServiceResponse.getExceptionResponse(e);
+		}
+	}
 
 	@POST
 	@Path("/cycle/save")
 	public Response saveCycle(Cycle cycle) throws Exception {
 		try {
 			ScriptService svc = new ScriptService();
-			cycle = svc.saveCycle(cycle);			
-			return ServiceResponse.getResponse(cycle, Status.OK);
+			List<Cycle> cycles = svc.saveCycle(cycle);			
+			return ServiceResponse.getResponse(cycles, Status.OK);
 		} 
 		catch (Exception e) {
 			e.printStackTrace();

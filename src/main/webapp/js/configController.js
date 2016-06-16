@@ -1,7 +1,7 @@
 var configCtrlFactory = function() {
 	
 	return {
-		setScope: function(scope, configSvc) {
+		setScope: function(scope, configSvc, cycleSvc) {
 			console.log("Configuring application controller scope");
 			scope.config = '';
 			scope.action = '';
@@ -13,6 +13,28 @@ var configCtrlFactory = function() {
 				configSvc.getConfig(false).then(
 						function(config) {
 							scope.config = config;
+							if(config.user && config.user.id) {
+								cycleSvc.getCycles(config.user.id, false).then(
+									function(cycles) {
+										scope.cycles = cycles;
+										cycleSvc.getEmptyCycle(config.user.id);
+									},
+									function(error) {
+										if(error.message) {
+											alert(
+												"Cycles fetch error!\n\n" + 
+												error.message + '\n\n' + 
+												error.data);
+										}
+										else if(error.data) {
+											alert(error.data);
+										}
+										else {
+											alert(error);
+										}
+									}
+								);
+							}							
 						},
 						function(error) {
 							if(error.message) {

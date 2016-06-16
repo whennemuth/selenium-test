@@ -2,8 +2,9 @@ package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -47,6 +49,9 @@ public class Module extends AbstractEntity implements Serializable {
 
 	@Column(nullable=false)
 	private int sequence;
+	
+	@Transient
+	private int repeat = 1;
 
 	//bi-directional many-to-one association to Suite
 	@ManyToOne
@@ -54,8 +59,11 @@ public class Module extends AbstractEntity implements Serializable {
 	private Suite suite;
 
 	//bi-directional many-to-one association to Tab
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="module")
-	private List<Tab> tabs = new ArrayList<Tab>();
+	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="module")
+	private Set<Tab> tabs = new TreeSet<Tab>(new Comparator<Tab>() {
+		@Override public int compare(Tab tab1, Tab tab2) {
+			return tab1.getSequence() - tab2.getSequence();
+		}});
 
 	public Module() {
 	}
@@ -93,11 +101,11 @@ public class Module extends AbstractEntity implements Serializable {
 		this.suite = suite;
 	}
 
-	public List<Tab> getTabs() {
+	public Set<Tab> getTabs() {
 		return this.tabs;
 	}
 
-	public void setTabs(List<Tab> tabs) {
+	public void setTabs(Set<Tab> tabs) {
 		this.tabs = tabs;
 	}
 
@@ -115,6 +123,15 @@ public class Module extends AbstractEntity implements Serializable {
 		return tab;
 	}
 	
+	public int getRepeat() {
+		return repeat;
+	}
+
+	public void setRepeat(int repeat) {
+		this.repeat = repeat;
+	}
+
+
 	public static class SuiteFieldSerializer extends JsonSerializer<Suite> {
 		@Override public void serialize(
 				Suite suite, 

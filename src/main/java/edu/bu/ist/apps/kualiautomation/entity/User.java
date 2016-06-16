@@ -15,9 +15,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 
 /**
  * The persistent class for the user database table.
@@ -26,7 +23,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 @Entity
 @Table(name="user")
 @NamedQuery(name="User.findAll", query="SELECT u FROM User u")
-//@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope=User.class) // Avoids infinite loop in bidirectional joins
 public class User extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -46,7 +42,6 @@ public class User extends AbstractEntity implements Serializable {
 	private Set<Cycle> cycles = new LinkedHashSet<Cycle>();
 
 	//bi-directional many-to-one association to Config
-//	@OneToMany(/*cascade=CascadeType.ALL,*/ fetch=FetchType.EAGER, mappedBy="user")
 	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="user")
 	private Set<Config> configs = new LinkedHashSet<Config>();
 

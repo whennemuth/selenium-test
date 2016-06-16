@@ -1,8 +1,9 @@
 package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,9 +14,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import edu.bu.ist.apps.kualiautomation.entity.Config.UserFieldSerializer;
 
 
 /**
@@ -24,7 +30,10 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="cycle")
-@NamedQuery(name="Cycle.findAll", query="SELECT c FROM Cycle c")
+@NamedQueries({
+	@NamedQuery(name="Cycle.findAll", query="SELECT c FROM Cycle c"),
+	@NamedQuery(name="Cycle.findByUserId", query="SELECT c FROM Cycle c WHERE c.user.id = :userid")
+})
 public class Cycle extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -40,9 +49,12 @@ public class Cycle extends AbstractEntity implements Serializable {
 	private int sequence;
 
 	//bi-directional many-to-one association to Suite
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="cycle")
-	private List<Suite> suites = new ArrayList<Suite>();
-
+	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="cycle")
+	private Set<Suite> suites = new TreeSet<Suite>(new Comparator<Suite>() {
+		@Override public int compare(Suite suite1, Suite suite2) {
+			return suite1.getSequence() - suite2.getSequence();
+		}});
+	
 	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JoinColumn(name="user_id", nullable=false)
@@ -75,6 +87,7 @@ public class Cycle extends AbstractEntity implements Serializable {
 		this.sequence = sequence;
 	}
 
+	@JsonSerialize(using=UserFieldSerializer.class)
 	public User getUser() {
 		return this.user;
 	}
@@ -83,11 +96,11 @@ public class Cycle extends AbstractEntity implements Serializable {
 		this.user = user;
 	}
 
-	public List<Suite> getSuites() {
+	public Set<Suite> getSuites() {
 		return this.suites;
 	}
 
-	public void setSuites(List<Suite> suites) {
+	public void setSuites(Set<Suite> suites) {
 		this.suites = suites;
 	}
 

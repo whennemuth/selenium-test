@@ -2,8 +2,23 @@ package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,9 +27,6 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -37,10 +49,16 @@ public class Suite extends AbstractEntity implements Serializable {
 
 	@Column(nullable=false)
 	private int sequence;
+	
+	@Transient
+	private int repeat = 1;
 
 	//bi-directional many-to-one association to Module
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="suite")
-	private List<Module> modules = new ArrayList<Module>();
+	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="suite")
+	private Set<Module> modules = new TreeSet<Module>(new Comparator<Module>() {
+		@Override public int compare(Module module1, Module module2) {
+			return module1.getSequence() - module2.getSequence();
+		}});
 
 	//bi-directional many-to-one association to Cycle
 	@ManyToOne
@@ -74,11 +92,11 @@ public class Suite extends AbstractEntity implements Serializable {
 		this.sequence = sequence;
 	}
 
-	public List<Module> getModules() {
+	public Set<Module> getModules() {
 		return this.modules;
 	}
 
-	public void setModules(List<Module> modules) {
+	public void setModules(Set<Module> modules) {
 		this.modules = modules;
 	}
 
@@ -103,6 +121,14 @@ public class Suite extends AbstractEntity implements Serializable {
 
 	public void setCycle(Cycle cycle) {
 		this.cycle = cycle;
+	}
+	
+	public int getRepeat() {
+		return repeat;
+	}
+
+	public void setRepeat(int repeat) {
+		this.repeat = repeat;
 	}
 	
 	public static class CycleFieldSerializer extends JsonSerializer<Cycle> {
