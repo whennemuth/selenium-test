@@ -74,11 +74,10 @@ var cycleCtrlFactory = function() {
 			}
 			
 			scope.getTabs = function(suiteIdx, moduleIdx) {
-				var moduleId = scope.cycle.suites[suiteIdx].modules[moduleIdx].id;
-				console.log(suiteIdx + ', ' + moduleIdx + ' = ' + moduleId + '');
+				var moduleName = scope.cycle.suites[suiteIdx].modules[moduleIdx].name;
 				for(var i=0; i<scope.config.configModules.length; i++) {
 					var cfgMdl = scope.config.configModules[i];
-					if(moduleId == cfgMdl.id) {
+					if(moduleName == cfgMdl.label) {
 						return cfgMdl.configTabs;
 					}
 				}

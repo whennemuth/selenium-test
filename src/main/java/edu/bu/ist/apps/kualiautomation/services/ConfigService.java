@@ -32,7 +32,7 @@ public class ConfigService {
 	 * found is returned, else the first configuration bearing bearing the provided user id is returned.
 	 * 
 	 * NOTE: It is assumed that any user has only one configuration.
-	 *       While this one-to-one feature is functional, it is not enforced in the database schema.
+	 *       While this one-to-one feature is functionally enforced, a user can be store with many configurations.
 	 * 
 	 * @param user
 	 * @return
@@ -88,19 +88,6 @@ public class ConfigService {
 	private Config getEmptyConfig(boolean defaultEnvironments) {
 		Config cfg = new Config();
 		ConfigDefaults.populate(cfg);
-//		if(defaultEnvironments) {
-//			ConfigEnvironment currentEnv = null;
-//			for(ConfigEnvironment.Defaults d : ConfigEnvironment.Defaults.values()) {
-//				ConfigEnvironment env = new ConfigEnvironment();
-//				env.setName(d.name());
-//				env.setUrl(d.getUrl());
-//				cfg.addConfigEnvironment(env);
-//				if(currentEnv == null)
-//					currentEnv = env;
-//			}
-//			cfg.setCurrentEnvironment(currentEnv);
-//		}
-//		setDummyModules(cfg);
 		return cfg;
 	}
 	
@@ -190,57 +177,5 @@ public class ConfigService {
 	    			tab.setConfigModule(mdl);
 	    	}
 	    }		
-	}
-	
-	private void setDummyModules(Config cfg) {
-		ConfigTab tab1 = new ConfigTab();
-		tab1.setLabel("tab 1");
-		
-		ConfigTab tab2 = new ConfigTab();
-		tab2.setLabel("tab 2");
-		
-		ConfigTab tab3 = new ConfigTab();
-		tab3.setLabel("tab 3");
-		
-		ConfigTab tab4 = new ConfigTab();
-		tab4.setLabel("tab 4");
-		
-		ConfigTab tab5 = new ConfigTab();
-		tab5.setLabel("tab 5");
-		
-		ConfigTab tab6 = new ConfigTab();
-		tab6.setLabel("tab 6");
-		
-		ConfigTab tab7 = new ConfigTab();
-		tab7.setLabel("tab 7");
-		
-		ConfigTab tab8 = new ConfigTab();
-		tab8.setLabel("tab 8");
-		
-		ConfigTab tab9 = new ConfigTab();
-		tab9.setLabel("tab 9");
-		tab9.setInclude((byte)0);
-		
-		ConfigModule m1 = new ConfigModule();
-		m1.setLabel("module 1");
-		m1.addConfigTab(tab1);
-		m1.addConfigTab(tab2);
-		m1.addConfigTab(tab3);
-		
-		ConfigModule m2 = new ConfigModule();
-		m2.setLabel("module 2");
-		m2.addConfigTab(tab4);
-		m2.addConfigTab(tab5);
-		m2.addConfigTab(tab6);
-		
-		ConfigModule m3 = new ConfigModule();
-		m3.setLabel("module 3");
-		m3.addConfigTab(tab7);
-		m3.addConfigTab(tab8);
-		m3.addConfigTab(tab9);
-		
-		cfg.addConfigModule(m1);
-		cfg.addConfigModule(m2);
-		cfg.addConfigModule(m3);
 	}
 }
