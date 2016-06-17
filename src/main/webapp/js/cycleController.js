@@ -41,6 +41,10 @@ var cycleCtrlFactory = function() {
 				scope.cycle = '';
 			};
 			
+			scope.cloneCycle = function() {
+				
+			};
+			
 			scope.getBlankObject = function(objectType) {
 				var cycleTemplate = cycleSvc.getEmptyCycle(scope.config.user.id);
 				switch(objectType) {

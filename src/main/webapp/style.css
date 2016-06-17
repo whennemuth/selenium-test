@@ -57,6 +57,10 @@ div.navigated a {
 	font: bold normal 14px arial;
 }
 
+.boldpad {
+	padding:5px; font-weight:bold;
+}
+
 .sectionarea {
 	border: solid 1px #007acc;
 	padding: 10px;

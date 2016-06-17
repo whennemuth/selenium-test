@@ -1,9 +1,9 @@
 package edu.bu.ist.apps.kualiautomation;
 
-import edu.bu.ist.apps.kualiautomation.services.EmbeddedJetty;
-import edu.bu.ist.apps.kualiautomation.services.OperatingSystem;
-import edu.bu.ist.apps.kualiautomation.services.WebBrowser;
-import edu.bu.ist.apps.kualiautomation.services.WebBrowserFactory;
+import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJetty;
+import edu.bu.ist.apps.kualiautomation.services.config.OperatingSystem;
+import edu.bu.ist.apps.kualiautomation.services.config.WebBrowser;
+import edu.bu.ist.apps.kualiautomation.services.config.WebBrowserFactory;
 
 public class ScriptBuilderGUI {
 

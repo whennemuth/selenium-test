@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services;
+package edu.bu.ist.apps.kualiautomation.services.config;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
-import edu.bu.ist.apps.kualiautomation.model.ConfigDefaults;
 import edu.bu.ist.apps.kualiautomation.model.Directory;
 
 /**

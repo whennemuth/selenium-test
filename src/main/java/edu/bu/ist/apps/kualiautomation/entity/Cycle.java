@@ -18,6 +18,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -47,6 +48,12 @@ public class Cycle extends AbstractEntity implements Serializable {
 
 	@Column(nullable=false)
 	private int sequence;
+	
+	@Transient
+	private String kerberosUsername;
+	
+	@Transient
+	private String kerberosPassword;
 
 	//bi-directional many-to-one association to Suite
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="cycle")
@@ -85,6 +92,22 @@ public class Cycle extends AbstractEntity implements Serializable {
 
 	public void setSequence(int sequence) {
 		this.sequence = sequence;
+	}
+
+	public String getKerberosUsername() {
+		return kerberosUsername;
+	}
+
+	public void setKerberosUsername(String kerberosUsername) {
+		this.kerberosUsername = kerberosUsername;
+	}
+
+	public String getKerberosPassword() {
+		return kerberosPassword;
+	}
+
+	public void setKerberosPassword(String kerberosPassword) {
+		this.kerberosPassword = kerberosPassword;
 	}
 
 	@JsonSerialize(using=UserFieldSerializer.class)

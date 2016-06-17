@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services;
+package edu.bu.ist.apps.kualiautomation.services.config;
 
 import java.awt.Desktop;
 import java.io.IOException;

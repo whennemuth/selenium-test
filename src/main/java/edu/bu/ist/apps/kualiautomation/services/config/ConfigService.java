@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services;
+package edu.bu.ist.apps.kualiautomation.services.config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,6 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
 import edu.bu.ist.apps.kualiautomation.entity.User;
 import edu.bu.ist.apps.kualiautomation.entity.util.Entity;
 import edu.bu.ist.apps.kualiautomation.entity.util.EntityPopulator;
-import edu.bu.ist.apps.kualiautomation.model.ConfigDefaults;
 
 public class ConfigService {
 

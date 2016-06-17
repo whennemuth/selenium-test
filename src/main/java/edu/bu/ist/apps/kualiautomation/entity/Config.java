@@ -82,6 +82,10 @@ public class Config extends AbstractEntity implements Serializable {
 		return this.headless;
 	}
 
+	public boolean isHeadless() {
+		return this.headless;
+	}
+
 	public void setHeadless(boolean headless) {
 		this.headless = headless;
 	}

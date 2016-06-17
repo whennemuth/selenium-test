@@ -19,13 +19,12 @@
 				<option value="" ng-if="false"></option>
 			</select>
 			<div align=right style='margin: 5px;'>
-				<input type='button' value=' Launch ' ng-disabled="cycle || cycles.length==0" style='padding:5px;' >
 				<input 
 					type='button' 
-					value="{{cycle ? ' Save ' : ' New '}}" 
+					value=" New " 
 					style='padding:5px;' 
-					ng-click="cycle ? saveCycle() : newCycle();" 
-					ng-disabled="!config || !config.user || !config.user.id">
+					ng-click="newCycle();" 
+					ng-disabled="cycle">
 			</div>
 		</div>
 	</div>
@@ -36,9 +35,11 @@
 {{cycles}}
 	</textarea>
 		<div class="sectionarea" style="height:800px;">
-			<div class="cycleWrap" ng-show='cycle'>
-				Cycle name: <input type="text" ng-model="cycle.name">
-				<input type="button" value="Cancel" ng-click="cancelNewCycle();">					
+			<div class="cycleWrap" ng-show='cycle' style="font-weight:bold;">
+				Cycle name: <input type="text" ng-model="cycle.name" class="boldpad">
+				<input type="button" value=" Cancel " ng-click="cancelNewCycle();" class="boldpad">					
+				<input type="button" value=" Save " ng-click="saveCycle();" class="boldpad">					
+				<input type="button" value=" Clone " ng-click="cloneCycle();" class="boldpad" ng-show="cycle && cycle.id">					
 			</div>
 			<div class="sectionarea noborder">	
 				<div ng-repeat="suite in cycle.suites">		
@@ -50,12 +51,15 @@
 							value="remove" 
 							ng-show="cycle.suites.length > 1"
 							ng-click="cycle.suites.splice($index, 1);">
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type='button' value=' Launch ' ng-disabled="cycle || cycles.length==0">
-						<select ng-model="suite.repeat" ng-options="idx as idx for idx in [1,2,3,4,5,6,7,8,9,10]">
-							<option value="" ng-if="false"></option>
-						</select>
-						&nbsp;times
+						<div style="display:inline; padding-left:50px; width:200px;" ng-show="cycle && cycle.suites[$index].id">
+							<input type='button' value=' Launch '>
+							<select 
+								ng-model="suite.repeat" 
+								ng-options="idx as idx for idx in [1,2,3,4,5,6,7,8,9,10]">
+								<option value="" ng-if="false"></option>
+							</select>
+							&nbsp;times
+						</div>
 					</div>
 					<div  class="sectionarea">
 						<div ng-repeat="module in suite.modules" style="background-color: #b3e0ff;" >
@@ -71,12 +75,14 @@
 									value="remove" 
 									ng-show="cycle.suites[$parent.$index].modules.length > 1"
 									ng-click="suite.modules.splice($index, 1);">
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-								<input type='button' value=' Launch ' ng-disabled="cycle || cycles.length==0">
-								<select ng-model="module.repeat" ng-options="idx as idx for idx in [1,2,3,4,5,6,7,8,9,10]">
-									<option value="" ng-if="false"></option>
-								</select>
-								&nbsp;times
+								<div style="display:inline; padding-left:50px; width:200px;" 
+									ng-show="cycle && cycle.suites[$parent.$index].modules[$index].id">
+									<input type='button' value=' Launch '>
+									<select ng-model="module.repeat" ng-options="idx as idx for idx in [1,2,3,4,5,6,7,8,9,10]">
+										<option value="" ng-if="false"></option>
+									</select>
+									&nbsp;times
+								</div>
 							</div>
 							<div  class="sectionarea noborder">
 								<div ng-repeat="tab in module.tabs" style="background-color: #e6f5ff;">

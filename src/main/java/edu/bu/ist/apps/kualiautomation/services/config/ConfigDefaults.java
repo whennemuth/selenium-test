@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.model;
+package edu.bu.ist.apps.kualiautomation.services.config;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
@@ -7,13 +7,15 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
 
 public enum ConfigDefaults {
 	CONFIG_FILE_NAME("kualiautomation.cfg"), 
-	DEFAULT_ENVIRONMENT("test"),
+	DEFAULT_ENVIRONMENT("dev"),
 	ENVIRONMENTS(
 		String.join("&&",
 				"TEST",
 				"https://kuali-test.bu.edu/kc/portal.do",
 				"STAGING",
-				"https://kuali-stg.bu.edu/kc/portal.do")
+				"https://kuali-stg.bu.edu/kc/portal.do",
+				"DEV",
+				"http://ist-kuali-sb1:8080/kc-dev")
 	),
 	MODULES(String.join("&&",
 			"Proposal Log"

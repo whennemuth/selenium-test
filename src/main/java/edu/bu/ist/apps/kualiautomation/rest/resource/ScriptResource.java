@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
-import edu.bu.ist.apps.kualiautomation.services.ScriptService;
+import edu.bu.ist.apps.kualiautomation.services.config.ScriptService;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)

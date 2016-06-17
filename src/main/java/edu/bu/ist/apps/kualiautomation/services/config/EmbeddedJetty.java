@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services;
+package edu.bu.ist.apps.kualiautomation.services.config;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
