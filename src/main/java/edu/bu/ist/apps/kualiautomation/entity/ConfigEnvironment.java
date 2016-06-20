@@ -32,18 +32,6 @@ import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
 //@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope=ConfigEnvironment.class) // Avoids infinite loop in bidirectional joins
 public class ConfigEnvironment extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
-	public static enum Defaults {
-		TEST("https://kuali-test.bu.edu/kc/portal.do"),
-		STAGING("https://kuali-stg.bu.edu/kc/portal.do");
-		private String url;
-		private Defaults(String url) {
-			this.url = url;
-		}
-		public String getUrl() {
-			return url;
-		}
-	};
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

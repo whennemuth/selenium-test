@@ -6,5 +6,9 @@ public interface Element {
 
 	public WebElement getWebElement();
 	
-	public boolean isVisible();
+	public boolean isInteractive();
+	
+	public void click();
+	
+	public void setValue(String value);
 }

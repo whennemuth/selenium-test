@@ -7,7 +7,7 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
 
 public enum ConfigTestingDefaults {
 	CONFIG_FILE_NAME("kualiautomation.cfg"), 
-	DEFAULT_ENVIRONMENT("dev"),
+	DEFAULT_ENVIRONMENT("login-demo"),
 	ENVIRONMENTS(
 		String.join("&&",
 				"TEST",
@@ -18,6 +18,8 @@ public enum ConfigTestingDefaults {
 				"http://ist-kuali-sb1:8080/kc-dev",
 				"LOGIN",
 				"file:///C:/Users/wrh/Desktop/welcome/login.htm",
+				"LOGIN-DEMO",
+				"https://res-demo2.kuali.co/kc-dev/kr-login/login?viewId=DummyLoginView&returnLocation=%2Fkc-krad%2FlandingPage&formKey=68ba02c6-3587-4b81-a4c9-d8eb465eaa01&cacheKey=7ft9p0xr31nwqntioww2pa",
 				"WELCOME",
 				"file:///C:/Users/wrh/Desktop/welcome/welcome.htm")
 	),

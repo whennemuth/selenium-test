@@ -6,13 +6,13 @@ import java.util.List;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public abstract class BasicLocator implements Locator {
+public abstract class AbstractElementLocator implements Locator {
 
-	private WebDriver driver;
-	private String label;
-	private ElementType elementType;
+	protected WebDriver driver;
+	protected String label;
+	protected ElementType elementType;
 	
-	public BasicLocator(WebDriver driver) {
+	public AbstractElementLocator(WebDriver driver) {
 		this.driver = driver;
 	}
 	
@@ -21,7 +21,21 @@ public abstract class BasicLocator implements Locator {
 		
 		this.label = label;
 		this.elementType = elementType;
-		List<WebElement> results = new ArrayList<WebElement>();
+		final List<WebElement> results = new ArrayList<WebElement>();
+		
+		customLocate(results);
+		
+		if(results.isEmpty()) {
+			defaultLocate(results);
+			if(results.isEmpty()) {
+				return null;
+			}
+		}
+		
+		return new BasicElementImpl(driver, results.get(0));
+	}
+	
+	protected void defaultLocate(List<WebElement> located) {
 		
 		switch(elementType) {
 		case BUTTON:
@@ -41,27 +55,11 @@ public abstract class BasicLocator implements Locator {
 		case OTHER:
 			break;
 		}
-		
-		extraLocate(results);
-		
-		if(results.isEmpty()) {
-			return null;
-		}
-
-		Element element = new Element() {
-			@Override public WebElement getWebElement() {
-				return results.get(0);
-			}
-			@Override public boolean isVisible() {
-				return true;
-			}			
-		};
-		
-		return element;
 	}
 	
-	protected abstract void extraLocate(List<WebElement> located);
+	protected abstract void customLocate(List<WebElement> located);
 
+	@Override
 	public WebDriver getDriver() {
 		return driver;
 	}

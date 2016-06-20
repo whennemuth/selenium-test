@@ -10,7 +10,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.services.config.ConfigTestingDefaults;
-import edu.bu.ist.apps.kualiautomation.services.element.BasicLocatorImpl;
+import edu.bu.ist.apps.kualiautomation.services.element.LabelledElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.element.Locator;
@@ -31,7 +31,7 @@ public class KerberosLogin {
 		this.password = session.getCycle().getKerberosPassword();
 		this.loginUrl = session.getConfig().getCurrentEnvironment().getUrl();
 		this.driver = session.getDriver();
-		this.locator = new BasicLocatorImpl(driver);
+		this.locator = new LabelledElementLocator(driver);
 	}
 
 	public boolean login() {
@@ -50,7 +50,7 @@ public class KerberosLogin {
 					Element submit = locator.locate("", ElementType.BUTTON);
 					
 					usrname.getWebElement().sendKeys(username);
-					if(psswd.isVisible()) {
+					if(psswd.isInteractive()) {
 						psswd.getWebElement().sendKeys(password);
 					}
 					submit.getWebElement().click();
