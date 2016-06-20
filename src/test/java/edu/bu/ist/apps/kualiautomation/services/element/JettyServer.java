@@ -12,11 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 public class JettyServer {
 
@@ -56,6 +53,12 @@ public class JettyServer {
 				String[] parts = target.split("/");
 				target = parts[parts.length-1];
 				String source = handlers.get(target);
+				
+				if(!source.contains("<")) {
+					// source is not raw html, but a reference to a classpath resource that contains html
+					source = Utils.getClassPathResourceContent(
+							"edu/bu/ist/apps/kualiautomation/services/element/html/" + source);
+				}
 				
 				out.println(source);
 				baseRequest.setHandled(true);

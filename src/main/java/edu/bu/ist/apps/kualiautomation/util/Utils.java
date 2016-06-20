@@ -1,17 +1,17 @@
 package edu.bu.ist.apps.kualiautomation.util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
-
-import edu.bu.ist.apps.kualiautomation.entity.util.EntityInspector;
 
 public class Utils {
 
@@ -89,5 +89,43 @@ public class Utils {
 		}
 		return f;
     }
-
+	
+	/**
+	 * Get the content of a file as a string.
+	 * @param in
+	 * @return
+	 */
+	public static String getStringFromInputStream(InputStream in) {
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(in));			
+			String inputLine;
+			StringWriter sb = new StringWriter();
+			PrintWriter pw = new PrintWriter(new BufferedWriter(sb));
+			while ((inputLine = br.readLine()) != null) {
+				pw.println(inputLine);
+			}
+			pw.flush();
+			return sb.toString();
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		finally {
+			if(br != null) {
+				try {
+					br.close();
+				} 
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}		
+	}
+	
+	public static String getClassPathResourceContent(String resource) {
+		InputStream in = Utils.class.getClassLoader().getResourceAsStream(resource);
+		return getStringFromInputStream(in);
+	}
 }

@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.element;
+package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
 import org.openqa.selenium.WebDriver;
 

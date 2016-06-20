@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.element;
+package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
 public enum ElementType {
 
@@ -46,13 +46,13 @@ public enum ElementType {
 	private String description;
 	private String xpathSelector;
 	private String tagname;
-	private String attribute;
+	private String typeAttribute;
 	
-	private ElementType(String description, String tagname, String attribute, String xpathSelector) {
+	private ElementType(String description, String tagname, String typeAttribute, String xpathSelector) {
 		this.description = description;
 		this.xpathSelector = xpathSelector;
 		this.tagname = tagname;
-		this.attribute = attribute;
+		this.typeAttribute = typeAttribute;
 	}
 
 	public String getDescription() {
@@ -67,8 +67,8 @@ public enum ElementType {
 		return tagname;
 	}
 
-	public String getAttribute() {
-		return attribute;
+	public String getTypeAttribute() {
+		return typeAttribute;
 	}
 	
 }

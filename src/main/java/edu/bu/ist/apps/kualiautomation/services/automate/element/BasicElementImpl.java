@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.element;
+package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -10,15 +10,27 @@ public class BasicElementImpl implements Element {
 	
 	private WebDriver driver;
 	private WebElement webElement;
+	private WebElement label;
 	
 	public BasicElementImpl(WebDriver driver, WebElement webElement) {
 		this.driver = driver;
 		this.webElement = webElement;
 	}
+	
+	public BasicElementImpl(WebDriver driver, WebElement webElement, WebElement label) {
+		this.driver = driver;
+		this.webElement = webElement;
+		this.label = label;
+	}
 
 	@Override
 	public WebElement getWebElement() {
 		return webElement;
+	}
+
+	@Override
+	public WebElement getLabel() {
+		return label;
 	}
 
 	@Override
