@@ -84,41 +84,12 @@ public abstract class AbstractElementLocator implements Locator {
 			//driver.findElements(By.xpath("//*[normalize-space(text())=\"" + cleanedLabel + "\"]"));
 			//driver.findElements(By.xpath("//*[text()[normalize-space(.)=\"" + cleanedLabel + "\"]]"));
 		driver.findElements(By.xpath("//*[starts-with(normalize-space(text()), \"" + cleanedLabel + "\")]"));
-
-//		+ "//if(elements[0].nodeType === Node.TEXT_NODE) "
-//+ "cleaned.push(elements[0].textContent); "
-
-		@SuppressWarnings("unused")
-//		List<String> fiteredText = (List<String>) ((JavascriptExecutor) driver).executeScript(""
-//				+ "var elements = arguments[0]; "
-//				+ "var cleaned = []; "
-//				+ "cleaned[cleaned.length] = elements[0].textContent; "
-//				+ "return cleaned", elements);
-//		
-//		String childInnerText = (String) ((JavascriptExecutor) driver).executeScript(""
-//				+ "var parent = arguments[0]; "
-//				+ "var ret = \"\"; "
-//				+ "for(var i=0; i<parent.length; i++) { "
-//				+ "    child = parent[i];"
-//				+ "    if (child.nodeType === Node.TEXT_NODE)"
-//				+ "        ret += child.textContent; "
-//				+ "    /*child = child.nextSibling; */"
-//				+ "} "
-//				+ "return ret;", elements);
 		
 		List<WebElement> filtered = new ArrayList<WebElement>();
 		for(WebElement we : elements) {
-//			List<WebElement> parts = we.findElements(By.xpath("*"));
-//			System.out.println("PARENT:");
-//			System.out.println(we.getText());
-//			for(WebElement part : parts) {
-//				System.out.println("CHILD:");
-//				System.out.println(part.getText());
-//			}
 			String cleanedElementText = getCleanedValue(we.getText());
 			
 			if(cleanedElementText.toLowerCase().startsWith(cleanedLabel.toLowerCase())) {
-			//if(cleanedLabel.equalsIgnoreCase(cleanedElementText)) {
 				filtered.add(we);
 			}
 		}

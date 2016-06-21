@@ -29,7 +29,7 @@ public class LabelledElementLocatorTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		
-		handlers.put("element", "TestCase1");
+		handlers.put("prop-log-lookup-frame", "ProposalLogLookupFrame.htm");
 		
 		server = new JettyServer();
 		server.start(handlers);
@@ -53,18 +53,18 @@ public class LabelledElementLocatorTest {
 			locator = new LabelledElementLocator(new HtmlUnitDriver(capabilities)); 
 		}
 		else {
-			locator = new LabelledElementLocator(new HtmlUnitDriver(BrowserVersion.FIREFOX_38, true));
+			locator = new LabelledElementLocator(new HtmlUnitDriver(BrowserVersion.FIREFOX_38, false));
 		}
 	}
 	
 	@Test 
-	public void findAdjacentLabel() {
-		locator.getDriver().get("http://localhost:8080/element");
-		Element element = locator.locate("My Label1: ", ElementType.TEXTBOX);
+	public void findNeighboringLabel() {
+		locator.getDriver().get("http://localhost:8080/prop-log-lookup-frame");
+		Element element = locator.locate("Proposal Number", ElementType.TEXTBOX);
 		assertNotNull(element);
 		assertEquals("input", element.getWebElement().getTagName().toLowerCase());
 		assertEquals("text", element.getWebElement().getAttribute("type").toLowerCase());
-		assertEquals("txt1", element.getWebElement().getAttribute("id").toLowerCase());
+		assertEquals("proposalNumber", element.getWebElement().getAttribute("id"));
 	}
 
 }

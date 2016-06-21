@@ -54,13 +54,13 @@ public class JettyServer {
 				target = parts[parts.length-1];
 				String source = handlers.get(target);
 				
-				if(!source.contains("<")) {
+				if(source != null && !source.contains("<")) {
 					// source is not raw html, but a reference to a classpath resource that contains html
 					source = Utils.getClassPathResourceContent(
 							"edu/bu/ist/apps/kualiautomation/services/element/html/" + source);
 				}
 				
-				out.println(source);
+				out.println(source == null ? target : source);
 				baseRequest.setHandled(true);
 			}});
 	}
