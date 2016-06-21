@@ -5,16 +5,16 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.util.component.AbstractLifeCycle.AbstractLifeCycleListener;
 import org.eclipse.jetty.util.component.LifeCycle;
 
-public abstract class EmbeddedJetty {
+public abstract class EmbeddedJettyServer {
 
 	private static Server server;
 	private static WebAppContext context;
 	
-	public EmbeddedJetty() {
+	public EmbeddedJettyServer() {
 		this(null);
 	}
 	
-	public EmbeddedJetty(Integer port) {
+	public EmbeddedJettyServer(Integer port) {
 		
 		// Instantiate the web server and define what extra tasks it must do when it starts up.
     	String webappDirLocation = "src/main/webapp/";
@@ -60,11 +60,11 @@ public abstract class EmbeddedJetty {
 	public abstract void onStart() throws Exception;
 	
 	public static void main(String[] args) throws Exception {
-		EmbeddedJetty jetty = new EmbeddedJetty(8080){
+		EmbeddedJettyServer jetty = new EmbeddedJettyServer(8080){
 			@Override public void onStart() {
-				System.out.println("Jetty started!!!");
+				System.out.println("Jetty starting!!!");
 			}};
 		jetty.start();
-		jetty.stop();
+		//jetty.stop();
 	}
 }

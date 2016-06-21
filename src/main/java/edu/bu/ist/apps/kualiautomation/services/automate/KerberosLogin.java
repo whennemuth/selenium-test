@@ -1,5 +1,7 @@
 package edu.bu.ist.apps.kualiautomation.services.automate;
 
+import java.util.Arrays;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -45,9 +47,9 @@ public class KerberosLogin {
 				
 				if(started == 0) {
 					System.out.println("Going to login page...");
-					Element usrname = locator.locate("", ElementType.TEXTBOX);
-					Element psswd = locator.locate("", ElementType.TEXTBOX);
-					Element submit = locator.locate("", ElementType.BUTTON);
+					Element usrname = locator.locateFirst(ElementType.TEXTBOX, Arrays.asList(new String[]{""}));
+					Element psswd = locator.locateFirst(ElementType.TEXTBOX, Arrays.asList(new String[]{""}));
+					Element submit = locator.locateFirst(ElementType.BUTTON, Arrays.asList(new String[]{""}));
 					
 					usrname.getWebElement().sendKeys(username);
 					if(psswd.isInteractive()) {

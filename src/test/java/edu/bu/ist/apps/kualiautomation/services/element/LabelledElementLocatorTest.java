@@ -15,23 +15,23 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 
-import edu.bu.ist.apps.kualiautomation.services.automate.element.AbstractElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.LabelledElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 
 public class LabelledElementLocatorTest {
 	
-	private static JettyServer server;
+	private static EmbeddedJettyStaticServer server;
 	private static Map<String, String> handlers = new HashMap<String, String>();
-	private static AbstractElementLocator locator;
+	private static LabelledElementLocator locator;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		
 		handlers.put("prop-log-lookup-frame", "ProposalLogLookupFrame.htm");
 		
-		server = new JettyServer();
+		server = new EmbeddedJettyStaticServer();
 		server.start(handlers);
 		
 		setLocator(false);
@@ -60,7 +60,7 @@ public class LabelledElementLocatorTest {
 	@Test 
 	public void findNeighboringLabel() {
 		locator.getDriver().get("http://localhost:8080/prop-log-lookup-frame");
-		Element element = locator.locate("Proposal Number", ElementType.TEXTBOX);
+		Element element = locator.locate(ElementType.TEXTBOX, "Proposal Number");
 		assertNotNull(element);
 		assertEquals("input", element.getWebElement().getTagName().toLowerCase());
 		assertEquals("text", element.getWebElement().getAttribute("type").toLowerCase());

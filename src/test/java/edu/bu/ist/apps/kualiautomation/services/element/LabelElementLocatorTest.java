@@ -5,27 +5,26 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.Platform;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 
-import edu.bu.ist.apps.kualiautomation.services.automate.element.AbstractElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.LabelElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 
-public class AbstractElementLocatorImplTest {
+public class LabelElementLocatorTest {
 	
-	private static JettyServer server;
+	private static EmbeddedJettyStaticServer server;
 	private static Map<String, String> handlers = new HashMap<String, String>();
-	private static AbstractElementLocator locator;
+	private static LabelElementLocator locator;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -40,7 +39,7 @@ public class AbstractElementLocatorImplTest {
 		handlers.put("colon2", "<html><body><span> :label </span></body></html>");
 		handlers.put("colon3", "<html><body><span> label : : </span></body></html>");
 		
-		server = new JettyServer();
+		server = new EmbeddedJettyStaticServer();
 		server.start(handlers);
 		
 		setLocator(false);
@@ -60,16 +59,10 @@ public class AbstractElementLocatorImplTest {
 			capabilities.setCapability("platform", Platform.WINDOWS);
 			capabilities.setCapability("name", "Testing Selenium");	
 			capabilities.setJavascriptEnabled(true);
-			locator = new AbstractElementLocator(new HtmlUnitDriver(capabilities)) {
-				@Override protected void customLocate(List<WebElement> located) {
-					// Do nothing. We are only testing functionality of the abstract class, not custom functionality.				
-				}};
+			locator = new LabelElementLocator(new HtmlUnitDriver(capabilities));
 		}
 		else {
-			locator = new AbstractElementLocator(new HtmlUnitDriver(BrowserVersion.FIREFOX_38, true)) {
-				@Override protected void customLocate(List<WebElement> located) {
-					// Do nothing. We are only testing functionality of the abstract class, not custom functionality.				
-				}};
+			locator = new LabelElementLocator(new HtmlUnitDriver(BrowserVersion.FIREFOX_38, true));
 		}
 	}
 	

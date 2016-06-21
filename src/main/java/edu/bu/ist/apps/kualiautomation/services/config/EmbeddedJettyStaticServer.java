@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.element;
+package edu.bu.ist.apps.kualiautomation.services.config;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,7 +15,17 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
-public class JettyServer {
+/**
+ * This jetty server does not work off a web context.
+ * Instead, content is issued by matching the last portion of the target url with a map of preconfigured output.
+ * The target value is the key to the map and the values of the map are either raw html, or a classpath indicator
+ * to a resource that contains html.
+ * Useful for unit testing.
+ * 
+ * @author wrh
+ *
+ */
+public class EmbeddedJettyStaticServer {
 
 	private Server server;
 	private Map<String, String> handlers = new HashMap<String, String>();
@@ -57,7 +67,7 @@ public class JettyServer {
 				if(source != null && !source.contains("<")) {
 					// source is not raw html, but a reference to a classpath resource that contains html
 					source = Utils.getClassPathResourceContent(
-							"edu/bu/ist/apps/kualiautomation/services/element/html/" + source);
+							"html/" + source);
 				}
 				
 				out.println(source == null ? target : source);
