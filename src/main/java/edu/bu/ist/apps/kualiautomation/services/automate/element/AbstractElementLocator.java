@@ -3,8 +3,11 @@ package edu.bu.ist.apps.kualiautomation.services.automate.element;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public abstract class AbstractElementLocator implements Locator {
 
@@ -43,6 +46,20 @@ public abstract class AbstractElementLocator implements Locator {
 		if(!webElements.isEmpty()) {
 			for(WebElement we : webElements) {
 				results.add(new BasicElementImpl(driver, we));
+			}
+		}
+		
+		if(webElements.isEmpty()) {
+			WebDriverWait wait = new WebDriverWait(driver, 100);
+			List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
+			if(!iframes.isEmpty()) {
+				for(WebElement iframe : iframes) {
+					driver = wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
+					results.addAll(locateAll(elementType, attributes));
+					// Don't switch back to the parent window because you will not be able to use the WebElement as it would 
+					// then belong to a frame that the WebDriver is longer focused on ( you will get a StaleElementReferenceException).
+					// driver.switchTo().defaultContent();
+				}
 			}
 		}
 		

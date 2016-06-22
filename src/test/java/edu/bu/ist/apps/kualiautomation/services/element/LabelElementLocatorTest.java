@@ -11,12 +11,14 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.LabelElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 
@@ -38,6 +40,8 @@ public class LabelElementLocatorTest {
 		handlers.put("colon1", "<html><body><span> label: </span></body></html>");
 		handlers.put("colon2", "<html><body><span> :label </span></body></html>");
 		handlers.put("colon3", "<html><body><span> label : : </span></body></html>");
+		handlers.put("prop-log-lookup-frame", "ProposalLogLookupFrame.htm");
+		handlers.put("prop-log-lookup", "ProposalLogLookup.htm");
 		
 		server = new EmbeddedJettyStaticServer();
 		server.start(handlers);
@@ -59,10 +63,12 @@ public class LabelElementLocatorTest {
 			capabilities.setCapability("platform", Platform.WINDOWS);
 			capabilities.setCapability("name", "Testing Selenium");	
 			capabilities.setJavascriptEnabled(true);
+			//locator = new LabelElementLocator(new HtmlUnitDriver(capabilities));
 			locator = new LabelElementLocator(new HtmlUnitDriver(capabilities));
 		}
 		else {
-			locator = new LabelElementLocator(new HtmlUnitDriver(BrowserVersion.FIREFOX_38, true));
+			//locator = new LabelElementLocator(new HtmlUnitDriver(BrowserVersion.FIREFOX_38, false));
+			locator = new LabelElementLocator(new HtmlUnitDriver(BrowserVersion.FIREFOX_38, false));
 		}
 	}
 	
@@ -123,4 +129,23 @@ public class LabelElementLocatorTest {
 		assertNotNull(element);
 		assertEquals("span", element.getWebElement().getTagName().toLowerCase());
 	}
+	
+	@Test 
+	public void findProposalLogLabel() {
+		locator.getDriver().get("http://localhost:8080/prop-log-lookup-frame");
+		Element element = locator.locate("Proposal Number");
+		assertNotNull(element);
+		assertEquals("label", element.getWebElement().getTagName().toLowerCase());
+		assertEquals("Proposal Number:", element.getWebElement().getText());
+	}
+	
+	@Test 
+	public void findProposalLogLabelInFrame() {
+		locator.getDriver().get("http://localhost:8080/prop-log-lookup");
+		Element element = locator.locate("Proposal Number");
+		assertNotNull(element);
+		assertEquals("label", element.getWebElement().getTagName().toLowerCase());
+		assertEquals("Proposal Number:", element.getWebElement().getText());
+	}
+
 }

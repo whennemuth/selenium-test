@@ -58,7 +58,7 @@ public class LabelledElementLocatorTest {
 	}
 	
 	@Test 
-	public void findNeighboringLabel() {
+	public void findLabel() {
 		locator.getDriver().get("http://localhost:8080/prop-log-lookup-frame");
 		Element element = locator.locate(ElementType.TEXTBOX, "Proposal Number");
 		assertNotNull(element);
@@ -66,5 +66,39 @@ public class LabelledElementLocatorTest {
 		assertEquals("text", element.getWebElement().getAttribute("type").toLowerCase());
 		assertEquals("proposalNumber", element.getWebElement().getAttribute("id"));
 	}
+	
+	/**
+	 * Find a label in a frame in an html page
+	 */
+	@Test 
+	public void findLabelInFrame() {
+		// RESUME NEXT: 
+	}
+	
+	/**
+	 * Find a field neighboring a label in a frameless html page
+	 */
+	@Test 
+	public void findField() {
+		// RESUME NEXT: 
+	}
+	
+	/**
+	 * Find a field neighboring a label in a frame in an html page
+	 */
+	@Test 
+	public void findFieldInFrame() {
+		// RESUME NEXT: 
+	}
+	
+	
+	/**
+	 * Find all fields in a frame in an html page based on their labels
+	 */
+	@Test 
+	public void findProposalLogFields() {
+		// RESUME NEXT: 
+	}
+	
 
 }

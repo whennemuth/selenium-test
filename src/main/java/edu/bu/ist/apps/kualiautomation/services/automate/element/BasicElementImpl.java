@@ -2,6 +2,7 @@ package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.htmlunit.HtmlUnitWebElement;
 
 public class BasicElementImpl implements Element {
 	

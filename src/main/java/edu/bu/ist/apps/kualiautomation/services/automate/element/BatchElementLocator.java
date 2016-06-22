@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 /**
@@ -44,7 +43,9 @@ public class BatchElementLocator implements Locator {
 				List<String> attributes = parms.get(clazz);
 				Locator locator = (Locator) ctr.newInstance(driver);
 				Element result = locator.locateFirst(elementType, attributes);
-				results.add(result);
+				if(result != null) {
+					results.add(result);
+				}
 				if(greedy)
 					continue;
 				else
@@ -98,16 +99,19 @@ public class BatchElementLocator implements Locator {
 	}
 
 
-	public static void main(String args) {
+	public static void main(String[] args) {
 		WebDriver driver = null;
 		try {
 			driver = new HtmlUnitDriver();
-			driver.get("http://google.com");
+			driver.get("file:///C:/whennemuth/workspaces/bu_workspace/selenium-test/src/test/resources/html/ProposalLogLookupFrame.htm");
 			BatchElementLocator locator = new BatchElementLocator(driver);
-			locator.locateAll(ElementType.TEXTBOX, Arrays.asList(new String[]{
-					"edu.bu.ist.apps.kualiautomation.services.automate.element.LabelElementLocator:",
-					"edu.bu.ist.apps.kualiautomation.services.automate.element.LabelledElementLocator:"
+			List<Element> elements = locator.locateAll(ElementType.TEXTBOX, Arrays.asList(new String[]{
+					"edu.bu.ist.apps.kualiautomation.services.automate.element.LabelElementLocator:Proposal Number",
+					"edu.bu.ist.apps.kualiautomation.services.automate.element.LabelledElementLocator:Proposal Number"
 			}));
+			for(Element e : elements) {
+				System.out.println(e.getWebElement().getTagName() + ": " + e.getWebElement().getText());
+			}
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
