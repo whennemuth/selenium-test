@@ -165,7 +165,7 @@
 	                <archive>
 	                    <manifest>
 	                        <addClasspath>true</addClasspath>
-	                        <mainClass>edu.bu.ist.apps.kualiautomation.services.ConfigService</mainClass>
+	                        <mainClass>edu.bu.ist.apps.kualiautomation.ScriptBuilderGUI</mainClass>
 	                    </manifest>
 	                </archive>
 	            </configuration>
@@ -178,7 +178,7 @@
 			  <configuration>
 			    <archive>
 			      <manifest>
-			        <mainClass>edu.bu.ist.apps.kualiautomation.services.ConfigService</mainClass>
+			        <mainClass>edu.bu.ist.apps.kualiautomation.ScriptBuilderGUI</mainClass>
 			      </manifest>
 			    </archive>
 			    <descriptorRefs>
