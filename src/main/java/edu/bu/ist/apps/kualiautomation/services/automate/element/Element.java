@@ -13,4 +13,6 @@ public interface Element {
 	public void click();
 	
 	public void setValue(String value);
+	
+	public ElementType getElementType();
 }

@@ -12,21 +12,32 @@ public class BasicElementImpl implements Element {
 	private WebDriver driver;
 	private WebElement webElement;
 	private WebElement label;
+	private ElementType elementType;
 	
 	public BasicElementImpl(WebDriver driver, WebElement webElement) {
 		this.driver = driver;
-		this.webElement = webElement;
+		setWebElement(webElement);
 	}
 	
 	public BasicElementImpl(WebDriver driver, WebElement webElement, WebElement label) {
 		this.driver = driver;
-		this.webElement = webElement;
+		setWebElement(webElement);
 		this.label = label;
 	}
 
 	@Override
 	public WebElement getWebElement() {
 		return webElement;
+	}
+	
+	private void setWebElement(WebElement webElement) {
+		this.webElement = webElement;
+		this.elementType = ElementType.getInstance(webElement);
+	}
+
+	@Override
+	public ElementType getElementType() {
+		return elementType;
 	}
 
 	@Override

@@ -11,5 +11,4 @@ public interface Locator {
 	public List<Element> locateAll(ElementType elementType, List<String> attributes);
 	
 	public WebDriver getDriver();
-	
 }

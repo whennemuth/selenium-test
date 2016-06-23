@@ -132,7 +132,7 @@ public class LabelElementLocatorTest {
 	
 	@Test 
 	public void findProposalLogLabel() {
-		locator.getDriver().get("http://localhost:8080/prop-log-lookup-frame");
+		locator.getDriver().get("http://localhost:8080/prop-log-lookup");
 		Element element = locator.locate("Proposal Number");
 		assertNotNull(element);
 		assertEquals("label", element.getWebElement().getTagName().toLowerCase());
@@ -141,7 +141,7 @@ public class LabelElementLocatorTest {
 	
 	@Test 
 	public void findProposalLogLabelInFrame() {
-		locator.getDriver().get("http://localhost:8080/prop-log-lookup");
+		locator.getDriver().get("http://localhost:8080/prop-log-lookup-frame");
 		Element element = locator.locate("Proposal Number");
 		assertNotNull(element);
 		assertEquals("label", element.getWebElement().getTagName().toLowerCase());
