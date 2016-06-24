@@ -71,16 +71,16 @@ public class BatchElementLocator implements Locator {
 	 *  
 	 * @param locator
 	 * @param elementType
-	 * @param attributes
+	 * @param parameters
 	 * @return
 	 */
-	private Element runLocator(Locator locator, ElementType elementType, List<String> attributes) {
+	private Element runLocator(Locator locator, ElementType elementType, List<String> parameters) {
 		if(defaultRan) {
 			if(locator instanceof AbstractElementLocator) {
 				((AbstractElementLocator) locator).setDefaultRan(true);
 			}
 		}
-		Element result = locator.locateFirst(elementType, attributes);
+		Element result = locator.locateFirst(elementType, parameters);
 		defaultRan = true;
 		return result;
 	}

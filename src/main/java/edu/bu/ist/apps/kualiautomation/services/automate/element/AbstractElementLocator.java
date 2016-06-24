@@ -13,7 +13,7 @@ public abstract class AbstractElementLocator implements Locator {
 
 	protected WebDriver driver;
 	protected ElementType elementType;
-	protected List<String> attributes = new ArrayList<String>();
+	protected List<String> parameters = new ArrayList<String>();
 	protected boolean defaultRan;
 	
 	public AbstractElementLocator(WebDriver driver) {
@@ -21,9 +21,9 @@ public abstract class AbstractElementLocator implements Locator {
 	}
 	
 	@Override
-	public Element locateFirst(ElementType elementType, List<String> attributes) {
+	public Element locateFirst(ElementType elementType, List<String> parameters) {
 		
-		List<Element> results = locateAll(elementType, attributes);
+		List<Element> results = locateAll(elementType, parameters);
 		if(results.isEmpty())
 			return null;
 		
@@ -31,10 +31,10 @@ public abstract class AbstractElementLocator implements Locator {
 	}
 	
 	@Override
-	public List<Element> locateAll(ElementType elementType, List<String> attributes) {
+	public List<Element> locateAll(ElementType elementType, List<String> parameters) {
 		
 		this.elementType = elementType;
-		this.attributes = attributes;
+		this.parameters = parameters;
 		final List<WebElement> webElements = new ArrayList<WebElement>();
 		List<Element> results = new ArrayList<Element>();
 		
@@ -46,7 +46,7 @@ public abstract class AbstractElementLocator implements Locator {
 		
 		if(!webElements.isEmpty()) {
 			for(WebElement we : webElements) {
-				results.add(new BasicElementImpl(driver, we));
+				results.add(new BasicElement(driver, we));
 			}
 		}
 		
@@ -56,7 +56,7 @@ public abstract class AbstractElementLocator implements Locator {
 			if(!iframes.isEmpty()) {
 				for(WebElement iframe : iframes) {
 					driver = wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
-					List<Element> frameResults = locateAll(elementType, attributes);
+					List<Element> frameResults = locateAll(elementType, parameters);
 					results.addAll(frameResults);
 					// Don't switch back to the parent window because you will not be able to use the WebElement as it would 
 					// then belong to a frame that the WebDriver is longer focused on ( you will get a StaleElementReferenceException ).
@@ -72,20 +72,16 @@ public abstract class AbstractElementLocator implements Locator {
 		this.defaultRan = defaultRan;
 	}
 	
-	/**
-	 * Attributes are evaluated in the following order, with the element of the first matching attribute being returned:
-	 *    1) id
-	 *    2) name
-	 */
 	protected void defaultLocate(List<WebElement> located) {
 		
-		if(defaultRan || attributes.isEmpty() || elementType == null)
+		if(defaultRan || parameters.isEmpty() || elementType == null)
 			return;
 		
 		switch(elementType) {
 		case BUTTON:
 			break;
 		case BUTTONIMAGE:
+			
 			break;
 		case CHECKBOX:
 			break;

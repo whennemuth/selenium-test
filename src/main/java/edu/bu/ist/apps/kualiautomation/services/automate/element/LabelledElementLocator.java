@@ -36,12 +36,16 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	protected void customLocate(List<WebElement> located) {
 		if(elementType != null && elementType.getTagname() != null) {
 			
-			String label = new String(attributes.get(0));
+			String label = new String(parameters.get(0));
+			String attribute = null;
+			if(parameters.size() > 1) {
+				attribute = parameters.get(1);
+			}
 			LabelElementLocator labelLocator = new LabelElementLocator(driver);
 			List<Element> candidates = labelLocator.locateAll(elementType, Arrays.asList(new String[]{label}));
 			
 			for(Element labelElement : candidates) {
-				WebElement fld = getInputField(labelElement.getWebElement());
+				WebElement fld = getInputField(labelElement.getWebElement(), attribute);
 				if(fld != null) {
 					located.add(fld);
 					break;
@@ -56,7 +60,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	 * @param element
 	 * @return
 	 */
-	private WebElement getInputField(WebElement element) {
+	private WebElement getInputField(WebElement element, String attributeValue) {
 		StringBuilder xpath = new StringBuilder(".//");
 		xpath.append(elementType.getTagname());
 		if(elementType.getTypeAttribute() != null) {
@@ -71,12 +75,25 @@ public class LabelledElementLocator extends AbstractElementLocator {
 			// WebElement parent = getParentElement(element);
 			WebElement parent = element.findElement(By.xpath("./.."));
 			if(parent != null) {
-				return getInputField(parent);
+				return getInputField(parent, attributeValue);
 			}
 			return null;
 		}
 		else {
-			return flds.get(0);
+			WebElement fld = flds.get(0);
+			
+			// A second parameter is present, it is an attribute value, so search attributes of the webElement for one with a matching value
+			if(attributeValue == null) {
+				return fld;
+			}
+			else {
+				Attribute attrib = new Attribute(fld);
+				if(attrib.existsForValue(attributeValue)) {
+					System.out.println(attrib.getMessage());
+					return fld;
+				}
+				return null;
+			}
 		}
 	}
 

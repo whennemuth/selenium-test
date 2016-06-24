@@ -4,7 +4,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitWebElement;
 
-public class BasicElementImpl implements Element {
+public class BasicElement implements Element {
 	
 	public static final String CHECKED_REGEX = "(?!)(true)|(yes)|(on)|(checked)";
 	public static final String UNCHECKED_REGEX = "(?!)(false)|(no)|(off)|(unchecked)";
@@ -14,12 +14,12 @@ public class BasicElementImpl implements Element {
 	private WebElement label;
 	private ElementType elementType;
 	
-	public BasicElementImpl(WebDriver driver, WebElement webElement) {
+	public BasicElement(WebDriver driver, WebElement webElement) {
 		this.driver = driver;
 		setWebElement(webElement);
 	}
 	
-	public BasicElementImpl(WebDriver driver, WebElement webElement, WebElement label) {
+	public BasicElement(WebDriver driver, WebElement webElement, WebElement label) {
 		this.driver = driver;
 		setWebElement(webElement);
 		this.label = label;

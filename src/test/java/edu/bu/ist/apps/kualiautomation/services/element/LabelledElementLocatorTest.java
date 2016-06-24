@@ -107,17 +107,19 @@ public class LabelledElementLocatorTest {
 	
 	@Test
 	public void findButton() {
-// RESUME NEXT: write functionality for this test		
-		findAndAssertElement(
-				"http://localhost:8080/prop-log-lookup-frame", 
-				ElementType.BUTTONIMAGE, 
-				"search proposal log status", 
-				"title:Search Proposal Log Status");
-		
+
+		// Find button by the nearest label
 		findAndAssertElement(
 				"http://localhost:8080/prop-log-lookup-frame", 
 				ElementType.BUTTONIMAGE, 
 				"Proposal Log Status", 
+				"title:Search Proposal Log Status");
+		
+		// Find button by its title
+		findAndAssertElement(
+				"http://localhost:8080/prop-log-lookup-frame", 
+				ElementType.BUTTONIMAGE, 
+				"search proposal log status", 
 				"title:Search Proposal Log Status");
 	}
 	

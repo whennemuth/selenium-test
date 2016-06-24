@@ -61,11 +61,11 @@ public class LocatorRunner {
 	
 	private Element runBatch(Class<?>[] classes) {
 		locator = new BatchElementLocator(driver);
-		String[] attributes = new String[classes.length];
+		String[] parameters = new String[classes.length];
 		for(int i=0; i<classes.length; i++) {
-			attributes[i] = classes[i].getName() + ":" + attribute;
+			parameters[i] = classes[i].getName() + ":" + attribute;
 		}
-		Element element = locator.locateFirst(elementType, Arrays.asList(attributes));
+		Element element = locator.locateFirst(elementType, Arrays.asList(parameters));
 		return element;
 	}
 }

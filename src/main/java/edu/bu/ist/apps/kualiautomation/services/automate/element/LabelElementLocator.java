@@ -24,7 +24,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 	@Override
 	protected void customLocate(List<WebElement> located) {
 		
-		String label = new String(attributes.get(0));
+		String label = new String(parameters.get(0));
 		String cleanedLabel = getCleanedValue(label);
 		
 		// If there is no element type specified, then we assume that label indicates the innerText of the element being sought.
