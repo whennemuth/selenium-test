@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.element;
+package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -9,6 +9,9 @@ import java.util.Map;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+
+import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
 /**
  * This locator works by trying the of one or more other locators and returning their output. 

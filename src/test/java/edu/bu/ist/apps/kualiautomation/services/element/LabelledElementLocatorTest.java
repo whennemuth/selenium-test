@@ -1,7 +1,5 @@
 package edu.bu.ist.apps.kualiautomation.services.element;
 
-import static org.junit.Assert.*;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,9 +12,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 
-import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
-import edu.bu.ist.apps.kualiautomation.services.automate.element.LabelledElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.LabelledElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 
 public class LabelledElementLocatorTest {
@@ -57,38 +54,6 @@ public class LabelledElementLocatorTest {
 		}
 	}
 	
-	private void findAndAssertElement(String url, ElementType et, String label, String ...otherAttributes) {
-		if(locator.getDriver().getCurrentUrl() == null || !locator.getDriver().getCurrentUrl().equalsIgnoreCase(url)) {
-			locator.getDriver().get(url);
-		}
-		
-		Element element = locator.locate(et, label);
-		assertNotNull(element);	
-		assertEquals(et.getTagname(), element.getWebElement().getTagName().toLowerCase());
-		assertTrue(areNullOrEqual(et.getTypeAttribute(), element.getWebElement().getAttribute("type")));
-		for(String pair: otherAttributes) {
-			String[] parts = pair.split(":");
-			String attributeName = parts[0];
-			String assertValue = null;
-			if(parts.length > 1) {
-				assertValue = pair.split(":")[1];
-				if(assertValue.trim().length() == 0) {
-					assertValue = null;
-				}
-			}
-			String actualValue = element.getWebElement().getAttribute(attributeName);
-			assertTrue(areNullOrEqual(assertValue, actualValue));
-		}
-	}
-	
-	private boolean areNullOrEqual(String val1, String val2) {
-		if(val1 == null && val2 == null)
-			return true;
-		if(val1 == null || val2 == null)
-			return false;
-		return val1.equalsIgnoreCase(val2);
-	}
-	
 	/**
 	 * Find all fields neighboring a label in a frameless html page
 	 */
@@ -106,38 +71,168 @@ public class LabelledElementLocatorTest {
 	}
 	
 	@Test
-	public void findButton() {
-
-		// Find button by the nearest label
-		findAndAssertElement(
-				"http://localhost:8080/prop-log-lookup-frame", 
-				ElementType.BUTTONIMAGE, 
-				"Proposal Log Status", 
-				"title:Search Proposal Log Status");
+	public void findButtonImageByNearestLabel() {
+		findButtonImageByNearestLabel("http://localhost:8080/prop-log-lookup");
+		findButtonImageByNearestLabel("http://localhost:8080/prop-log-lookup-frame");
+	}
+	public void findButtonImageByNearestLabel(String url) {
 		
-		// Find button by its title
-		findAndAssertElement(
-				"http://localhost:8080/prop-log-lookup-frame", 
-				ElementType.BUTTONIMAGE, 
-				"search proposal log status", 
-				"title:Search Proposal Log Status");
+		LocateResultAssertion asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Proposal Log Status");
+		asserter.setElementType(ElementType.BUTTONIMAGE);
+		asserter.setNumResults(2);
+		asserter.findAndAssertElements();
+
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Proposal Log Status");
+		asserter.addAttributeValue("Search Proposal Log Status");
+		asserter.setElementType(ElementType.BUTTONIMAGE);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("title", "Search Proposal Log Status");
+		asserter.findAndAssertElements();
+	}
+	
+	@Test
+	public void findButtonImageByTitle() {
+		findButtonImageByTitle("http://localhost:8080/prop-log-lookup");
+		findButtonImageByTitle("http://localhost:8080/prop-log-lookup-frame");
+	}
+	public void findButtonImageByTitle(String url) {
+
+		LocateResultAssertion asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.addAttributeValue("Search Proposal Log Status");
+		asserter.setElementType(ElementType.BUTTONIMAGE);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("title", "Search Proposal Log Status");
+		asserter.findAndAssertElements();
 	}
 	
 	private void findFields(String url) {
-		findAndAssertElement(url, ElementType.TEXTBOX, "Proposal Number", "id:proposalNumber");
-		findAndAssertElement(url, ElementType.SELECT, "Proposal Log Type", "id:proposalLogTypeCode", "name:proposalLogTypeCode");
-		findAndAssertElement(url, ElementType.SELECT, "Proposal Log Status", "id:logstatus", "name:logstatus");
-		findAndAssertElement(url, ElementType.TEXTBOX, "Proposal Merged With", "id:mergedwith", "name:mergedwith");
-		findAndAssertElement(url, ElementType.TEXTBOX, "Created Institutional Proposal", "id:instProposalNumber");
-		findAndAssertElement(url, ElementType.SELECT, "Proposal Type", "id:proposalTypeCode");
-		findAndAssertElement(url, ElementType.TEXTBOX, "Title", "id:title");
-		findAndAssertElement(url, ElementType.TEXTBOX, "Principal Investigator (Employee)", "id:person.username");
-		findAndAssertElement(url, ElementType.TEXTBOX, "Principal Investigator (Non-Employee)", "id:rolodexId");
-		findAndAssertElement(url, ElementType.TEXTBOX, "Lead Unit", "id:leadunit");
-		findAndAssertElement(url, ElementType.TEXTBOX, "Sponsor", "id:sponsorcode");
-		findAndAssertElement(url, ElementType.TEXTBOX, "Sponsor Name", "id:sponsorname");
-		findAndAssertElement(url, ElementType.TEXTBOX, "Comments", "id:comments");
-		findAndAssertElement(url, ElementType.TEXTBOX, "Deadline Date From", "id:rangeLowerBoundKeyPrefix_deadlineDate");
-		findAndAssertElement(url, ElementType.TEXTBOX, "Deadline Date To", "id:deadlinedate");
+		
+		LocateResultAssertion asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Proposal Number");
+		asserter.setElementType(ElementType.TEXTBOX);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "proposalNumber");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Proposal Log Type");
+		asserter.setElementType(ElementType.SELECT);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "proposalLogTypeCode");
+		asserter.addAttributeAssertion("name", "proposalLogTypeCode");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Proposal Log Status");
+		asserter.setElementType(ElementType.SELECT);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "logstatus");
+		asserter.addAttributeAssertion("name", "logstatus");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Proposal Merged With");
+		asserter.setElementType(ElementType.TEXTBOX);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "mergedwith");
+		asserter.addAttributeAssertion("name", "mergedwith");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Created Institutional Proposal");
+		asserter.setElementType(ElementType.TEXTBOX);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "instProposalNumber");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Proposal Type");
+		asserter.setElementType(ElementType.SELECT);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "proposalTypeCode");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Title");
+		asserter.setElementType(ElementType.TEXTBOX);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "title");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Principal Investigator (Employee)");
+		asserter.setElementType(ElementType.TEXTBOX);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "person.username");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Principal Investigator (Non-Employee)");
+		asserter.setElementType(ElementType.TEXTBOX);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "rolodexId");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Lead Unit");
+		asserter.setElementType(ElementType.TEXTBOX);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "leadunit");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Sponsor");
+		asserter.setElementType(ElementType.TEXTBOX);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "sponsorcode");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Sponsor Name");
+		asserter.setElementType(ElementType.TEXTBOX);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "sponsorname");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Comments");
+		asserter.setElementType(ElementType.TEXTBOX);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "comments");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Deadline Date From");
+		asserter.setElementType(ElementType.TEXTBOX);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "rangeLowerBoundKeyPrefix_deadlineDate");
+		asserter.findAndAssertElements();
+		
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Deadline Date To");
+		asserter.setElementType(ElementType.TEXTBOX);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "deadlinedate");
+		asserter.findAndAssertElements();
 	}
 }

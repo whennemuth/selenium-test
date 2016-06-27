@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.element;
+package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,6 +7,8 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 
 public class LabelElementLocator extends AbstractElementLocator {
 	
@@ -22,27 +24,57 @@ public class LabelElementLocator extends AbstractElementLocator {
 	}
 	
 	@Override
-	protected void customLocate(List<WebElement> located) {
+	protected List<WebElement> customLocate() {
 		
+		List<WebElement> located = new ArrayList<WebElement>();
 		String label = new String(parameters.get(0));
 		String cleanedLabel = getCleanedValue(label);
 		
 		// If there is no element type specified, then we assume that label indicates the innerText of the element being sought.
 		List<WebElement> elements = 
-			//driver.findElements(By.xpath("//*[text()[contains(., \"" + cleanedLabel + "\")]]"));
-			//driver.findElements(By.xpath("//*[normalize-space(text())=\"" + cleanedLabel + "\"]"));
 			//driver.findElements(By.xpath("//*[text()[normalize-space(.)=\"" + cleanedLabel + "\"]]"));
-		driver.findElements(By.xpath("//*[starts-with(normalize-space(text()), \"" + cleanedLabel + "\")]"));
+			driver.findElements(By.xpath("//*[normalize-space(text())=\"" + label.trim() + "\"]"));
 		
+		if(elements.isEmpty()) {
+			// Find a match that starts with the specified label. This is for long labels that can be uniquely identified by the way they start.
+			elements = 
+				//driver.findElements(By.xpath("//*[text()[contains(., \"" + cleanedLabel + "\")]]"));
+				driver.findElements(By.xpath("//*[starts-with(normalize-space(text()), \"" + cleanedLabel + "\")]"));
+		}
+		
+		// Double check the startswith/normalization filtering 
 		List<WebElement> filtered = new ArrayList<WebElement>();
+		Integer shortest = null;
 		for(WebElement we : elements) {
 			String cleanedElementText = getCleanedValue(we.getText());
 			
 			if(cleanedElementText.toLowerCase().startsWith(cleanedLabel.toLowerCase())) {
+				if(shortest == null) {
+					shortest = cleanedElementText.length();
+				}
+				else{
+					int len = cleanedElementText.length();
+					if(shortest > len)
+						shortest = len;
+				}
 				filtered.add(we);
 			}
 		}
-		located.addAll(filtered);
+		
+		// Of the filtered matches, keep the shortest match(s).
+		for(WebElement we : filtered) {
+			String cleanedElementText = getCleanedValue(we.getText());
+			int len = cleanedElementText.length();
+			if(shortest.equals(len)) {
+				located.add(we);
+			}
+		}
+
+		// We are only searching for labels, but if the search fails then the upcoming default search
+		// will try to find fields. Prevent this by indicating the default search has already run.
+		defaultRan = true;
+		
+		return located;
 	}
 	
 	/**

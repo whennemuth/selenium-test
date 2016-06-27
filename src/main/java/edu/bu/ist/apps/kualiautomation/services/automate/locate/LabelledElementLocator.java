@@ -1,12 +1,18 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.element;
+package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import edu.bu.ist.apps.kualiautomation.services.automate.element.Attribute;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
 /**
  * With a specified WebElement that serves as a label, traverse up the DOM one element at a time until
@@ -27,31 +33,27 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	public LabelledElementLocator(WebDriver driver){
 		super(driver);
 	}
-
-	public Element locate(ElementType elementType, String label) {
-		return super.locateFirst(elementType, Arrays.asList(new String[]{label}));
-	}
 	
 	@Override
-	protected void customLocate(List<WebElement> located) {
+	protected List<WebElement> customLocate() {
+		List<WebElement> located = new ArrayList<WebElement>();
 		if(elementType != null && elementType.getTagname() != null) {
 			
 			String label = new String(parameters.get(0));
-			String attribute = null;
+			List<String> attributes = new ArrayList<String>();
 			if(parameters.size() > 1) {
-				attribute = parameters.get(1);
+				attributes = parameters.subList(1, parameters.size());
 			}
 			LabelElementLocator labelLocator = new LabelElementLocator(driver);
 			List<Element> candidates = labelLocator.locateAll(elementType, Arrays.asList(new String[]{label}));
 			
 			for(Element labelElement : candidates) {
-				WebElement fld = getInputField(labelElement.getWebElement(), attribute);
-				if(fld != null) {
-					located.add(fld);
-					break;
-				}
+				List<WebElement> flds = getInputField(labelElement.getWebElement(), attributes);
+				located.addAll(flds);
 			}
 		}
+		
+		return located;
 	}
 
 	/**
@@ -60,39 +62,35 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	 * @param element
 	 * @return
 	 */
-	private WebElement getInputField(WebElement element, String attributeValue) {
-		StringBuilder xpath = new StringBuilder(".//");
-		xpath.append(elementType.getTagname());
-		if(elementType.getTypeAttribute() != null) {
-			xpath.append("[@type='")
-			.append(elementType.getTypeAttribute())
-			.append("']");
-		}
+	private List<WebElement> getInputField(WebElement element, List<String> attributeValues) {
 
-		List<WebElement> flds = element.findElements(By.xpath(xpath.toString()));
-		
+		List<WebElement> flds = elementType.findFrom(element);
+
 		if(flds.isEmpty()) {
 			// WebElement parent = getParentElement(element);
-			WebElement parent = element.findElement(By.xpath("./.."));
-			if(parent != null) {
-				return getInputField(parent, attributeValue);
+			WebElement parent = null;
+			try {
+				parent = element.findElement(By.xpath("./.."));
+			} 
+			catch (InvalidSelectorException e) {
+				// Runtime exception thrown when you are at the top of the DOM and try to select higher.
+				// An instance of com.gargoylesoftware.htmlunit.html.HtmlPage is returned, which triggers the exception.
+				return flds;
 			}
-			return null;
+			if(parent != null) {
+				return getInputField(parent, attributeValues);
+			}
+			return flds;
 		}
 		else {
-			WebElement fld = flds.get(0);
-			
-			// A second parameter is present, it is an attribute value, so search attributes of the webElement for one with a matching value
-			if(attributeValue == null) {
-				return fld;
+			if(attributeValues.isEmpty()) {
+				return flds;
 			}
 			else {
-				Attribute attrib = new Attribute(fld);
-				if(attrib.existsForValue(attributeValue)) {
-					System.out.println(attrib.getMessage());
-					return fld;
-				}
-				return null;
+				// If parameters are present beyond the first, they are attribute values, so pick only 
+				// those webElements that have every attributeValue accounted for among their attributes.
+				List<WebElement> filtered = Attribute.findForValues(flds, attributeValues);
+				return filtered;
 			}
 		}
 	}
@@ -102,6 +100,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	 * @param childElement
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private WebElement getParentElement(WebElement childElement) {
 		JavascriptExecutor executor = (JavascriptExecutor)driver;
 		WebElement parentElement = (WebElement)executor.executeScript("return arguments[0].parentNode;", childElement);

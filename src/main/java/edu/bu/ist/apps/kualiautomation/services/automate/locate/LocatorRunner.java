@@ -1,8 +1,11 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.element;
+package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.Arrays;
 
 import org.openqa.selenium.WebDriver;
+
+import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
 public class LocatorRunner {
 
@@ -24,7 +27,6 @@ public class LocatorRunner {
 		return run(false);
 	}
 	
-	// RESUME NEXT: unit test what's here so far and then fill out the remaining cases and test.
 	public Element run(boolean greedy) {
 		
 		Element element = null;
@@ -49,6 +51,7 @@ public class LocatorRunner {
 		case TEXTAREA:
 			break;
 		case SELECT:
+			// RESUME NEXT: write code here.
 			break;
 		case RADIO:
 			break;

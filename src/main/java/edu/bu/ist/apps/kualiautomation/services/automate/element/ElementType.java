@@ -1,5 +1,9 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public enum ElementType {
@@ -8,54 +12,64 @@ public enum ElementType {
 		"Simple text box",
 		"input",
 		"text",
-		"//input[@type='text']"),
+		"//input[@type='text']",
+		true),
 	TEXTAREA(
 		"Area in which multi-line text can be input",
 		"textarea",
 		null,
-		"//textarea"),
+		"//textarea",
+		true),
 	BUTTON(
 		"Something to click that looks like a button",
 		"input",
 		"button",
-		"//input[@type='button']"),
+		"//input[@type='button']",
+		false),
 	BUTTONIMAGE(
 		"Something to click that looks like an image",
 		"input",
-		"button",
-		"//input[@type='image']"),
+		"image",
+		"//input[@type='image']",
+		false),
 	HYPERLINK(
 		"Clickable text or graphic that changes the cursor when hovered over to indicate a hotspot for navigation or function trigger.",
 		"a",
 		null,
-		"//a"), 
+		"//a",
+		false), 
 	SELECT(
 		"A dropdown box or listbox",
 		"select",
 		null,
-		"//select"),
+		"//select",
+		false),
 	CHECKBOX(
 		"Checkable box",
 		"input",
 		"checkbox",
-		"//input[@type='checkbox']"),
+		"//input[@type='checkbox']",
+		false),
 	RADIO(
 		"Radio Button",
 		"input",
 		"radio",
-		"//input[@type='radio']"),
+		"//input[@type='radio']",
+		false),
 	OTHER(
 		"None of the above, but clickable",
 		null,
 		null,
-		null);
+		null,
+		false);
 	
 	private String description;
 	private String xpathSelector;
 	private String tagname;
 	private String typeAttribute;
+	private boolean acceptsKeystrokes;
 	
-	private ElementType(String description, String tagname, String typeAttribute, String xpathSelector) {
+	private ElementType(String description, String tagname, String typeAttribute, String xpathSelector, boolean acceptsKeystrokes) {
 		this.description = description;
 		this.xpathSelector = xpathSelector;
 		this.tagname = tagname;
@@ -76,6 +90,31 @@ public enum ElementType {
 
 	public String getTypeAttribute() {
 		return typeAttribute;
+	}
+	
+	public boolean acceptsKeystrokes() {
+		return acceptsKeystrokes;
+	}
+
+	public List<WebElement> findAll(WebDriver driver) {
+		List<WebElement> flds = driver.findElements(By.xpath(getXpath(true)));
+		return flds;
+	}
+	
+	public List<WebElement> findFrom(WebElement element) {
+		List<WebElement> flds = element.findElements(By.xpath(getXpath(false)));
+		return flds;
+	}
+	
+	private String getXpath(boolean global) {
+		StringBuilder xpath = new StringBuilder(global ? "//" : ".//");
+		xpath.append(getTagname());
+		if(getTypeAttribute() != null) {
+			xpath.append("[@type='")
+			.append(getTypeAttribute())
+			.append("']");
+		}
+		return xpath.toString();
 	}
 	
 	public static ElementType getInstance(WebElement we) {

@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.element;
+package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import edu.bu.ist.apps.kualiautomation.services.automate.element.Attribute;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
 public abstract class AbstractElementLocator implements Locator {
 
@@ -32,25 +37,22 @@ public abstract class AbstractElementLocator implements Locator {
 	
 	@Override
 	public List<Element> locateAll(ElementType elementType, List<String> parameters) {
-		
+		defaultRan = false;
 		this.elementType = elementType;
 		this.parameters = parameters;
 		final List<WebElement> webElements = new ArrayList<WebElement>();
 		List<Element> results = new ArrayList<Element>();
 		
-		customLocate(webElements);
+		List<WebElement> custom = customLocate();
+		webElements.addAll(custom);
 		
 		if(webElements.isEmpty()) {
-			defaultLocate(webElements);
-		}
-		
-		if(!webElements.isEmpty()) {
-			for(WebElement we : webElements) {
-				results.add(new BasicElement(driver, we));
-			}
+			List<WebElement> defaults = defaultLocate();
+			webElements.addAll(defaults);
 		}
 		
 		if(webElements.isEmpty()) {
+			// Check for frames and search those as well
 			WebDriverWait wait = new WebDriverWait(driver, 100);
 			List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
 			if(!iframes.isEmpty()) {
@@ -64,6 +66,11 @@ public abstract class AbstractElementLocator implements Locator {
 				}
 			}
 		}
+		else {
+			for(WebElement we : webElements) {
+				results.add(new BasicElement(driver, we));
+			}
+		}
 		
 		return results;
 	}
@@ -72,22 +79,29 @@ public abstract class AbstractElementLocator implements Locator {
 		this.defaultRan = defaultRan;
 	}
 	
-	protected void defaultLocate(List<WebElement> located) {
+	protected abstract List<WebElement> customLocate();
+	
+	protected List<WebElement> defaultLocate() {
+		
+		List<WebElement> results = new ArrayList<WebElement>();
 		
 		if(defaultRan || parameters.isEmpty() || elementType == null)
-			return;
+			return results;
 		
 		switch(elementType) {
 		case BUTTON:
 			break;
 		case BUTTONIMAGE:
-			
+			String attributeValue = parameters.get(0);
+			List<WebElement> candidates = elementType.findAll(driver);
+			results.addAll(Attribute.findForValue(candidates, attributeValue));
 			break;
 		case CHECKBOX:
 			break;
 		case HYPERLINK:
 			break;
 		case TEXTBOX:
+			// RESUME NEXT: write code here.
 			break;
 		case TEXTAREA:
 			break;
@@ -100,9 +114,9 @@ public abstract class AbstractElementLocator implements Locator {
 		}
 		
 		defaultRan = true;
+		
+		return results;
 	}
-	
-	protected abstract void customLocate(List<WebElement> located);
 
 	@Override
 	public WebDriver getDriver() {

@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.element;
+package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.List;
 
@@ -18,8 +18,8 @@ public class BasicElementLocator extends AbstractElementLocator {
 	}
 
 	@Override
-	protected void customLocate(List<WebElement> located) {
-		super.defaultLocate(located);
+	protected List<WebElement> customLocate() {
+		return super.defaultLocate();
 	}
 
 }

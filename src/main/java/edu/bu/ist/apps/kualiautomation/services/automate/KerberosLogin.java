@@ -13,8 +13,8 @@ import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
-import edu.bu.ist.apps.kualiautomation.services.automate.element.LabelledElementLocator;
-import edu.bu.ist.apps.kualiautomation.services.automate.element.Locator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.LabelledElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.Locator;
 import edu.bu.ist.apps.kualiautomation.services.config.ConfigTestingDefaults;
 
 public class KerberosLogin {

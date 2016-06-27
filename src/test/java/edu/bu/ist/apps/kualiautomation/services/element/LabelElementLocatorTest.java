@@ -19,7 +19,7 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
-import edu.bu.ist.apps.kualiautomation.services.automate.element.LabelElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.LabelElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 
 public class LabelElementLocatorTest {
