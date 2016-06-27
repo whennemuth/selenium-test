@@ -60,7 +60,7 @@ public enum ElementType {
 		"None of the above, but clickable",
 		null,
 		null,
-		null,
+		"//*",
 		false);
 	
 	private String description;
@@ -107,14 +107,11 @@ public enum ElementType {
 	}
 	
 	private String getXpath(boolean global) {
-		StringBuilder xpath = new StringBuilder(global ? "//" : ".//");
-		xpath.append(getTagname());
-		if(getTypeAttribute() != null) {
-			xpath.append("[@type='")
-			.append(getTypeAttribute())
-			.append("']");
+		String xpath = global ? "//" : ".//";
+		if(xpathSelector != null) {
+			xpath = xpathSelector.replaceFirst("//", xpath);
 		}
-		return xpath.toString();
+		return xpath;
 	}
 	
 	public static ElementType getInstance(WebElement we) {
@@ -133,6 +130,6 @@ public enum ElementType {
 				}
 			}
 		}
-		return null;
+		return OTHER;
 	}
 }

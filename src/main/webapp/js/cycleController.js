@@ -89,6 +89,10 @@ var cycleCtrlFactory = function() {
 				}
 				return [];
 			};
+			
+			scope.getCycleJson = function() {
+				return 'CYCLE:\n' + angular.toJson(scope.cycle, true) + '\n\nCYCLES:\n' + angular.toJson(scope.cycles, true);
+			}
 		}
 	};
 };

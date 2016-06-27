@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.element;
+package edu.bu.ist.apps.kualiautomation.services.locate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

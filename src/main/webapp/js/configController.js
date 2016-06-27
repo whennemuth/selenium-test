@@ -121,6 +121,10 @@ var configCtrlFactory = function() {
 					}
 				)
 			};
+			
+			scope.getConfigJson = function() {
+				return 'CONFIG:\n' + angular.toJson(scope.config, true);
+			}
 		}
 	};
 };

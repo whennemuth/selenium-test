@@ -43,6 +43,7 @@ public class LocatorRunner {
 		case CHECKBOX:
 			break;
 		case HYPERLINK:
+			// RESUME NEXT: write code here.
 			break;
 		case TEXTBOX:
 			locator = new LabelledElementLocator(driver);
@@ -51,7 +52,6 @@ public class LocatorRunner {
 		case TEXTAREA:
 			break;
 		case SELECT:
-			// RESUME NEXT: write code here.
 			break;
 		case RADIO:
 			break;

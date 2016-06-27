@@ -89,6 +89,10 @@ div.navigated a {
 	padding: 10px;	
 }
 
+.showjson {
+	display:inline; position:relative; top:-4px;	
+}
+
 input[type='text'],[type='password'] {
 	border: solid 1px #007acc;
 }

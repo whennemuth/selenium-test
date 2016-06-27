@@ -40,15 +40,15 @@ public class LabelledElementLocator extends AbstractElementLocator {
 		if(elementType != null && elementType.getTagname() != null) {
 			
 			String label = new String(parameters.get(0));
-			List<String> attributes = new ArrayList<String>();
+			List<String> attributeValues = new ArrayList<String>();
 			if(parameters.size() > 1) {
-				attributes = parameters.subList(1, parameters.size());
+				attributeValues = parameters.subList(1, parameters.size());
 			}
 			LabelElementLocator labelLocator = new LabelElementLocator(driver);
 			List<Element> candidates = labelLocator.locateAll(elementType, Arrays.asList(new String[]{label}));
 			
 			for(Element labelElement : candidates) {
-				List<WebElement> flds = getInputField(labelElement.getWebElement(), attributes);
+				List<WebElement> flds = getInputField(labelElement.getWebElement(), attributeValues);
 				located.addAll(flds);
 			}
 		}

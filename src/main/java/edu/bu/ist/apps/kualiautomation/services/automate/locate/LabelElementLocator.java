@@ -32,14 +32,14 @@ public class LabelElementLocator extends AbstractElementLocator {
 		
 		// If there is no element type specified, then we assume that label indicates the innerText of the element being sought.
 		List<WebElement> elements = 
-			//driver.findElements(By.xpath("//*[text()[normalize-space(.)=\"" + cleanedLabel + "\"]]"));
-			driver.findElements(By.xpath("//*[normalize-space(text())=\"" + label.trim() + "\"]"));
+			//driver.findElements(By.xpath("//*[text()[normalize-space(lower-case(.))=\"" + cleanedLabel.toLowerCase() + "\"]]"));
+			driver.findElements(By.xpath("//*[normalize-space(lower-case(text()))=\"" + label.trim().toLowerCase() + "\"]"));
 		
 		if(elements.isEmpty()) {
 			// Find a match that starts with the specified label. This is for long labels that can be uniquely identified by the way they start.
 			elements = 
-				//driver.findElements(By.xpath("//*[text()[contains(., \"" + cleanedLabel + "\")]]"));
-				driver.findElements(By.xpath("//*[starts-with(normalize-space(text()), \"" + cleanedLabel + "\")]"));
+				//driver.findElements(By.xpath("//*[text()[contains(lower-case(.), \"" + cleanedLabel.toLowerCase() + "\")]]"));
+				driver.findElements(By.xpath("//*[starts-with(normalize-space(lower-case(text())), \"" + cleanedLabel.toLowerCase() + "\")]"));
 		}
 		
 		// Double check the startswith/normalization filtering 
@@ -84,7 +84,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 	 * @param s
 	 * @return
 	 */
-	private String getCleanedValue(String s) {
+	public static String getCleanedValue(String s) {
 		// Normalize the spaces (trim from edges, and replace multiple contiguous whitespace with single space character)
 		String cleaned = s.trim().replaceAll("\\s+", " ");
 		// Trim off any sequence of colons and whitespace from the end of the text.

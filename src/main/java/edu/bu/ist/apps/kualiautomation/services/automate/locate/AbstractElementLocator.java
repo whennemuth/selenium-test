@@ -81,35 +81,35 @@ public abstract class AbstractElementLocator implements Locator {
 	
 	protected abstract List<WebElement> customLocate();
 	
+	/**
+	 * This is the default method for locating a WebElement on an html page.
+	 * It contains generic methods for matching and is invoked if the custom method found no results.
+	 * 
+	 * @return
+	 */
 	protected List<WebElement> defaultLocate() {
 		
 		List<WebElement> results = new ArrayList<WebElement>();
+		List<WebElement> candidates = new ArrayList<WebElement>();
 		
 		if(defaultRan || parameters.isEmpty() || elementType == null)
 			return results;
 		
 		switch(elementType) {
 		case BUTTON:
-			break;
 		case BUTTONIMAGE:
-			String attributeValue = parameters.get(0);
-			List<WebElement> candidates = elementType.findAll(driver);
-			results.addAll(Attribute.findForValue(candidates, attributeValue));
-			break;
 		case CHECKBOX:
-			break;
 		case HYPERLINK:
-			break;
 		case TEXTBOX:
-			// RESUME NEXT: write code here.
-			break;
 		case TEXTAREA:
-			break;
 		case SELECT:
-			break;
 		case RADIO:
+			candidates = elementType.findAll(driver);
+			results.addAll(Attribute.findForValues(candidates, parameters));
 			break;
 		case OTHER:
+			candidates = elementType.findAll(driver);
+			results.addAll(Attribute.findForValues(candidates, parameters));
 			break;
 		}
 		
