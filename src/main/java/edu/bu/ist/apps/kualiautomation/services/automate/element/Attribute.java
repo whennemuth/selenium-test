@@ -9,7 +9,7 @@ import org.openqa.selenium.WebElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.LabelElementLocator;
 
 /**
- * Check attributes of the webElement for the specified attributeValue in the order found in attributesToCheck.
+ * Check attributes of the webElement for the specified attributeValue(s) in the order found in attributesToCheck.
  * 
  * @author wrh
  *

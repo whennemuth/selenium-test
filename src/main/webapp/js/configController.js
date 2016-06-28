@@ -1,5 +1,4 @@
 var configCtrlFactory = function() {
-	
 	return {
 		setScope: function(scope, configSvc, cycleSvc) {
 			console.log("Configuring application controller scope");

@@ -29,11 +29,11 @@
 				<a href="#" onclick="document.location.href = 'main.htm#/home/';">refresh</a>
 			</div>
 			<div style="float: right;">
-				<div class="basicfont showjson" ng-click="RESUME NEXT: how to modify the scope of kitAppController">show json</div>
-				<input id="showjson" type="checkbox">
+				<div class="basicfont showjson" click="show">show json</div>
+				<input id="showjson" type="checkbox" ng-model="jsoncbx">
 			</div>
 		</div>
-		
+
 		<div ng-view></div>
 	</div>
 	
@@ -78,6 +78,11 @@
 			$scope.getTabs = function() {
 				return navSvc.getTabs();
 			}
+			
+			$scope.jsoncbx = true;
+			$scope.showJson = function(){
+				return jsoncbx;
+			};
 		});
 
 		// 4) Set the application controller for the kitApp module and load its default model and event handlers
@@ -87,13 +92,9 @@
 			
 			configCtrl.setScope($scope, configSvc, cycleSvc);
 			
-			cycleCtrl.setScope($scope, cycleSvc);
+			cycleCtrl.setScope($scope, cycleSvc);	
 			
-			$scope.showjson = false;
-			$scope.toggleJson = function() {
-				scope.showjson = ! scope.showjson;
-				//return document.getElementById('showjson').checked;
-			}
+			$scope.showjson = navSvc.showJson();
 		});
 		
 		// 5) Setup injection for the various services.
