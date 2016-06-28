@@ -30,7 +30,7 @@
 			</div>
 			<div style="float: right;">
 				<div class="basicfont showjson" click="show">show json</div>
-				<input id="showjson" type="checkbox" ng-model="jsoncbx">
+				<input id="showjson" type="checkbox" ng-model="jsoncbx"">
 			</div>
 		</div>
 
@@ -80,9 +80,7 @@
 			}
 			
 			$scope.jsoncbx = true;
-			$scope.showJson = function(){
-				return jsoncbx;
-			};
+			navSvc.setScope($scope);
 		});
 
 		// 4) Set the application controller for the kitApp module and load its default model and event handlers
@@ -94,7 +92,9 @@
 			
 			cycleCtrl.setScope($scope, cycleSvc);	
 			
-			$scope.showjson = navSvc.showJson();
+			$scope.showJson = function() {
+				return navSvc.showJson();
+			}
 		});
 		
 		// 5) Setup injection for the various services.

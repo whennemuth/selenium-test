@@ -3,6 +3,7 @@
  */
 var navigationFactory = function($http, $q) {
 	
+	var _scope;
 	var configCache;
 	var tabCache;
 	var tabs = function() { };
@@ -11,6 +12,12 @@ var navigationFactory = function($http, $q) {
 	tabs.prototype.helpClass =   'navigation';
 	
 	return {
+		setScope: function(scope) {
+			_scope = scope;
+		},
+		showJson: function() {
+			return _scope.jsoncbx;
+		},
 		getTabs : function() {
 			if(tabCache) {
 				return tabCache;

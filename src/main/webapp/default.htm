@@ -30,7 +30,7 @@
 	</div>
 	<div class="section suite">
 		<div class=sectionlabel>Add/Edit Cycle</div>
-		<textarea cols="80" rows=15 ng-show="showjson">{{getCycleJson()}}</textarea>
+		<textarea cols="80" rows=15 ng-show="showJson()">{{getCycleJson()}}</textarea>
 		<div class="sectionarea" style="height:800px;">
 			<div class="cycleWrap" ng-show='cycle' style="font-weight:bold;">
 				Cycle name: <input type="text" ng-model="cycle.name" class="boldpad">
