@@ -3,7 +3,6 @@ package edu.bu.ist.apps.kualiautomation.entity;
 import java.io.IOException;
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -46,7 +45,13 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 
 	@Column(nullable=false, length=1000)
 	private String value;
-
+	
+	@Column(nullable=false, length=50)
+	private String elementType;
+	
+	@Column(nullable=true, length=100)
+	private String identifer;
+	
 	//bi-directional many-to-one association to Tab
 	@ManyToOne
 	@JoinColumn(name="tab_id", nullable=false)
@@ -85,6 +90,22 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public String getElementType() {
+		return elementType;
+	}
+
+	public void setElementType(String elementType) {
+		this.elementType = elementType;
+	}
+
+	public String getIdentifer() {
+		return identifer;
+	}
+
+	public void setIdentifer(String identifer) {
+		this.identifer = identifer;
 	}
 
 	@JsonSerialize(using=TabFieldSerializer.class)
