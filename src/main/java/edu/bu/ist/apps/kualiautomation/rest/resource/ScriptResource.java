@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.config.ScriptService;
 
 @Path("/")
@@ -24,6 +25,13 @@ public class ScriptResource {
 	@Path("/cycle/empty/{userId}")
 	public Response getEmptyCycle(@PathParam("userId") Integer userId) throws Exception {		
 		Response response = ServiceResponse.getResponse((new ScriptService()).getEmptyCycle(userId), Status.OK);
+		return response;		
+	}
+
+	@GET
+	@Path("/cycle/element/types")
+	public Response getElementTypes(@PathParam("userId") Integer userId) throws Exception {		
+		Response response = ServiceResponse.getResponse(ElementType.toJson(), Status.OK);
 		return response;		
 	}
 	

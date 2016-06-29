@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -50,7 +51,26 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	private String elementType;
 	
 	@Column(nullable=true, length=100)
-	private String identifer;
+	private String identifier;
+	
+	/**
+	 * This is a hack. I'm adding this property to be included into the json object created
+	 * from an instance of this class for convenience in angularjs 2-way binding UI manipulation.
+	 */
+	@Transient
+	public String getChecked() {
+		if(elementType == null)
+			return "";
+		if(value == null)
+			return "";
+		boolean checked = Boolean.valueOf(value);
+		return String.valueOf(checked);
+	}
+	@Transient
+	public void setChecked(String checked) {
+		// Do nothing
+	}
+
 	
 	//bi-directional many-to-one association to Tab
 	@ManyToOne
@@ -77,6 +97,8 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	}
 
 	public int getSequence() {
+		if(this.sequence == 0)
+			this.sequence++;
 		return this.sequence;
 	}
 
@@ -100,14 +122,14 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 		this.elementType = elementType;
 	}
 
-	public String getIdentifer() {
-		return identifer;
+	public String getIdentifier() {
+		return identifier;
 	}
-
-	public void setIdentifer(String identifer) {
-		this.identifer = identifer;
+	
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
 	}
-
+	
 	@JsonSerialize(using=TabFieldSerializer.class)
 	public Tab getTab() {
 		return this.tab;

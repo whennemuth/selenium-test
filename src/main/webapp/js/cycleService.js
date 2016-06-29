@@ -3,14 +3,19 @@ var GET_EMPTY_CYCLE_URL = '/rest/cycle/empty';
 var GET_CYCLE_BY_ID_URL = '/rest/cycle/lookup';	// tack id on to the end as a path variable
 var GET_CYCLES_BY_USER_ID = '/rest/cycles';
 var SAVE_CYCLE_URL = '/rest/cycle/save';
+var GET_ELEMENT_TYPES_URL = '/rest/cycle/element/types';
 
 var cycleSvcFactory = function($http, $q) {
 	
 	var emptyCycleJson;
-	var thisCycle;
+	var elementTypes;
 	var cyclesCache;	
 	
 	return {
+		isInitialized : function() {
+			// Once these objects have been obtained and cached from the corresponding web services, we are initialized.
+			return emptyCycleJson && elementTypes;
+		},
 		getEmptyCycle : function(userId) {
 			if(emptyCycleJson) {
 				// Called AFTER page load (not a promise)
@@ -84,6 +89,27 @@ var cycleSvcFactory = function($http, $q) {
 					deferred.reject(response);
 				});
 			return deferred.promise;
+		},
+		getElementTypes : function() {
+			if(elementTypes) {
+				// Called AFTER first load and is taken from cached variable (not a promise)
+				var ets = null;
+				eval("ets = " + elementTypes);
+				return ets;
+			}
+			else {
+				// First load must come from the web service call (is a promise)
+				var deferred = $q.defer();
+				$http.get(GET_ELEMENT_TYPES_URL)
+					.success(function(response) {
+						elementTypes = angular.toJson(response.data);
+						deferred.resolve(response.data);
+						
+					}).error(function(response){
+						deferred.reject(response);
+					});
+				return deferred.promise;
+			}
 		}
 	};
 };

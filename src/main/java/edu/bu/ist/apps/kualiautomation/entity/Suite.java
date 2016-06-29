@@ -3,6 +3,7 @@ package edu.bu.ist.apps.kualiautomation.entity;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -55,10 +56,7 @@ public class Suite extends AbstractEntity implements Serializable {
 
 	//bi-directional many-to-one association to Module
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="suite")
-	private Set<Module> modules = new TreeSet<Module>(new Comparator<Module>() {
-		@Override public int compare(Module module1, Module module2) {
-			return module1.getSequence() - module2.getSequence();
-		}});
+	private Set<Module> modules = new HashSet<Module>();
 
 	//bi-directional many-to-one association to Cycle
 	@ManyToOne
@@ -85,6 +83,8 @@ public class Suite extends AbstractEntity implements Serializable {
 	}
 
 	public int getSequence() {
+		if(this.sequence == 0)
+			this.sequence++;
 		return this.sequence;
 	}
 
@@ -93,7 +93,12 @@ public class Suite extends AbstractEntity implements Serializable {
 	}
 
 	public Set<Module> getModules() {
-		return this.modules;
+		TreeSet<Module> sorted = new TreeSet<Module>(new Comparator<Module>() {
+			@Override public int compare(Module module1, Module module2) {
+				return module1.getSequence() - module2.getSequence();
+			}});
+		sorted.addAll(modules);
+		return sorted;
 	}
 
 	public void setModules(Set<Module> modules) {
@@ -103,14 +108,12 @@ public class Suite extends AbstractEntity implements Serializable {
 	public Module addModule(Module module) {
 		getModules().add(module);
 		module.setSuite(this);
-
 		return module;
 	}
 
 	public Module removeModule(Module module) {
 		getModules().remove(module);
 		module.setSuite(null);
-
 		return module;
 	}
 

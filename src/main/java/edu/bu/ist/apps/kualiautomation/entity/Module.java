@@ -3,6 +3,7 @@ package edu.bu.ist.apps.kualiautomation.entity;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -60,10 +61,7 @@ public class Module extends AbstractEntity implements Serializable {
 
 	//bi-directional many-to-one association to Tab
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="module")
-	private Set<Tab> tabs = new TreeSet<Tab>(new Comparator<Tab>() {
-		@Override public int compare(Tab tab1, Tab tab2) {
-			return tab1.getSequence() - tab2.getSequence();
-		}});
+	private Set<Tab> tabs = new HashSet<Tab>();
 
 	public Module() {
 	}
@@ -85,6 +83,8 @@ public class Module extends AbstractEntity implements Serializable {
 	}
 
 	public int getSequence() {
+		if(this.sequence == 0)
+			this.sequence++;
 		return this.sequence;
 	}
 
@@ -102,7 +102,12 @@ public class Module extends AbstractEntity implements Serializable {
 	}
 
 	public Set<Tab> getTabs() {
-		return this.tabs;
+		TreeSet<Tab> sorted = new TreeSet<Tab>(new Comparator<Tab>() {
+			@Override public int compare(Tab tab1, Tab tab2) {
+				return tab1.getSequence() - tab2.getSequence();
+			}});
+		sorted.addAll(tabs);
+		return sorted;
 	}
 
 	public void setTabs(Set<Tab> tabs) {

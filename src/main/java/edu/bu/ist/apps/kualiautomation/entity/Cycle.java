@@ -2,6 +2,7 @@ package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -57,10 +58,7 @@ public class Cycle extends AbstractEntity implements Serializable {
 
 	//bi-directional many-to-one association to Suite
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="cycle")
-	private Set<Suite> suites = new TreeSet<Suite>(new Comparator<Suite>() {
-		@Override public int compare(Suite suite1, Suite suite2) {
-			return suite1.getSequence() - suite2.getSequence();
-		}});
+	private Set<Suite> suites = new HashSet<Suite>();
 	
 	//bi-directional many-to-one association to User
 	@ManyToOne
@@ -87,6 +85,8 @@ public class Cycle extends AbstractEntity implements Serializable {
 	}
 
 	public int getSequence() {
+		if(this.sequence == 0)
+			this.sequence++;
 		return this.sequence;
 	}
 
@@ -120,7 +120,14 @@ public class Cycle extends AbstractEntity implements Serializable {
 	}
 
 	public Set<Suite> getSuites() {
-		return this.suites;
+// RESUME NEXT: Do this sorting a different way. addSuites is adding to the copy returned here, which bypasses the private suites variable)
+// Repeat the fix for all the other entities. PROBLEM: defining the treeset at the private suites variable does not seem to return a set that is sorted.
+		TreeSet<Suite> sorted = new TreeSet<Suite>(new Comparator<Suite>() {
+			@Override public int compare(Suite suite1, Suite suite2) {
+				return suite1.getSequence() - suite2.getSequence();
+			}});
+		sorted.addAll(suites);
+		return sorted;
 	}
 
 	public void setSuites(Set<Suite> suites) {

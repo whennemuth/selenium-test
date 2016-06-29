@@ -3,6 +3,7 @@ package edu.bu.ist.apps.kualiautomation.entity;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -51,10 +52,7 @@ public class Tab extends AbstractEntity implements Serializable {
 
 	//bi-directional many-to-one association to LabelAndValue
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="tab")
-	private Set<LabelAndValue> labelAndValues = new TreeSet<LabelAndValue>(new Comparator<LabelAndValue>() {
-		@Override public int compare(LabelAndValue lv1, LabelAndValue lv2) {
-			return lv1.getSequence() - lv2.getSequence();
-		}});
+	private Set<LabelAndValue> labelAndValues = new HashSet<LabelAndValue>();
 
 	//bi-directional many-to-one association to Module
 	@ManyToOne
@@ -81,6 +79,8 @@ public class Tab extends AbstractEntity implements Serializable {
 	}
 
 	public int getSequence() {
+		if(this.sequence == 0)
+			this.sequence++;
 		return this.sequence;
 	}
 
@@ -89,7 +89,12 @@ public class Tab extends AbstractEntity implements Serializable {
 	}
 
 	public Set<LabelAndValue> getLabelAndValues() {
-		return this.labelAndValues;
+		TreeSet<LabelAndValue> sorted = new TreeSet<LabelAndValue>(new Comparator<LabelAndValue>() {
+			@Override public int compare(LabelAndValue lv1, LabelAndValue lv2) {
+				return lv1.getSequence() - lv2.getSequence();
+			}});
+		sorted.addAll(labelAndValues);
+		return sorted;
 	}
 
 	public void setLabelAndValues(Set<LabelAndValue> labelAndValues) {

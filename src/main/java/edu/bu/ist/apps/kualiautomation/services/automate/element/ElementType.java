@@ -1,6 +1,8 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -131,5 +133,13 @@ public enum ElementType {
 			}
 		}
 		return OTHER;
+	}
+
+	public static Map<String, String> toJson() {
+		Map<String, String> map = new HashMap<String, String>();
+		for(ElementType typ : ElementType.values()) {
+			map.put(typ.name(), typ.getDescription());
+		}
+		return map;
 	}
 }

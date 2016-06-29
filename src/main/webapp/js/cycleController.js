@@ -3,6 +3,74 @@ var cycleCtrlFactory = function() {
 	return {
 		setScope: function(scope, cycleSvc) {
 			
+			// Load in Element Types from web service
+			cycleSvc.getElementTypes();
+			
+			// Add an event handler to query if the service has intialized yet.
+			scope.isInitialized = function() {
+				return cycleSvc.isInitialized();
+			}
+			
+			scope.getElementTypes = function() {
+				return cycleSvc.getElementTypes();
+			}
+			
+			// Control which fields for label and value row get shown/hidden depending on element type selection.
+			scope.lvShow = function(lv, inputType) {
+				var checkable = false;
+				var clickonly = false;
+				var textvalue = false;
+				switch(lv.elementType) {
+					case 'BUTTON': 	case 'BUTTONIMAGE': case 'HYPERLINK':
+						clickonly = true;
+						break;
+					case 'CHECKBOX': case 'RADIO': 
+						checkable = true;
+						break;
+					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'OTHER':
+						textvalue = true;
+						break;
+				}
+				
+				switch(inputType) {
+					case 'state':
+						return checkable;
+					case 'value':
+						return textvalue;
+					default:
+						return false;
+				}
+			}
+			
+			// Clear out or pre-populate field values of a label and value row depending on element type and checked state selections
+			scope.lvChange = function(lv) {
+				switch(lv.elementType) {
+					case 'BUTTON': 	case 'BUTTONIMAGE': case 'HYPERLINK':
+						lv.value = '';
+						lv.checked = '';
+						break;
+					case 'CHECKBOX': case 'RADIO': 
+						lv.value = lv.checked;
+						break;
+					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'OTHER':
+						lv.checked = '';
+						lv.value = /^(true)|(false)$/i.test(lv.value) ? '' : lv.value;
+						break;
+					default:
+						lv.identifier = '';
+						lv.label = '';
+						lv.value = '';
+						lv.checked = '';
+						break;
+				}
+			}
+			
+			scope.resequence = function(items) {
+				for(var i=0; i<items.length; i++) {
+					items[i].sequence = (i+1);
+				}
+			}
+			
 			// Define an event handler to load in an empty default cycle object bound to a ng-repeat block for new cycles
 			scope.newCycle = function() {
 				cycleSvc.getCycle(null, scope.config.user.id).then(
@@ -15,6 +83,10 @@ var cycleCtrlFactory = function() {
 				);
 			}
 			
+			scope.backupCycle = function() {
+				scope.cycleBackup = angular.copy(scope.cycle);
+			}
+				
 			scope.saveCycle = function() {
 				cycleSvc.saveCycle(scope.cycle).then(
 					function(serviceResponse) {
@@ -36,9 +108,21 @@ var cycleCtrlFactory = function() {
 				);
 			};
 			
-			// Define an event handler to cancel the addition of a new cycle.
+			/**
+			 * Define an event handler to cancel the addition of a new cycle. It must restore the cycle that was being 
+			 * edited from its backup copy made before the edits started (backup made on change event for the cycles listbox).
+			 */
 			scope.cancelNewCycle = function() {
 				scope.cycle = '';
+				if(scope.cycles && scope.cycles.length && scope.cycles.length > 0) {
+					for(var i=0; i<scope.cycles.length; i++) {
+						if(scope.cycles[i].id == scope.cycleBackup.id) {
+							scope.cycles[i] = scope.cycleBackup;
+							scope.cycleBackup = '';
+							break;
+						}
+					}
+				}				
 			};
 			
 			scope.cloneCycle = function() {
@@ -91,7 +175,7 @@ var cycleCtrlFactory = function() {
 			};
 			
 			scope.getCycleJson = function() {
-				return 'CYCLE:\n' + angular.toJson(scope.cycle, true) + '\n\nCYCLES:\n' + angular.toJson(scope.cycles, true);
+				return 'CYCLE:\n' + angular.toJson(scope.cycle, true) + '\n\nCYCLES:\n' + angular.toJson(scope.cycles, true) + '\n\nBACKUP:\n' + angular.toJson(scope.cycleBackup, true);
 			}
 		}
 	};
