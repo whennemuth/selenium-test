@@ -22,7 +22,7 @@ public class Attribute {
 	private ElementType elementType;
 	private List<String> attributesToCheck = new ArrayList<String>();
 	static String[] DEFAULT_ATTRIBUTES_TO_CHECK = new String[] {
-			"id", "title", "name", "value"
+			"id", "title", "placeholder", "name", "value"
 	};
 	
 	public Attribute(WebElement webElement) {

@@ -8,11 +8,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
+import edu.bu.ist.apps.kualiautomation.services.automate.ModuleAction;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.config.ScriptService;
 
@@ -32,6 +34,13 @@ public class ScriptResource {
 	@Path("/cycle/element/types")
 	public Response getElementTypes(@PathParam("userId") Integer userId) throws Exception {		
 		Response response = ServiceResponse.getResponse(ElementType.toJson(), Status.OK);
+		return response;		
+	}
+	
+	@GET
+	@Path("/cycle/module/actions")
+	public Response getModuleActions() throws Exception {		
+		Response response = ServiceResponse.getResponse(ModuleAction.toJson(), Status.OK);
 		return response;		
 	}
 	
@@ -77,4 +86,18 @@ public class ScriptResource {
 		}		
 	}
 
+	@GET
+	@Path("/cycle/launch/cycle")
+	public Response launchCycle(@QueryParam("cycleId") Integer cycleId, @QueryParam("cfgId") Integer configId) {
+		try {
+			ScriptService svc = new ScriptService();
+			String message = svc.launchCycle(configId, cycleId);
+			return ServiceResponse.getSuccessResponse(null, message);
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+			return ServiceResponse.getExceptionResponse(e);
+		}
+	}
+	
 }

@@ -4,17 +4,22 @@ var GET_CYCLE_BY_ID_URL = '/rest/cycle/lookup';	// tack id on to the end as a pa
 var GET_CYCLES_BY_USER_ID = '/rest/cycles';
 var SAVE_CYCLE_URL = '/rest/cycle/save';
 var GET_ELEMENT_TYPES_URL = '/rest/cycle/element/types';
+var GET_MODULE_ACTIONS_URL = '/rest/cycle/module/actions';
+var LAUNCH_CYCLE_URL = '/rest/cycle/launch/cycle';
+var LAUNCH_SUITE_URL = '/rest/cycle/launch/suite';
+var LAUNCH_MODULE_URL = '/rest/cycle/launch/module';
 
 var cycleSvcFactory = function($http, $q) {
 	
 	var emptyCycleJson;
 	var elementTypes;
+	var moduleActions;
 	var cyclesCache;	
 	
 	return {
 		isInitialized : function() {
 			// Once these objects have been obtained and cached from the corresponding web services, we are initialized.
-			return emptyCycleJson && elementTypes;
+			return emptyCycleJson && elementTypes && moduleActions;
 		},
 		getEmptyCycle : function(userId) {
 			if(emptyCycleJson) {
@@ -90,19 +95,46 @@ var cycleSvcFactory = function($http, $q) {
 				});
 			return deferred.promise;
 		},
+		launch : function(configId, itemId, itemType) {
+			var deferred = $q.defer();
+			var url = '';
+			switch(itemType) {
+			case 'cycle':
+				var url = LAUNCH_CYCLE_URL + "?cfgId=" + configId + "&cycleId=" + itemId;
+				break;
+			case 'suite':
+				var url = LAUNCH_SUITE_URL + "?cfgId=" + configId + "&suiteId=" + itemId;
+				break;
+			case 'module':
+				var url = LAUNCH_MODULE_URL + "?cfgId=" + configId + "&moduleId=" + itemId;
+				break;
+			}
+
+			if(url) {
+				$http.get(url)
+				.success(function(response) {
+					deferred.resolve(response);				
+				}).error(function(response){
+					deferred.reject(response);
+				});
+				return deferred.promise;
+			}
+		},
 		getElementTypes : function() {
 			if(elementTypes) {
 				// Called AFTER first load and is taken from cached variable (not a promise)
-				var ets = null;
-				eval("ets = " + elementTypes);
-				return ets;
+				//var ets = null;
+				//eval("ets = " + elementTypes);
+				//return ets;
+				return elementTypes;
 			}
 			else {
 				// First load must come from the web service call (is a promise)
 				var deferred = $q.defer();
 				$http.get(GET_ELEMENT_TYPES_URL)
 					.success(function(response) {
-						elementTypes = angular.toJson(response.data);
+						//elementTypes = angular.toJson(response.data);
+						elementTypes = response.data;
 						deferred.resolve(response.data);
 						
 					}).error(function(response){
@@ -110,6 +142,25 @@ var cycleSvcFactory = function($http, $q) {
 					});
 				return deferred.promise;
 			}
-		}
+		},		
+		getModuleActions : function() {
+			if(moduleActions) {
+				// Called AFTER first load and is taken from cached variable (not a promise)
+				return moduleActions;
+			}
+			else {
+				// First load must come from the web service call (is a promise)
+				var deferred = $q.defer();
+				$http.get(GET_MODULE_ACTIONS_URL)
+					.success(function(response) {
+						moduleActions = response.data;
+						deferred.resolve(response.data);
+						
+					}).error(function(response){
+						deferred.reject(response);
+					});
+				return deferred.promise;
+			}
+		}		
 	};
 };

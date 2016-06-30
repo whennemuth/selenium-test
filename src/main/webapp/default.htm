@@ -37,7 +37,15 @@
 				Cycle name: <input type="text" ng-model="cycle.name" class="boldpad">
 				<input type="button" value=" Cancel " ng-click="cancelNewCycle();" class="boldpad">					
 				<input type="button" value=" Save " ng-click="saveCycle();" class="boldpad">					
-				<input type="button" value=" Clone " ng-click="cloneCycle();" class="boldpad" ng-show="cycle && cycle.id">					
+				<div style="display:inline" ng-show="cycle && cycle.id">
+					<input type="button" value=" Clone " ng-click="cloneCycle();" class="boldpad">
+					&nbsp;&nbsp;&nbsp;
+					<input type="button" value=" Launch " ng-click="launch(cycle.id, 'cycle');" class="boldpad">	
+					<select ng-model="cycle.repeat" ng-options="idx as idx for idx in [1,2,3,4,5,6,7,8,9,10]" class="boldpad">
+						<option value="" ng-if="false"></option>
+					</select>
+					&nbsp;times		
+				</div>
 			</div>
 			<div class="sectionarea noborder">	
 				<div ng-repeat="suite in cycle.suites">		
@@ -63,11 +71,16 @@
 					<div  class="sectionarea">
 						<div ng-repeat="module in suite.modules" style="background-color: #b3e0ff;" >
 							<div class="cycleWrap">
-								{{module.sequence}}) Module: <select 
-											ng-model="module.name"
-											ng-options="mdl.label as mdl.label for mdl in config.configModules">
+								{{module.sequence}}) Page:
+								<select ng-model="module.actionType" ng-change="toggleModuleType(module);">
+									<option value="{{a.name}}" title="{{a.description}}" ng-repeat="a in getModuleActions()">{{a.label}}</option>
+								</select>								
+								<select ng-show="module.actionType == 'MODULE'"
+										ng-model="module.name"
+										ng-options="mdl.label as mdl.label for mdl in config.configModules">
 									<option value=""><- Select One -></option>
 								</select>
+								<input type="text" ng-model="module.customName" ng-show="module.actionType == 'CUSTOM'">
 								<input type="button" value="add" 
 									ng-click="suite.modules.splice($index+1, 0, getBlankObject('module')); resequence($parent.suite.modules);">
 								<input 
@@ -86,7 +99,7 @@
 							</div>
 							<div  class="sectionarea noborder">
 								<div ng-repeat="tab in module.tabs" style="background-color: #e6f5ff;">
-									<div class="cycleWrap">
+									<div class="cycleWrap" ng-show="$parent.module.actionType == 'MODULE'">
 										{{tab.sequence}}) Tab: <select 
 												ng-model="tab.name" 
 												ng-options="t.label as t.label for t in getTabs($parent.$parent.$index, $parent.$index)">

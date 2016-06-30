@@ -2,9 +2,8 @@ package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -43,18 +43,16 @@ public class Tab extends AbstractEntity implements Serializable {
 	@Column(unique=true, nullable=false)
 	private Integer id;
 
-	@Column(nullable=false, length=45)
+	@Column(nullable=true, length=45)
 	private String name;
 
 	@Column(nullable=false)
 	private int sequence;
 
 	//bi-directional many-to-one association to LabelAndValue
+	@OrderBy("sequence ASC")
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="tab")
-	private Set<LabelAndValue> labelAndValues = new TreeSet<LabelAndValue>(new Comparator<LabelAndValue>() {
-		@Override public int compare(LabelAndValue lv1, LabelAndValue lv2) {
-			return lv1.getSequence() - lv2.getSequence();
-		}});
+	private Set<LabelAndValue> labelAndValues = new LinkedHashSet<LabelAndValue>();
 
 	//bi-directional many-to-one association to Module
 	@ManyToOne
@@ -90,8 +88,8 @@ public class Tab extends AbstractEntity implements Serializable {
 		this.sequence = sequence;
 	}
 
-	public TreeSet<LabelAndValue> getLabelAndValues() {
-		return (TreeSet) labelAndValues;
+	public Set<LabelAndValue> getLabelAndValues() {
+		return labelAndValues;
 	}
 
 	public void setLabelAndValues(Set<LabelAndValue> labelAndValues) {

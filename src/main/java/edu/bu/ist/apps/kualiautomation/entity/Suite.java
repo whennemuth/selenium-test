@@ -3,6 +3,7 @@ package edu.bu.ist.apps.kualiautomation.entity;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -17,6 +18,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -54,11 +56,9 @@ public class Suite extends AbstractEntity implements Serializable {
 	private int repeat = 1;
 
 	//bi-directional many-to-one association to Module
+	@OrderBy("sequence ASC")
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="suite")
-	private Set<Module> modules = new TreeSet<Module>(new Comparator<Module>() {
-		@Override public int compare(Module module1, Module module2) {
-			return module1.getSequence() - module2.getSequence();
-		}});
+	private Set<Module> modules = new LinkedHashSet<Module>();
 
 	//bi-directional many-to-one association to Cycle
 	@ManyToOne

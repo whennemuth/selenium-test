@@ -2,9 +2,8 @@ package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
+import edu.bu.ist.apps.kualiautomation.services.automate.ModuleAction;
 
 
 /**
@@ -44,7 +45,7 @@ public class Module extends AbstractEntity implements Serializable {
 	@Column(unique=true, nullable=false)
 	private Integer id;
 
-	@Column(nullable=false, length=45)
+	@Column(nullable=true, length=45)
 	private String name;
 
 	@Column(nullable=false)
@@ -52,6 +53,12 @@ public class Module extends AbstractEntity implements Serializable {
 	
 	@Transient
 	private int repeat = 1;
+	
+	@Transient 
+	private String actionType;
+	
+	@Column(nullable=true, length=45) 
+	private String customName;
 
 	//bi-directional many-to-one association to Suite
 	@ManyToOne
@@ -59,11 +66,9 @@ public class Module extends AbstractEntity implements Serializable {
 	private Suite suite;
 
 	//bi-directional many-to-one association to Tab
+	@OrderBy("sequence ASC")
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="module")
-	private Set<Tab> tabs = new TreeSet<Tab>(new Comparator<Tab>() {
-		@Override public int compare(Tab tab1, Tab tab2) {
-			return tab1.getSequence() - tab2.getSequence();
-		}});
+	private Set<Tab> tabs = new LinkedHashSet<Tab>();
 
 	public Module() {
 	}
@@ -92,6 +97,31 @@ public class Module extends AbstractEntity implements Serializable {
 
 	public void setSequence(int sequence) {
 		this.sequence = sequence;
+	}
+
+	public String getActionType() {
+		if(actionType != null)
+			return actionType;
+		if(id == null)
+			return ModuleAction.MODULE.name();
+		if(name == null && customName == null)
+			return ModuleAction.NONE.name();
+		if(customName == null)
+			return ModuleAction.MODULE.name();
+		else
+			return ModuleAction.CUSTOM.name();
+	}
+
+	public void setActionType(String actionType) {
+		this.actionType = actionType;
+	}
+
+	public String getCustomName() {
+		return customName;
+	}
+
+	public void setCustomName(String customName) {
+		this.customName = customName;
 	}
 
 	@JsonSerialize(using=SuiteFieldSerializer.class)

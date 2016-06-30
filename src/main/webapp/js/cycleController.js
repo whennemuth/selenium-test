@@ -3,8 +3,9 @@ var cycleCtrlFactory = function() {
 	return {
 		setScope: function(scope, cycleSvc) {
 			
-			// Load in Element Types from web service
+			// Load in Element Types and module actions from web service
 			cycleSvc.getElementTypes();
+			cycleSvc.getModuleActions();
 			
 			// Add an event handler to query if the service has intialized yet.
 			scope.isInitialized = function() {
@@ -13,6 +14,10 @@ var cycleCtrlFactory = function() {
 			
 			scope.getElementTypes = function() {
 				return cycleSvc.getElementTypes();
+			}
+			
+			scope.getModuleActions = function() {
+				return cycleSvc.getModuleActions();
 			}
 			
 			// Control which fields for label and value row get shown/hidden depending on element type selection.
@@ -127,6 +132,32 @@ var cycleCtrlFactory = function() {
 			
 			scope.cloneCycle = function() {
 				
+			};
+			
+			scope.launch = function(itemId, itemType) {
+				cycleSvc.launch(scope.config.id, itemId, itemType).then(
+						function(serviceResponse) {
+							alert(serviceResponse.message);					
+						},
+						function(serviceResponse) {
+							if(serviceResponse != undefined && serviceResponse.message) {
+								alert(serviceResponse.message + '\n\n' + serviceResponse.data);
+							}
+							else {
+								alert('Launch error:\n' + serviceResponse);
+							}
+						}
+					);
+			};
+			
+			/**
+			 * If the module type is "custom", then there is to be no module name selection and no tabs, so blank and hide these.
+			 */
+			scope.toggleModuleType = function(module) {
+				module.tabs = [];
+				module.tabs[0] = scope.getBlankObject('tab');
+				module.name = null;
+				module.customName = null;
 			};
 			
 			scope.getBlankObject = function(objectType) {

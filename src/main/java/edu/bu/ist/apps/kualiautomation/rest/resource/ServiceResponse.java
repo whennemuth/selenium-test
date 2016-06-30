@@ -54,6 +54,9 @@ public class ServiceResponse {
 	public static Response getSuccessResponse(Object data) {
 		return getResponse(data, Status.OK);
 	}
+	public static Response getSuccessResponse(Object data, String message) {
+		return getResponse(data, message, Status.OK);
+	}
 	public static Response getResponse(Object data, Status status) {
 		return getResponse(data, status.getReasonPhrase(), status);
 	}

@@ -9,6 +9,8 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
+import edu.bu.ist.apps.kualiautomation.entity.Config;
+import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.entity.Module;
@@ -17,6 +19,7 @@ import edu.bu.ist.apps.kualiautomation.entity.Tab;
 import edu.bu.ist.apps.kualiautomation.entity.User;
 import edu.bu.ist.apps.kualiautomation.entity.util.Entity;
 import edu.bu.ist.apps.kualiautomation.entity.util.EntityPopulator;
+import edu.bu.ist.apps.kualiautomation.services.automate.Session;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 public class ScriptService {
@@ -110,6 +113,42 @@ public class ScriptService {
 	    	if(factory != null && factory.isOpen())
 	    		factory.close();
 		}			
+	}
+
+	public String launchCycle(Integer configId, Integer cycleId) {
+        EntityManagerFactory factory = null;
+        EntityManager em = null;
+        try {
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            em = factory.createEntityManager();
+            Config config = em.find(Config.class, configId);
+        	Cycle cycle = em.find(Cycle.class, cycleId);
+        	
+        	if(true) {
+        		StringBuilder s = new StringBuilder("TESTING!!! ")
+        				.append("configId = ")
+        				.append(String.valueOf(config.getId()))
+        				.append(", env = ")
+        				.append(config.getCurrentEnvironment().getName())
+        				.append(": ")
+        				.append(config.getCurrentEnvironment().getUrl())
+        				.append(", cycleId = ")
+        				.append(String.valueOf(cycle.getId()));
+        		System.out.println(s.toString());
+        		return s.toString();
+        	}
+        	
+        	Session session = new Session(config, cycle);
+    		Thread thread = new Thread(session);
+    		thread.start();
+    		return "Launch started successfully!";
+		} 
+	    finally {
+	    	if(em != null && em.isOpen())
+	    		em.close();
+	    	if(factory != null && factory.isOpen())
+	    		factory.close();
+		}
 	}
 	
 	/**

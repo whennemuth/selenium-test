@@ -2,6 +2,7 @@ package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -17,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -50,17 +52,18 @@ public class Cycle extends AbstractEntity implements Serializable {
 	private int sequence;
 	
 	@Transient
+	private int repeat = 1;
+	
+	@Transient
 	private String kerberosUsername;
 	
 	@Transient
 	private String kerberosPassword;
 
 	//bi-directional many-to-one association to Suite
+	@OrderBy("sequence ASC")
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="cycle")
-	private Set<Suite> suites = new TreeSet<Suite>(new Comparator<Suite>() {
-		@Override public int compare(Suite suite1, Suite suite2) {
-			return suite1.getSequence() - suite2.getSequence();
-		}});
+	private Set<Suite> suites = new LinkedHashSet<Suite>();
 	
 	//bi-directional many-to-one association to User
 	@ManyToOne
@@ -94,6 +97,14 @@ public class Cycle extends AbstractEntity implements Serializable {
 
 	public void setSequence(int sequence) {
 		this.sequence = sequence;
+	}
+	
+	public int getRepeat() {
+		return repeat;
+	}
+
+	public void setRepeat(int repeat) {
+		this.repeat = repeat;
 	}
 
 	public String getKerberosUsername() {
@@ -143,5 +154,6 @@ public class Cycle extends AbstractEntity implements Serializable {
 
 		return suite;
 	}
+
 
 }
