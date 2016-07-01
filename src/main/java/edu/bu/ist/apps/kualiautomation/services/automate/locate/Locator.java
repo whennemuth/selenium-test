@@ -14,4 +14,6 @@ public interface Locator {
 	public List<Element> locateAll(ElementType elementType, List<String> parameters);
 	
 	public WebDriver getDriver();
+	
+	public boolean busy();
 }

@@ -25,17 +25,24 @@ public class BatchElementLocator implements Locator {
 	
 	private WebDriver driver;
 	private boolean defaultRan;
+	private boolean busy;
 	
 	public BatchElementLocator(WebDriver driver) {
 		this.driver = driver;
 	}
 
 	public Element locateFirst(ElementType elementType, Map<Class<?>, List<String>> parms) {		
-		List<Element> results = locateAll(elementType, parms, false);
-		if(results.isEmpty())
-			return null;
-		
-		return results.get(0);
+		try {
+			busy = true;
+			List<Element> results = locateAll(elementType, parms, false);
+			if(results.isEmpty())
+				return null;
+			
+			return results.get(0);
+		} 
+		finally {
+			busy = false;
+		}
 	}
 	
 	private List<Element> locateAll(ElementType elementType, Map<Class<?>, List<String>> parms, boolean greedy) {
@@ -43,28 +50,34 @@ public class BatchElementLocator implements Locator {
 		defaultRan = false;
 		List<Element> results = new ArrayList<Element>();
 		
-		for(Class<?> clazz : parms.keySet()) {
-			try {
-				Constructor<?> ctr = clazz.getConstructor(WebDriver.class);
-				List<String> attributes = parms.get(clazz);
-				Locator locator = (Locator) ctr.newInstance(driver);
-				
-				Element result = runLocator(locator, elementType, attributes);
-				
-				if(result != null) {
-					results.add(result);
+		try {
+			busy = true;
+			for(Class<?> clazz : parms.keySet()) {
+				try {
+					Constructor<?> ctr = clazz.getConstructor(WebDriver.class);
+					List<String> attributes = parms.get(clazz);
+					Locator locator = (Locator) ctr.newInstance(driver);
+					
+					Element result = runLocator(locator, elementType, attributes);
+					
+					if(result != null) {
+						results.add(result);
+					}
+					if(greedy)
+						continue;
+					else
+						break;
+				} 
+				catch (Exception e) {
+					e.printStackTrace();
 				}
-				if(greedy)
-					continue;
-				else
-					break;
-			} 
-			catch (Exception e) {
-				e.printStackTrace();
 			}
-		}
-		
-		return results;		
+			
+			return results;
+		} 
+		finally {
+			busy = false;
+		}		
 	}
 	
 	/**
@@ -152,5 +165,10 @@ public class BatchElementLocator implements Locator {
 			}
 		}
 
+	}
+
+	@Override
+	public boolean busy() {
+		return busy;
 	}
 }

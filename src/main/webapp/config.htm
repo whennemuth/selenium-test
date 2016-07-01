@@ -85,6 +85,10 @@
 <div class="floatingbox width400">
 	<div class=sectionlabel>Head selection</div>
 	<div class=sectionarea>
+		<div style="float:right; width:250px; height:45px; border: solid 1px #007acc;">
+			<div class="basicfont pad5" ng-show="!config.headless">Desktop use. A browser will appear and the script will run in it as you watch.</div>
+			<div class="basicfont pad5" ng-show="config.headless">Build use. To be run by another process against a virtual, in memory browser. Use this to test how Jenkins might run scripts created for desktop use.</div>
+		</div>
 		<div class="fieldlabel"><input 
 			name="browser" 
 			type='radio'

@@ -17,7 +17,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -60,10 +61,12 @@ public class Config extends AbstractEntity implements Serializable {
 	private User user;
 	
 	//bi-directional many-to-one association to configEnvironment (all the environments "owned" by this config.
+// TODO: Give the ConfigEnvironment entity a sequence field and make it sortable with the @OrderBy annotation	
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="parentConfig")
 	private Set<ConfigEnvironment> configEnvironments = new LinkedHashSet<ConfigEnvironment>();
 
 	//bi-directional many-to-one association to ConfigModule
+// TODO: Give the ConfigModule entity a sequence field and make it sortable with the @OrderBy annotation	
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="config")
 	private Set<ConfigModule> configModules = new LinkedHashSet<ConfigModule>();
 
@@ -147,6 +150,35 @@ public class Config extends AbstractEntity implements Serializable {
 			}
 		}
 	}
+	
+	/**
+	 * One ConfigEnvironment must be the current one. Make one of any new ConfigEnvironments current
+	 * (change existing current ConfigEnvironment to non-current), or if no new ConfigEnvironments, set one
+	 * of the existing ConfigEnvironments to current if none already are (should not encounter this scenario). 
+	 */
+	@PrePersist
+	@PreUpdate
+	private void setCurrentEnvironment() {
+		ConfigEnvironment current = null;
+		ConfigEnvironment unpersisted = null;
+		for(ConfigEnvironment env : configEnvironments) {
+			if(env.isCurrent() && env.getId() != null) {
+				current = env;
+			}
+			if(env.getId() == null && !env.isCurrent()) {
+				unpersisted = env;
+			}
+		}
+		if(unpersisted != null) {
+			unpersisted.setCurrent(true);
+			if(current != null)
+				current.setCurrent(false);
+		}
+		else if(unpersisted == null && current == null && !configEnvironments.isEmpty()) {
+			configEnvironments.toArray(new ConfigEnvironment[]{})[0].setCurrent(true);
+		}
+	}
+	
 	public Set<ConfigModule> getConfigModules() {
 		return this.configModules;
 	}

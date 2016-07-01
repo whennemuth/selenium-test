@@ -7,7 +7,7 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
 
 public enum ConfigTestingDefaults {
 	CONFIG_FILE_NAME("kualiautomation.cfg"), 
-	DEFAULT_ENVIRONMENT("login-demo"),
+	DEFAULT_ENVIRONMENT("test-drive"),
 	ENVIRONMENTS(
 		String.join("&&",
 				"TEST",
@@ -18,7 +18,7 @@ public enum ConfigTestingDefaults {
 				"http://ist-kuali-sb1:8080/kc-dev",
 				"LOGIN",
 				"file:///C:/Users/wrh/Desktop/welcome/login.htm",
-				"LOGIN-DEMO",
+				"TEST-DRIVE",
 				"https://res-demo2.kuali.co/kc-dev/kr-login/login?viewId=DummyLoginView&returnLocation=%2Fkc-krad%2FlandingPage&formKey=68ba02c6-3587-4b81-a4c9-d8eb465eaa01&cacheKey=7ft9p0xr31nwqntioww2pa",
 				"WELCOME",
 				"file:///C:/Users/wrh/Desktop/welcome/welcome.htm")
@@ -85,12 +85,14 @@ public enum ConfigTestingDefaults {
 		
 		// Add the default environments
 		String[] envs = ENVIRONMENTS.getValues();
-		for(int i=0; i< envs.length; i+=2) {
+		int id = 1;
+		for(int i=0; i< envs.length; i+=2, id++) {
 			ConfigEnvironment env = new ConfigEnvironment();
+			env.setId(id);
 			env.setName(envs[i]);
 			env.setUrl(envs[i+1]);
 			cfg.addConfigEnvironment(env);
-			cfg.addConfigEnvironment(env);
+			env.setParentConfig(cfg);
 			if(env.getName().equalsIgnoreCase(DEFAULT_ENVIRONMENT.getValue())) {
 				cfg.setCurrentEnvironment(env);
 			}

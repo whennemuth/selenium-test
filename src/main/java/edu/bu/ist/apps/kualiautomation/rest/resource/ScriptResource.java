@@ -89,9 +89,15 @@ public class ScriptResource {
 	@GET
 	@Path("/cycle/launch/cycle")
 	public Response launchCycle(@QueryParam("cycleId") Integer cycleId, @QueryParam("cfgId") Integer configId) {
+		return launchCycle(cycleId, configId, false);
+	}
+	
+	@GET
+	@Path("/cycle/launch/cycle")
+	public Response launchCycle(@QueryParam("cycleId") Integer cycleId, @QueryParam("cfgId") Integer configId, @QueryParam("terminate") boolean terminate) {
 		try {
 			ScriptService svc = new ScriptService();
-			String message = svc.launchCycle(configId, cycleId);
+			String message = svc.launchCycle(configId, cycleId, terminate);
 			return ServiceResponse.getSuccessResponse(null, message);
 		} 
 		catch (Exception e) {

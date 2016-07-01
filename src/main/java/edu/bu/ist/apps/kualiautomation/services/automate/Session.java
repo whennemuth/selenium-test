@@ -13,10 +13,15 @@ public class Session implements Runnable {
 	private Cycle cycle;
 	private Config config;
 	private WebDriver driver;
+	private boolean terminate;
 	
-	public Session(Config config, Cycle cycle) {
+	@SuppressWarnings("unused")
+	private Session() { /* Restrict private constructor */ }
+	
+	public Session(Config config, Cycle cycle, boolean terminate) {
 		this.config = config;
 		this.cycle = cycle;
+		this.terminate = terminate;
 	}
 	
 	@Override
@@ -40,7 +45,7 @@ public class Session implements Runnable {
 			e.printStackTrace();
 		}
 		finally {
-			if(driver != null) {
+			if(terminate()) {
 				driver.close();
 				driver.quit();
 			}
@@ -56,11 +61,12 @@ public class Session implements Runnable {
 	}
 
 	private boolean login() throws Exception {
-		if(new KerberosLogin(this).login()) {
+		KerberosLogin kerberos = new KerberosLogin(this, 60);
+		if(kerberos.login()) {
 			return true;
 		}
 		else {
-			System.out.println("Login failed!");
+			System.out.println(kerberos.getFailureMessage());
 			return false;
 		}
 	}
@@ -77,11 +83,19 @@ public class Session implements Runnable {
 		return driver;
 	}
 	
+	private boolean terminate() {
+		if(driver == null)
+			return false;
+		if(config.isHeadless())
+			return true;
+		return terminate;
+	}
+	
 	public static void main(String[] args) {
 		Config config = new Config();
 		ConfigDefaults.populate(config);
 		Cycle cycle = new Cycle();
-		Thread thread = new Thread(new Session(config, cycle));
+		Thread thread = new Thread(new Session(config, cycle, false));
 		thread.start();
 		System.out.println("thread started...");
 	}

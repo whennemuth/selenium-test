@@ -85,7 +85,11 @@ div.navigated a {
 	font: normal normal 12px arial;
 }
 
-.padding10 {
+.pad5 {
+	padding: 5px;	
+}
+
+.pad10 {
 	padding: 10px;	
 }
 

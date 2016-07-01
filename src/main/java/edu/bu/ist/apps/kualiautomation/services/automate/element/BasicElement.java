@@ -47,7 +47,7 @@ public class BasicElement implements Element {
 
 	@Override
 	public boolean isInteractive() {
-		return webElement.isDisplayed() && webElement.isEnabled();
+		return webElement != null && webElement.isDisplayed() && webElement.isEnabled();
 	}
 
 	@Override

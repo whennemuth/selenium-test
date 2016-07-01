@@ -1,10 +1,8 @@
 package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -25,6 +23,7 @@ import javax.persistence.Transient;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config.UserFieldSerializer;
+import edu.bu.ist.apps.kualiautomation.services.automate.KerberosLoginParms;
 
 
 /**
@@ -55,10 +54,7 @@ public class Cycle extends AbstractEntity implements Serializable {
 	private int repeat = 1;
 	
 	@Transient
-	private String kerberosUsername;
-	
-	@Transient
-	private String kerberosPassword;
+	private KerberosLoginParms kerberosLoginParms = new KerberosLoginParms();
 
 	//bi-directional many-to-one association to Suite
 	@OrderBy("sequence ASC")
@@ -107,20 +103,12 @@ public class Cycle extends AbstractEntity implements Serializable {
 		this.repeat = repeat;
 	}
 
-	public String getKerberosUsername() {
-		return kerberosUsername;
+	public KerberosLoginParms getKerberosLoginParms() {
+		return kerberosLoginParms;
 	}
 
-	public void setKerberosUsername(String kerberosUsername) {
-		this.kerberosUsername = kerberosUsername;
-	}
-
-	public String getKerberosPassword() {
-		return kerberosPassword;
-	}
-
-	public void setKerberosPassword(String kerberosPassword) {
-		this.kerberosPassword = kerberosPassword;
+	public void setKerberosLoginParms(KerberosLoginParms kerberosLoginParms) {
+		this.kerberosLoginParms = kerberosLoginParms;
 	}
 
 	@JsonSerialize(using=UserFieldSerializer.class)

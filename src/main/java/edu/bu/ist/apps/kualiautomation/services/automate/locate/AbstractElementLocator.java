@@ -20,14 +20,19 @@ public abstract class AbstractElementLocator implements Locator {
 	protected ElementType elementType;
 	protected List<String> parameters = new ArrayList<String>();
 	protected boolean defaultRan;
+	/**
+	 * busy variable is queried to prevent repeated calls in case locator inside a WebDriverWait.until() method.
+	 * The find methods of the WebDriver will no longer return immediately with results but will instead inherit
+	 * the timeout of the WebDriverWait method.
+	 */
+	protected boolean busy = false; 
 	
 	public AbstractElementLocator(WebDriver driver) {
 		this.driver = driver;
 	}
 	
 	@Override
-	public Element locateFirst(ElementType elementType, List<String> parameters) {
-		
+	public Element locateFirst(ElementType elementType, List<String> parameters) {		
 		List<Element> results = locateAll(elementType, parameters);
 		if(results.isEmpty())
 			return null;
@@ -37,39 +42,46 @@ public abstract class AbstractElementLocator implements Locator {
 	
 	@Override
 	public List<Element> locateAll(ElementType elementType, List<String> parameters) {
-		defaultRan = false;
-		this.elementType = elementType;
-		this.parameters = parameters;
-		final List<WebElement> webElements = new ArrayList<WebElement>();
-		List<Element> results = new ArrayList<Element>();
-		
-		List<WebElement> custom = customLocate();
-		webElements.addAll(custom);
-		
-		if(webElements.isEmpty()) {
-			List<WebElement> defaults = defaultLocate();
-			webElements.addAll(defaults);
-		}
-		
-		if(webElements.isEmpty()) {
-			// Check for frames and search those as well
-			WebDriverWait wait = new WebDriverWait(driver, 100);
-			List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
-			if(!iframes.isEmpty()) {
-				for(WebElement iframe : iframes) {
-					driver = wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
-					List<Element> frameResults = locateAll(elementType, parameters);
-					results.addAll(frameResults);
-					// Don't switch back to the parent window because you will not be able to use the WebElement as it would 
-					// then belong to a frame that the WebDriver is longer focused on ( you will get a StaleElementReferenceException ).
-					// driver.switchTo().defaultContent();
+		List<Element> results;
+		try {
+			busy = true;
+			defaultRan = false;
+			this.elementType = elementType;
+			this.parameters = parameters;
+			final List<WebElement> webElements = new ArrayList<WebElement>();
+			results = new ArrayList<Element>();
+			
+			List<WebElement> custom = customLocate();
+			webElements.addAll(custom);
+			
+			if(webElements.isEmpty()) {
+				List<WebElement> defaults = defaultLocate();
+				webElements.addAll(defaults);
+			}
+			
+			if(webElements.isEmpty()) {
+				// Check for frames and search those as well
+				WebDriverWait wait = new WebDriverWait(driver, 100);
+				List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
+				if(!iframes.isEmpty()) {
+					for(WebElement iframe : iframes) {
+						driver = wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
+						List<Element> frameResults = locateAll(elementType, parameters);
+						results.addAll(frameResults);
+						// Don't switch back to the parent window because you will not be able to use the WebElement as it would 
+						// then belong to a frame that the WebDriver is longer focused on ( you will get a StaleElementReferenceException ).
+						// driver.switchTo().defaultContent();
+					}
 				}
 			}
-		}
-		else {
-			for(WebElement we : webElements) {
-				results.add(new BasicElement(driver, we));
+			else {
+				for(WebElement we : webElements) {
+					results.add(new BasicElement(driver, we));
+				}
 			}
+		} 
+		finally {
+			busy = false;
 		}
 		
 		return results;
@@ -79,6 +91,12 @@ public abstract class AbstractElementLocator implements Locator {
 		this.defaultRan = defaultRan;
 	}
 	
+	
+	@Override
+	public boolean busy() {
+		return busy;
+	}
+
 	protected abstract List<WebElement> customLocate();
 	
 	/**

@@ -46,7 +46,6 @@ public class LabelledElementLocator extends AbstractElementLocator {
 			}
 			LabelElementLocator labelLocator = new LabelElementLocator(driver);
 			List<Element> candidates = labelLocator.locateAll(elementType, Arrays.asList(new String[]{label}));
-			
 			for(Element labelElement : candidates) {
 				List<WebElement> flds = getInputField(labelElement.getWebElement(), attributeValues);
 				located.addAll(flds);

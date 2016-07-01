@@ -115,7 +115,7 @@ public class ScriptService {
 		}			
 	}
 
-	public String launchCycle(Integer configId, Integer cycleId) {
+	public String launchCycle(Integer configId, Integer cycleId, boolean terminate) {
         EntityManagerFactory factory = null;
         EntityManager em = null;
         try {
@@ -138,7 +138,7 @@ public class ScriptService {
         		return s.toString();
         	}
         	
-        	Session session = new Session(config, cycle);
+        	Session session = new Session(config, cycle, terminate);
     		Thread thread = new Thread(session);
     		thread.start();
     		return "Launch started successfully!";
