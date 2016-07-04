@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
+import edu.bu.ist.apps.kualiautomation.services.automate.KerberosLoginParms;
 import edu.bu.ist.apps.kualiautomation.services.automate.ModuleAction;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.config.ScriptService;
@@ -85,16 +86,10 @@ public class ScriptResource {
 			return ServiceResponse.getExceptionResponse(e);
 		}		
 	}
-
-	@GET
-	@Path("/cycle/launch/cycle")
-	public Response launchCycle(@QueryParam("cycleId") Integer cycleId, @QueryParam("cfgId") Integer configId) {
-		return launchCycle(cycleId, configId, false);
-	}
 	
-	@GET
+	@POST
 	@Path("/cycle/launch/cycle")
-	public Response launchCycle(@QueryParam("cycleId") Integer cycleId, @QueryParam("cfgId") Integer configId, @QueryParam("terminate") boolean terminate) {
+	public Response launchCycle(KerberosLoginParms parms, @QueryParam("cycleId") Integer cycleId, @QueryParam("cfgId") Integer configId, @QueryParam("terminate") boolean terminate) {
 		try {
 			ScriptService svc = new ScriptService();
 			String message = svc.launchCycle(configId, cycleId, terminate);

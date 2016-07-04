@@ -26,7 +26,7 @@ public enum ElementType {
 		"Something to click that looks like a button",
 		"input",
 		"button",
-		"//input[@type='button']",
+		"//input[@type='button'] | //input[@type='submit'] | //button",
 		false),
 	BUTTONIMAGE(
 		"Something to click that looks like an image",
@@ -76,6 +76,7 @@ public enum ElementType {
 		this.xpathSelector = xpathSelector;
 		this.tagname = tagname;
 		this.typeAttribute = typeAttribute;
+		this.acceptsKeystrokes = acceptsKeystrokes;
 	}
 
 	public String getDescription() {
@@ -111,7 +112,7 @@ public enum ElementType {
 	private String getXpath(boolean global) {
 		String xpath = global ? "//" : ".//";
 		if(xpathSelector != null) {
-			xpath = xpathSelector.replaceFirst("//", xpath);
+			xpath = xpathSelector.replaceAll("//", xpath);
 		}
 		return xpath;
 	}

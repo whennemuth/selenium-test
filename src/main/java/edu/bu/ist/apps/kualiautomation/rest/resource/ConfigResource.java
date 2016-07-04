@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response.Status;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigModule;
+import edu.bu.ist.apps.kualiautomation.entity.util.EntityPopulator;
 import edu.bu.ist.apps.kualiautomation.model.Directory;
 import edu.bu.ist.apps.kualiautomation.services.config.ConfigService;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
@@ -94,6 +95,7 @@ public class ConfigResource {
 	@Path("/config/save")
 	public Response setConfig(Config cfg) {
 		try {
+			EntityPopulator.count = 0;
 			ConfigService svc = new ConfigService();
 			cfg = svc.saveConfig(cfg);
 			return ServiceResponse.getSuccessResponse(cfg);

@@ -43,7 +43,7 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 					labels.add(we);
 			}
 			
-			// 3) If a WebElement is not an anchor tag, regard it as an element that labels an achor tag and use the LabelledElementLocator to find it.
+			// 3) If a WebElement is not an anchor tag, regard it as an element that labels an anchor tag and use the LabelledElementLocator to find it.
 			for(@SuppressWarnings("unused") WebElement label : labels) {
 				//if(!attributeValues.isEmpty()) {
 					LabelledElementLocator labelledLocator = new LabelledElementLocator(driver);

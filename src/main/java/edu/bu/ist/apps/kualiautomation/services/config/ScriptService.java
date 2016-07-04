@@ -124,7 +124,7 @@ public class ScriptService {
             Config config = em.find(Config.class, configId);
         	Cycle cycle = em.find(Cycle.class, cycleId);
         	
-        	if(true) {
+        	if(false) {
         		StringBuilder s = new StringBuilder("TESTING!!! ")
         				.append("configId = ")
         				.append(String.valueOf(config.getId()))
@@ -141,7 +141,7 @@ public class ScriptService {
         	Session session = new Session(config, cycle, terminate);
     		Thread thread = new Thread(session);
     		thread.start();
-    		return "Launch started successfully!";
+    		return "Launch started!";
 		} 
 	    finally {
 	    	if(em != null && em.isOpen())

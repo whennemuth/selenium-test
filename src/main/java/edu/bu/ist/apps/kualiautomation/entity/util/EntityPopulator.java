@@ -101,9 +101,11 @@ public class EntityPopulator {
 		}
 	}
 	
+	public static int count = 0;
 	private boolean handledAsEntity(Object beanToPopulate, Object val, Method getterMethod, Method setterMethod) throws Exception {
 		if(EntityInspector.isEntity(val)) {
 			if(!isTransitory(val)) {
+				count++;
 				boolean populated = entity.populate(beanToPopulate, getterMethod.getName(), val);
 				if(!populated) {
 					setterMethod.invoke(beanToPopulate, val);
@@ -118,7 +120,7 @@ public class EntityPopulator {
 	}
 	
 	private boolean handledAsEntityCollection(Object beanToPopulate, Object val, Method getterMethod, Object sourceBean) throws Exception {
-		if(val instanceof Collection) { System.out.println("hello");
+		if(val instanceof Collection) { 
 			if(EntityInspector.returnsEntityCollection(getterMethod)) {
 				if(!isTransitory(sourceBean)) {
 					Collection<?> sourceCollection = (Collection<?>) val;

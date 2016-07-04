@@ -1,6 +1,7 @@
 package edu.bu.ist.apps.kualiautomation.services.automate;
 
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
@@ -61,7 +62,7 @@ public class Session implements Runnable {
 	}
 
 	private boolean login() throws Exception {
-		KerberosLogin kerberos = new KerberosLogin(this, 60);
+		KerberosLogin kerberos = new KerberosLogin(this, 10);
 		if(kerberos.login()) {
 			return true;
 		}

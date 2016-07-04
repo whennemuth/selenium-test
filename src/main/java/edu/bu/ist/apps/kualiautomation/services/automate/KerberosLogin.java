@@ -6,11 +6,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import com.google.common.base.Predicate;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
@@ -78,7 +75,7 @@ public class KerberosLogin {
 		}));
 		
 		username.setValue(loginParms.getUsername());
-		if(password.isInteractive()) {
+		if(password != null && password.isInteractive()) {
 			password.setValue(loginParms.getPassword());
 		}
 		submit.click();
@@ -105,7 +102,6 @@ public class KerberosLogin {
 				} 
 				catch (Exception e) {
 					// The apply method will ignore checked exceptions, so wrap them in RuntimeExceptions
-// RESUME NEXT: Why is xpath syntax happening in browser mode?					
 					throw new RuntimeException(e);
 				}
 			}
@@ -126,7 +122,7 @@ public class KerberosLogin {
 					username.getWebElement().findElements(By.id("does not matter"));
 				} 
 				catch (StaleElementReferenceException e) {
-					if(!driver.findElements(By.id("html")).isEmpty()) {
+					if(!driver.findElements(By.tagName("html")).isEmpty()) {
 						return true;
 					}
 				}

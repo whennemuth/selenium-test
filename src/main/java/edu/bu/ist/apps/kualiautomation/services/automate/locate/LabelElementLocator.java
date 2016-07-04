@@ -33,13 +33,17 @@ public class LabelElementLocator extends AbstractElementLocator {
 		// If there is no element type specified, then we assume that label indicates the innerText of the element being sought.
 		List<WebElement> elements = 
 			//driver.findElements(By.xpath("//*[text()[normalize-space(lower-case(.))=\"" + cleanedLabel.toLowerCase() + "\"]]"));
-			driver.findElements(By.xpath("//*[normalize-space(lower-case(text()))=\"" + label.trim().toLowerCase() + "\"]"));
+			//driver.findElements(By.xpath("//*[normalize-space(lower-case(text()))=\"" + label.trim().toLowerCase() + "\"]"));
+			// lower-case if for xpath v2.0, but firefox uses v1.0, so have to use the translate function.
+			driver.findElements(By.xpath("//*[normalize-space(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'))=\"" + label.trim().toLowerCase() + "\"]"));
 		
 		if(elements.isEmpty()) {
 			// Find a match that starts with the specified label. This is for long labels that can be uniquely identified by the way they start.
 			elements = 
 				//driver.findElements(By.xpath("//*[text()[contains(lower-case(.), \"" + cleanedLabel.toLowerCase() + "\")]]"));
-				driver.findElements(By.xpath("//*[starts-with(normalize-space(lower-case(text())), \"" + cleanedLabel.toLowerCase() + "\")]"));
+				//driver.findElements(By.xpath("//*[starts-with(normalize-space(lower-case(text())), \"" + cleanedLabel.toLowerCase() + "\")]"));
+				// lower-case if for xpath v2.0, but firefox uses v1.0, so have to use the translate function.
+				driver.findElements(By.xpath("//*[starts-with(normalize-space(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')), \"" + cleanedLabel.toLowerCase() + "\")]"));
 		}
 		
 		// Double check the startswith/normalization filtering 

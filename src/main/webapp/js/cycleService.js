@@ -95,7 +95,7 @@ var cycleSvcFactory = function($http, $q) {
 				});
 			return deferred.promise;
 		},
-		launch : function(configId, itemId, itemType) {
+		launch : function(configId, itemId, itemType, kerberosLoginParms) {
 			var deferred = $q.defer();
 			var url = '';
 			switch(itemType) {
@@ -111,7 +111,11 @@ var cycleSvcFactory = function($http, $q) {
 			}
 
 			if(url) {
-				$http.get(url)
+				$http({
+					method: 'POST',
+					url: url,
+					data: kerberosLoginParms
+				})
 				.success(function(response) {
 					deferred.resolve(response);				
 				}).error(function(response){

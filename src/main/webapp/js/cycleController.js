@@ -135,7 +135,7 @@ var cycleCtrlFactory = function() {
 			};
 			
 			scope.launch = function(itemId, itemType) {
-				cycleSvc.launch(scope.config.id, itemId, itemType).then(
+				cycleSvc.launch(scope.config.id, itemId, itemType, scope.cycle.kerberosLoginParms).then(
 						function(serviceResponse) {
 							alert(serviceResponse.message);					
 						},
