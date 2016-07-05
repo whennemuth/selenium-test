@@ -1,7 +1,8 @@
 package edu.bu.ist.apps.kualiautomation.services.automate;
 
+import java.io.OutputStream;
+
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
@@ -15,6 +16,8 @@ public class Session implements Runnable {
 	private Config config;
 	private WebDriver driver;
 	private boolean terminate;
+	private RunLog runLog;
+	private OutputStream logOutput;
 	
 	@SuppressWarnings("unused")
 	private Session() { /* Restrict private constructor */ }
@@ -53,12 +56,17 @@ public class Session implements Runnable {
 		}
 	}
 
+	private void work() {
+		System.out.println("Running cycle...");
+		CycleRunner runner = new CycleRunner(this);
+		runLog = runner.run();		
+	}
+	
 	private void reportResults() {
 		System.out.println("Reporting results...");
-	}
-
-	private void work() {
-		System.out.println("Working...");
+		if(logOutput == null)
+			logOutput = System.out;
+		runLog.printResults(logOutput);
 	}
 
 	private boolean login() throws Exception {
@@ -84,6 +92,10 @@ public class Session implements Runnable {
 		return driver;
 	}
 	
+	public void setLogOutput(OutputStream logOutput) {
+		this.logOutput = logOutput;
+	}
+
 	private boolean terminate() {
 		if(driver == null)
 			return false;

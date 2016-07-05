@@ -89,6 +89,10 @@ public class Module extends AbstractEntity implements Serializable {
 		this.name = name;
 	}
 
+	public boolean isBlank() {
+		return getName() == null || getName().isEmpty();
+	}
+	
 	public int getSequence() {
 		if(this.sequence == 0)
 			this.sequence++;

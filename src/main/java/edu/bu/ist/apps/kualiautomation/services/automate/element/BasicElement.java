@@ -4,6 +4,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitWebElement;
 
+import edu.bu.ist.apps.kualiautomation.util.Utils;
+
 public class BasicElement implements Element {
 	
 	public static final String CHECKED_REGEX = "(?!)(true)|(yes)|(on)|(checked)";
@@ -91,6 +93,30 @@ public class BasicElement implements Element {
 			case "textarea":
 				break;
 		}
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("webElement=[");
+		if(webElement == null) {
+			builder.append("null");
+		}
+		else {
+			builder.append(webElement.getTagName());
+			if(!Utils.isEmpty(webElement.getText())) {
+				builder.append(" (text='").append(webElement.getText()).append("', ")
+				.append("enabled=").append(Boolean.valueOf(webElement.isEnabled()))
+				.append("disabled=").append(Boolean.valueOf(webElement.isDisplayed()))
+				.append(")");
+			}
+		}
+		builder.append(", label=");
+		builder.append(label);
+		builder.append(", elementType=");
+		builder.append(elementType.name());
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

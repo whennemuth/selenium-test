@@ -23,6 +23,8 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
  */
 public class BatchElementLocator implements Locator {
 	
+	public static final String PARAMETER_DELIMITER = "||";
+	
 	private WebDriver driver;
 	private boolean defaultRan;
 	private boolean busy;
@@ -114,7 +116,7 @@ public class BatchElementLocator implements Locator {
 	private Map<Class<?>, List<String>> parseParms(List<String> parms) {
 		Map<Class<?>, List<String>> map = new LinkedHashMap<Class<?>, List<String>>();
 		for(String parm : parms) {
-			String[] parts = parm.split(":");
+			String[] parts = parm.split(PARAMETER_DELIMITER);
 			String classname = parts[0];
 			Class<?> clazz = null;
 			try {
@@ -148,8 +150,8 @@ public class BatchElementLocator implements Locator {
 			driver.get("file:///C:/whennemuth/workspaces/bu_workspace/selenium-test/src/test/resources/html/ProposalLogLookupFrame.htm");
 			BatchElementLocator locator = new BatchElementLocator(driver);
 			List<Element> elements = locator.locateAll(ElementType.TEXTBOX, Arrays.asList(new String[]{
-					"edu.bu.ist.apps.kualiautomation.services.automate.element.LabelElementLocator:Proposal Number",
-					"edu.bu.ist.apps.kualiautomation.services.automate.element.LabelledElementLocator:Proposal Number"
+					"edu.bu.ist.apps.kualiautomation.services.automate.element.LabelElementLocator" + PARAMETER_DELIMITER + "Proposal Number",
+					"edu.bu.ist.apps.kualiautomation.services.automate.element.LabelledElementLocator" + PARAMETER_DELIMITER + "Proposal Number"
 			}));
 			for(Element e : elements) {
 				System.out.println(e.getWebElement().getTagName() + ": " + e.getWebElement().getText());
