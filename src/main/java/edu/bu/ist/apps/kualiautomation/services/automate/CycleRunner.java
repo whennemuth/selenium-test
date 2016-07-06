@@ -11,6 +11,7 @@ import edu.bu.ist.apps.kualiautomation.entity.Suite;
 import edu.bu.ist.apps.kualiautomation.entity.Tab;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementValue;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.LocatorRunner;
 
 /**
@@ -42,11 +43,14 @@ public class CycleRunner {
 	public RunLog run() {		
 		System.out.println("Processing Cycle: " + cycle.getName());
 		runlog = new RunLog();
+		
+		outerloop:
 		for(Suite suite : cycle.getSuites()) {
 			System.out.println("Processing Suite: " + suite.getName());
 			for(Module module : suite.getModules()) {
 				if(!module.isBlank()) {
 					System.out.println("Processing Page/Module " + String.valueOf(module.getSequence()));
+					
 				}
 				for(Tab tab : module.getTabs()) {
 					if(!tab.isBlank()) {
@@ -56,7 +60,14 @@ public class CycleRunner {
 						ElementType elementType = ElementType.valueOf(lv.getElementType());
 						LocatorRunner locator = new LocatorRunner(driver, elementType, lv.getLabel(), lv.getIdentifier());
 						List<Element> elements = locator.run(true);
-						processElement(lv, elements);
+						if(elementLocated(lv, elements)) {
+							if(!applyElementValue(lv, elements.get(0))) {
+								break outerloop;
+							}
+						}
+						else {
+							break outerloop;
+						}
 					}
 				}
 			}
@@ -64,15 +75,14 @@ public class CycleRunner {
 		
 		return runlog;
 	}
-	
+
 	/**
-	 * Apply the provided value to the element or log a reason why this cannot be done,
-	 * such as more than one element found, or none at all, or some unspecified error.
+	 * Require that one element was found from the location attempt and make a log entry if not so.
 	 * 
 	 * @param lv
 	 * @param elements
 	 */
-	private boolean processElement(LabelAndValue lv, List<Element> elements) {
+	private boolean elementLocated(LabelAndValue lv, List<Element> elements) {
 		if(elements.isEmpty()) {
 			runlog.elementNotFound(lv);
 			return false;
@@ -81,10 +91,18 @@ public class CycleRunner {
 			runlog.multipleElementCandidates(lv, elements);
 			return false;
 		}
-
-		Element element = elements.get(0);
+		return true;
+	}
+	
+	/**
+	 * Apply the provided value to the element or log any error in the attempt.
+	 * 
+	 * @param lv
+	 * @param elements
+	 */
+	private boolean applyElementValue(LabelAndValue lv, Element element) {
 		ElementValue val = new ElementValue(lv);
-		if(val.apply(element)) {
+		if(val.applyTo(element)) {
 			runlog.log(element, lv);
 		}
 		else {

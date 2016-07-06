@@ -1,7 +1,6 @@
-package edu.bu.ist.apps.kualiautomation.services.automate;
+package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
-import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 
 public class ElementValue {
 
@@ -11,7 +10,7 @@ public class ElementValue {
 		this.lv = lv;
 	}
 
-	public boolean apply(Element element) {
+	public boolean applyTo(Element element) {
 		// TODO Auto-generated method stub
 		return true;
 	}

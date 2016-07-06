@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.locate;
+package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.HashMap;
 import java.util.Map;
