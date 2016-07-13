@@ -32,7 +32,7 @@ var cycleCtrlFactory = function() {
 					case 'CHECKBOX': case 'RADIO': 
 						checkable = true;
 						break;
-					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'OTHER':
+					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'PASSWORD': case 'OTHER':
 						textvalue = true;
 						break;
 				}
@@ -57,7 +57,7 @@ var cycleCtrlFactory = function() {
 					case 'CHECKBOX': case 'RADIO': 
 						lv.value = lv.checked;
 						break;
-					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'OTHER':
+					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'PASSWORD': case 'OTHER':
 						lv.checked = '';
 						lv.value = /^(true)|(false)$/i.test(lv.value) ? '' : lv.value;
 						break;

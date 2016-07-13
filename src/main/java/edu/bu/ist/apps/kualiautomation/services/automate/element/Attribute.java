@@ -21,7 +21,7 @@ public class Attribute {
 	private String attributeName;
 	private ElementType elementType;
 	private List<String> attributesToCheck = new ArrayList<String>();
-	static String[] DEFAULT_ATTRIBUTES_TO_CHECK = new String[] {
+	public static String[] DEFAULT_ATTRIBUTES_TO_CHECK = new String[] {
 			"id", "title", "placeholder", "name", "value"
 	};
 	

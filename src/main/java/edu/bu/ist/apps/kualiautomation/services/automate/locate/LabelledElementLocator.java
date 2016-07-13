@@ -12,7 +12,6 @@ import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Attribute;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
-import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
 /**
  * With a specified WebElement that serves as a label, traverse up the DOM one element at a time until

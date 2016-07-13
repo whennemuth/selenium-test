@@ -7,6 +7,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
+import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.services.config.ConfigDefaults;
 
@@ -105,8 +106,19 @@ public class Session implements Runnable {
 	}
 	
 	public static void main(String[] args) {
+		
+		// Create a configuration and load with default values.
 		Config config = new Config();
 		ConfigDefaults.populate(config);
+		
+		// Change the default environment
+		ConfigEnvironment testDriveEnv = new ConfigEnvironment();
+		testDriveEnv.setUrl("https://res-demo2.kuali.co/kc-dev/kr-login/login?viewId=DummyLoginView&returnLocation=%2Fkc-krad%2FlandingPage&formKey=68ba02c6-3587-4b81-a4c9-d8eb465eaa01&cacheKey=7ft9p0xr31nwqntioww2pa");
+		testDriveEnv.setId(999);
+		config.addConfigEnvironment(testDriveEnv);
+		config.setCurrentEnvironment(testDriveEnv);
+		
+		// Create a cycle and start it in a thread. 
 		Cycle cycle = new Cycle();
 		Thread thread = new Thread(new Session(config, cycle, false));
 		thread.start();

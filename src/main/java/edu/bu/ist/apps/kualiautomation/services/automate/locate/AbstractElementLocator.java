@@ -52,6 +52,7 @@ public abstract class AbstractElementLocator implements Locator {
 			results = new ArrayList<Element>();
 			
 			List<WebElement> custom = customLocate();
+			
 			webElements.addAll(custom);
 			
 			if(webElements.isEmpty()) {
@@ -68,9 +69,14 @@ public abstract class AbstractElementLocator implements Locator {
 						driver = wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
 						List<Element> frameResults = locateAll(elementType, parameters);
 						results.addAll(frameResults);
-						// Don't switch back to the parent window because you will not be able to use the WebElement as it would 
-						// then belong to a frame that the WebDriver is longer focused on ( you will get a StaleElementReferenceException ).
-						// driver.switchTo().defaultContent();
+						if(frameResults.isEmpty()) {
+							driver.switchTo().defaultContent();
+						}
+						else {
+							// Don't switch back to the parent window because you will not be able to use the WebElement as it would 
+							// then belong to a frame that the WebDriver is longer focused on ( you will get a StaleElementReferenceException ).
+							// driver.switchTo().defaultContent();
+						}
 					}
 				}
 			}
@@ -119,12 +125,10 @@ public abstract class AbstractElementLocator implements Locator {
 		case CHECKBOX:
 		case HYPERLINK:
 		case TEXTBOX:
+		case PASSWORD: 
 		case TEXTAREA:
 		case SELECT:
 		case RADIO:
-			candidates = elementType.findAll(driver);
-			results.addAll(Attribute.findForValues(candidates, parameters));
-			break;
 		case OTHER:
 			candidates = elementType.findAll(driver);
 			results.addAll(Attribute.findForValues(candidates, parameters));

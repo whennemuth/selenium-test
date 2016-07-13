@@ -2,7 +2,6 @@ package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitWebElement;
 
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
@@ -59,39 +58,28 @@ public class BasicElement implements Element {
 
 	@Override
 	public void setValue(String value) {
-		if(webElement == null)
-			return;
-		String tagname = webElement.getTagName();
-		if(tagname == null)
-			return;
-		switch(tagname.toLowerCase()) {
-			case "input":
-				String type = webElement.getAttribute("type");
-				if(type == null)
-					return;
-				
-				switch(type.toLowerCase()) {
-					case "text":
-						webElement.sendKeys(value);
-						break;
-					case "checkbox": case "radio":
-						String val = value.trim();
-						String checked = webElement.getAttribute("checked");
-						if(checked != null) {
-							if(val.matches(CHECKED_REGEX) && checked.matches(UNCHECKED_REGEX)) {
-								webElement.click();
-							}
-							else if(val.matches(UNCHECKED_REGEX) && checked.matches(CHECKED_REGEX)) {
-								webElement.click();
-							}
-						}
-						break;
+		switch(elementType) {
+		case TEXTAREA: case TEXTBOX: case PASSWORD:
+			webElement.sendKeys(value);
+			break;
+		case CHECKBOX: case RADIO:
+			String val = value.trim();
+			String checked = webElement.getAttribute("checked");
+			if(checked != null) {
+				if(val.matches(CHECKED_REGEX) && checked.matches(UNCHECKED_REGEX)) {
+					webElement.click();
 				}
-				break;
-			case "select":
-				break;
-			case "textarea":
-				break;
+				else if(val.matches(UNCHECKED_REGEX) && checked.matches(CHECKED_REGEX)) {
+					webElement.click();
+				}
+			}
+			break;
+		case SELECT:
+			break;
+		case OTHER:
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -106,9 +94,20 @@ public class BasicElement implements Element {
 			builder.append(webElement.getTagName());
 			if(!Utils.isEmpty(webElement.getText())) {
 				builder.append(" (text='").append(webElement.getText()).append("', ")
-				.append("enabled=").append(Boolean.valueOf(webElement.isEnabled()))
-				.append("disabled=").append(Boolean.valueOf(webElement.isDisplayed()))
-				.append(")");
+				.append("enabled=").append(Boolean.valueOf(webElement.isEnabled())).append(", ")
+				.append("disabled=").append(Boolean.valueOf(webElement.isDisplayed()));
+				for (int i = 0; i < Attribute.DEFAULT_ATTRIBUTES_TO_CHECK.length; i++) {
+					if(i == 0) {
+						builder.append(", ");
+					}
+					String attribute = Attribute.DEFAULT_ATTRIBUTES_TO_CHECK[i];
+					builder.append(attribute).append("='").append(String.valueOf(webElement.getAttribute(attribute)));
+					builder.append("'");
+					if((i+1) == Attribute.DEFAULT_ATTRIBUTES_TO_CHECK.length)
+						break;
+					builder.append(", ");
+				}
+				builder.append(")");
 			}
 		}
 		builder.append(", label=");

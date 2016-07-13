@@ -8,61 +8,79 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import edu.bu.ist.apps.kualiautomation.util.Utils;
+
 public enum ElementType {
 
 	TEXTBOX(
 		"Simple text box",
 		"input",
 		"text",
-		"//input[@type='text']",
-		true),
+		"//input[@type='text'] | //input[not(@type)]",
+		true,
+		false),
+	PASSWORD(
+		"Password text box",
+		"input",
+		"password",
+		"//input[@type='password']",
+		true,
+		false),
 	TEXTAREA(
 		"Area in which multi-line text can be input",
 		"textarea",
 		null,
 		"//textarea",
-		true),
+		true,
+		false),
 	BUTTON(
 		"Something to click that looks like a button",
 		"input",
 		"button",
 		"//input[@type='button'] | //input[@type='submit'] | //button",
-		false),
+		false,
+		true),
 	BUTTONIMAGE(
 		"Something to click that looks like an image",
 		"input",
 		"image",
 		"//input[@type='image']",
-		false),
+		false,
+		true),
 	HYPERLINK(
 		"Clickable text or graphic that changes the cursor when hovered over to indicate a hotspot for navigation or function trigger.",
 		"a",
 		null,
 		"//a",
-		false), 
+		false,
+		true), 
 	SELECT(
 		"A dropdown box or listbox",
 		"select",
 		null,
 		"//select",
+		false,
 		false),
 	CHECKBOX(
 		"Checkable box",
 		"input",
 		"checkbox",
 		"//input[@type='checkbox']",
+		false,
 		false),
 	RADIO(
 		"Radio Button",
 		"input",
 		"radio",
 		"//input[@type='radio']",
+		false,
 		false),
 	OTHER(
 		"None of the above, but clickable",
 		null,
 		null,
 		"//*",
+		false,
 		false);
 	
 	private String description;
@@ -70,13 +88,15 @@ public enum ElementType {
 	private String tagname;
 	private String typeAttribute;
 	private boolean acceptsKeystrokes;
+	private boolean canNavigate;
 	
-	private ElementType(String description, String tagname, String typeAttribute, String xpathSelector, boolean acceptsKeystrokes) {
+	private ElementType(String description, String tagname, String typeAttribute, String xpathSelector, boolean acceptsKeystrokes, boolean canNavigate) {
 		this.description = description;
 		this.xpathSelector = xpathSelector;
 		this.tagname = tagname;
 		this.typeAttribute = typeAttribute;
 		this.acceptsKeystrokes = acceptsKeystrokes;
+		this.canNavigate = canNavigate;
 	}
 
 	public String getDescription() {
@@ -99,6 +119,10 @@ public enum ElementType {
 		return acceptsKeystrokes;
 	}
 
+	public boolean canNavigate() {
+		return canNavigate;
+	}
+
 	public List<WebElement> findAll(WebDriver driver) {
 		List<WebElement> flds = driver.findElements(By.xpath(getXpath(true)));
 		return flds;
@@ -118,10 +142,10 @@ public enum ElementType {
 	}
 	
 	public static ElementType getInstance(WebElement we) {
+		String type = we.getAttribute("type");
 		if(we != null && we.getTagName() != null) {
 			for(ElementType et : ElementType.values()) {
 				if(we.getTagName().equalsIgnoreCase(et.getTagname())) {
-					String type = we.getAttribute("type");
 					if(type == null && et.getTypeAttribute() == null) {
 						return et;
 					}
@@ -132,6 +156,17 @@ public enum ElementType {
 					}
 				}
 			}
+		}
+		if(we.getTagName().equalsIgnoreCase("input")) {
+			if("submit".equalsIgnoreCase(type)) {
+				return BUTTON;
+			}
+			else if(Utils.isEmpty(type)) {
+				return TEXTBOX;	// The default type of input is text
+			}
+		}
+		if(we.getTagName().equalsIgnoreCase("button")) {
+			return BUTTON;
 		}
 		return OTHER;
 	}

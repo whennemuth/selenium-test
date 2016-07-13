@@ -1,15 +1,19 @@
 package edu.bu.ist.apps.kualiautomation.services.automate;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
+import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
@@ -163,6 +167,13 @@ public class KerberosLogin {
 		// Create the configuration
 		Config config = new Config();
 		ConfigTestingDefaults.populate(config);
+		
+		// Change the default environment
+		ConfigEnvironment testDriveEnv = new ConfigEnvironment();
+		testDriveEnv.setUrl("https://res-demo2.kuali.co/kc-dev/kr-login/login?viewId=DummyLoginView&returnLocation=%2Fkc-krad%2FlandingPage&formKey=68ba02c6-3587-4b81-a4c9-d8eb465eaa01&cacheKey=7ft9p0xr31nwqntioww2pa");
+		testDriveEnv.setId(999);
+		config.addConfigEnvironment(testDriveEnv);
+		config.setCurrentEnvironment(testDriveEnv);
 		
 		// Create the cycle to run
 		Cycle cycle = new Cycle();

@@ -70,7 +70,7 @@ public class LocatorRunner {
 		case HYPERLINK:
 			// RESUME NEXT: write code here.
 			break;
-		case TEXTBOX:
+		case TEXTBOX: case PASSWORD:
 			locator = new LabelledElementLocator(driver);
 			element = locator.locateAll(elementType, Arrays.asList(new String[]{ label }));
 			break;
@@ -108,6 +108,7 @@ public class LocatorRunner {
 			parameters[i] = s.toString();
 		}
 		List<Element> elements = locator.locateAll(elementType, Arrays.asList(parameters));
+		
 		return elements;
 	}
 }

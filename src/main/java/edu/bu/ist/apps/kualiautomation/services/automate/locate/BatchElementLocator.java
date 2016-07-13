@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
@@ -62,13 +63,9 @@ public class BatchElementLocator implements Locator {
 					
 					Element result = runLocator(locator, elementType, attributes);
 					
-					if(result != null) {
-						results.add(result);
-					}
-					if(greedy)
-						continue;
-					else
+					if(addUniqueResult(results, result) && !greedy) {
 						break;
+					}
 				} 
 				catch (Exception e) {
 					e.printStackTrace();
@@ -80,6 +77,25 @@ public class BatchElementLocator implements Locator {
 		finally {
 			busy = false;
 		}		
+	}
+	
+	/**
+	 * Add an Element to a list of found elements only if it is not found to be equal (by toString() value) to an element already in the list.
+	 * 
+	 * @param results
+	 * @param result
+	 * @return
+	 */
+	private boolean addUniqueResult(List<Element> results, Element result) {
+		if(result == null)
+			return false;
+		for(Element e : results) {
+			if(e.toString().equals(result.toString())) {
+				return false;
+			}
+		}
+		results.add(result);
+		return true;
 	}
 	
 	/**
@@ -116,7 +132,7 @@ public class BatchElementLocator implements Locator {
 	private Map<Class<?>, List<String>> parseParms(List<String> parms) {
 		Map<Class<?>, List<String>> map = new LinkedHashMap<Class<?>, List<String>>();
 		for(String parm : parms) {
-			String[] parts = parm.split(PARAMETER_DELIMITER);
+			String[] parts = parm.split(getDelimiterRegex());
 			String classname = parts[0];
 			Class<?> clazz = null;
 			try {
@@ -142,6 +158,9 @@ public class BatchElementLocator implements Locator {
 		return driver;
 	}
 
+	private static String getDelimiterRegex() {
+		return "\\" + StringUtils.join(PARAMETER_DELIMITER.split(""), "\\");
+	}
 
 	public static void main(String[] args) {
 		WebDriver driver = null;

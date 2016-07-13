@@ -82,6 +82,8 @@ public class Tab extends AbstractEntity implements Serializable {
 		return getName() == null || this.getName().isEmpty();
 	}
 	
+	public void setBlank(boolean blank) { /* do nothing - this is just for jersey */ }
+	
 	public int getSequence() {
 		if(this.sequence == 0)
 			this.sequence++;
