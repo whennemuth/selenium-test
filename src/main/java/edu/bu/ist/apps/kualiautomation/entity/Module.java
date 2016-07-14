@@ -57,7 +57,7 @@ public class Module extends AbstractEntity implements Serializable {
 	@Transient 
 	private String actionType;
 	
-	@Column(nullable=true, length=45) 
+	@Column(name="custom_name", nullable=true, length=45) 
 	private String customName;
 
 	//bi-directional many-to-one association to Suite

@@ -70,6 +70,11 @@ public class Config extends AbstractEntity implements Serializable {
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="config")
 	private Set<ConfigModule> configModules = new LinkedHashSet<ConfigModule>();
 
+	//bi-directional many-to-one association to ConfigModule
+// TODO: Give the ConfigModule entity a sequence field and make it sortable with the @OrderBy annotation	
+	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="config")
+	private Set<ConfigShortcut> configShortcuts = new LinkedHashSet<ConfigShortcut>();
+
 	public Config() {
 	}
 
@@ -199,6 +204,28 @@ public class Config extends AbstractEntity implements Serializable {
 		configModule.setConfig(null);
 
 		return configModule;
+	}
+	
+	public Set<ConfigShortcut> getConfigShortcuts() {
+		return this.configShortcuts;
+	}
+
+	public void setConfigShortcuts(Set<ConfigShortcut> configShortcuts) {
+		this.configShortcuts = configShortcuts;
+	}
+
+	public ConfigShortcut addConfigShortcut(ConfigShortcut configShortcut) {
+		getConfigShortcuts().add(configShortcut);
+		configShortcut.setConfig(this);
+
+		return configShortcut;
+	}
+
+	public ConfigShortcut removeConfigShortcut(ConfigShortcut configShortcut) {
+		getConfigShortcuts().remove(configShortcut);
+		configShortcut.setConfig(null);
+
+		return configShortcut;
 	}
 
 	/**

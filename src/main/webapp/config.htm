@@ -102,6 +102,8 @@
 			ng-value="true"
 			ng-click="setConfig();">Headless Mode</div>
 	</div>
+	
+	
 	<div class=sectionlabel>Module definitions</div>
 	<div class=sectionarea>
 		<div ng-repeat="m in config.configModules" style="padding-top:5px;">
@@ -141,6 +143,56 @@
 			</div>
 		</div>
 	</div>
+	
+	
+	<div class=sectionlabel>Shortcuts</div>
+	<div class=sectionarea>
+		<div style="float:right; width:250px; height:45px; border: solid 1px #007acc;">
+			<div class="basicfont pad5">A shortcut is a pre-defined method for locating and clicking a link. The link can be located under a label heading, which is under its own larger heading, and so on.</div>
+		</div>
+		<div ng-repeat="sc in config.configShortcuts" style="padding-top:5px;">
+			<input 
+				type="checkbox" 
+				ng-model="config.configShortcuts[$index].checked"> 
+			<input 
+				required name="shortcutname" 
+				style="width:200px"
+				type='text' 
+				ng-model="sc.name" >
+	    	<input 
+	    		type="button" 
+	    		value="add"
+	    		title="Add a heading label"
+	    		ng-disabled="!sc.name" 
+	    		ng-click="insertNewShortcut($index);">		    
+			<input 
+				type="button" 
+				value="remove" 
+				ng-click="sc.configShortcuts.splice($index, 1);">
+			<div 
+				style="padding-left:50px; padding-top: {{$index==0 ? '5px;' : '0px;'}}" 
+				ng-show="config.configShortcuts[$parent.$index].checked">
+				<input type="text" style="width:200px" 
+					ng-model="sc.labelHierarchyObject.name"> 
+	    		<input 
+	    			type="button" value=" > label " 
+	    			title="Add a sub-heading label"
+	    			ng-disabled="!sc.labelHierarchyObject.name" 
+	    			ng-click="insertShortcutSubHeading(sc.labelHierarchyObject);">		    
+	    		<input 
+	    			type="button" value=" | link " 
+	    			title="Terminate the shortcut with a link"
+	    			ng-disabled="!sc.labelHierarchyObject.name" 
+	    			ng-click="insertShortcutLink(sc.labelHierarchyObject);">		    
+				<input 
+					type="button" 
+					value="remove" 
+					ng-click="sc.labelHierarchyObject = null;">
+			</div>
+		</div>
+	
+	</div>
+	
 	<div class=sectionarea align="right" style="border:none;">
 		<input 
 			type="button" 

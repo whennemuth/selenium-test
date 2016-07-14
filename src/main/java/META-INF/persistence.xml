@@ -11,6 +11,7 @@
 		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigModule</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigTab</class>
+		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut</class>
 		
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		
@@ -42,6 +43,7 @@
 		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigModule</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigTab</class>
+		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut</class>
 		
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		

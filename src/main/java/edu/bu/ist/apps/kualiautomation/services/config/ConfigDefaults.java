@@ -3,6 +3,7 @@ package edu.bu.ist.apps.kualiautomation.services.config;
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigModule;
+import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
 
 public enum ConfigDefaults {
@@ -58,7 +59,15 @@ public enum ConfigDefaults {
 				+ ":History"
 				+ ":Medusa",
 			"Negotiations:"
-				+ "Negotiation")
+				+ "Negotiation")),
+			SHORTCUTS(String.join("&&",
+				"TEST",
+				"https://kuali-test.bu.edu/kc/portal.do",
+				"STAGING",
+				"https://kuali-stg.bu.edu/kc/portal.do",
+				"DEV",
+				"http://ist-kuali-sb1:8080/kc-dev")
+				
 	);
 
 	private String value;
@@ -106,5 +115,58 @@ public enum ConfigDefaults {
 			}
 			cfg.addConfigModule(m);
 		}
+		
+		cfg.addConfigShortcut(configShortcut)
+		ConfigShortcut shortcut = new ConfigShortcut();
+		shortcut.setName("RESEARCHER");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Proposals >>> Create Proposal");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Proposals >>> Proposals Enroute");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Proposals >>> All My Proposals");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Proposals >>> Create Proposal For S2S Opportunity");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Proposals >>> Lists >>> Search Proposals");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Proposals >>> Lists >>> View S2S Submissions");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Proposals >>> Lists >>> Search Proposal Log");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Proposals >>> Lists >>> Search Institutional Proposals");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Awards >>> All my Awards");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Negotiations >>> All My Negotiations");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IRB Protocols >>> Actions >>> Create IRB Protocol");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IRB Protocols >>> Actions >>> Amend or Renew IRB Protocol");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IRB Protocols >>> Actions >>> Notify IRB on a Protocol");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IRB Protocols >>> Actions >>> Request a Status Change on a IRB Protocol");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IRB Protocols >>> Lists >>> Pending Protocols");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IRB Protocols >>> Lists >>> Protocols Pending PI Action");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IRB Protocols >>> Lists >>> Protocols Pending Committee Action");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IRB Protocols >>> Lists >>> Protocols Under Development");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IRB Protocols >>> Lists >>> All My Protocols");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IRB Protocols >>> Lists >>> Search Protocols");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IRB Protocols >>> Lists >>> All My Reviews");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IRB Protocols >>> Lists >>> All My Schedules");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Conflict of Interest >>> My Financial Entities >>> Financial Entity");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Conflict of Interest >>> My Financial Entities >>> View/Edit Financial Entities");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Conflict of Interest >>> My Financial Entities >>> All My Financial Entities");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Conflict of Interest >>> My Disclosures >>> Master Disclosure");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Conflict of Interest >>> My Disclosures >>> Create Annual Disclosure");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Conflict of Interest >>> My Disclosures >>> Create Manual Disclosure");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Conflict of Interest >>> My Disclosures >>> New Project Disclosures To Complete");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Conflict of Interest >>> My Disclosures >>> Update Master Disclosure");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Conflict of Interest >>> My Disclosures >>> All My Disclosures");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Conflict of Interest >>> My Disclosures >>> All My Disclosure Reviews");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Conflict of Interest >>> My Disclosures >>> Search Disclosures");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IACUC Protocols >>> Actions >>> Create IACUC Protocol");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IACUC Protocols >>> Lists >>> All My Protocols");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IACUC Protocols >>> Lists >>> Search Protocols");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IACUC Protocols >>> Lists >>> All My Reviews");
+		shortcut.setLabelHierarchy("RESEARCHER >>> IACUC Protocols >>> Lists >>> All My Schedules");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Quicklinks >>> Pessimistic Lock");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Quicklinks >>> Grants.gov Opportunity Lookup");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Quicklinks >>> Reporting");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Personnel >>> Current & Pending Support");
+		shortcut.setLabelHierarchy("RESEARCHER >>> Workflow >>> Preferences");
+	}
+
+	private void addShortcut(Config cfg, String name, String labelHierarchy) {
+		ConfigShortcut shortcut = new ConfigShortcut();
+		shortcut.setName(name);
+		shortcut.setLabelHierarchy(labelHierarchy);
 	}
 }

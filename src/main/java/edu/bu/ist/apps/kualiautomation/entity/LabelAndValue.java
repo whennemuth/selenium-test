@@ -47,7 +47,7 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	@Column(nullable=false, length=1000)
 	private String value;
 	
-	@Column(nullable=false, length=50)
+	@Column(name="element_type", nullable=false, length=45)
 	private String elementType;
 	
 	@Column(nullable=true, length=100)

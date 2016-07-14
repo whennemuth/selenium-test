@@ -123,6 +123,18 @@ var configCtrlFactory = function() {
 				)
 			};
 			
+			scope.insertNewShortcut = function(index) {
+				// emulate scope.insertNewModule
+				alert('not implemented!');
+			}
+			
+			scope.insertShortcutSubHeading = function(labelHierarchyObject) {
+				alert('not implemented!');
+			}
+			scope.insertShortcutLink = function(labelHierarchyObject) {
+				alert('not implemented!');
+			}
+			
 			scope.getConfigJson = function() {
 				return 'CONFIG:\n' + angular.toJson(scope.config, true);
 			}
