@@ -46,12 +46,19 @@ public enum ElementType {
 		"image",
 		"//input[@type='image']",
 		false,
-		true),
+		true),	
 	HYPERLINK(
-		"Clickable text or graphic that changes the cursor when hovered over to indicate a hotspot for navigation or function trigger.",
+		"Clickable text that changes the cursor when hovered over to indicate a hyperlink.",
 		"a",
 		null,
-		"//a",
+		"//a[text()]",
+		false,
+		true), 
+	HOTSPOT(
+		"Clickable graphic that changes the cursor when hovered over to indicate a hotspot for navigation or function trigger.",
+		"a",
+		null,
+		"//a[not(text())] | //a[text() and not(text())]",
 		false,
 		true), 
 	SELECT(

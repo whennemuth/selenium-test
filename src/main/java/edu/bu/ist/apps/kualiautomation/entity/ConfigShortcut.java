@@ -164,78 +164,89 @@ public class ConfigShortcut implements Serializable {
 	
 
 	public static final String LABEL_HIERARCHY_SEPARATOR = " >>> ";
+	public static final String LABEL_HIERARCHY_SEPARATOR_REGEX = "\\x20>>>\\x20";
 	public String getSeparator() {
 		return LABEL_HIERARCHY_SEPARATOR;
 	}
+	
 	@Transient
-	public LabelHierarchy getLabelHierarchyObject() {
+	public String[] getLabelHierarchyParts() {
 		String h = getLabelHierarchy();
 		if(Utils.isEmpty(h) || h.trim().isEmpty() || h.trim().equals(LABEL_HIERARCHY_SEPARATOR.trim())) {
-			return null;
+			return new String[]{};
 		}
-		String[] labels = h.trim().split(LABEL_HIERARCHY_SEPARATOR.trim());
-		return getLabelHierarchyObject(null, labels);
-	}
-	private LabelHierarchy getLabelHierarchyObject(LabelHierarchy parent, String[] labels) {
-		if(labels == null || labels.length == 0)
-			return null;
-		if(parent == null) {
-			parent = new LabelHierarchy(labels[0].trim());
-			if(labels.length == 1) {
-				return parent;
-			}
-			return getLabelHierarchyObject(parent, Arrays.copyOfRange(labels, 1, labels.length));
-		}
-		if(labels.length == 1) {
-			LabelHierarchy child = new LabelHierarchy(labels[0].trim());
-			parent.setChildHierachy(child);
-		}
-		else {
-			LabelHierarchy child = new LabelHierarchy(labels[0].trim());
-			String[] childLabels = Arrays.copyOfRange(labels, 1, labels.length);
-			parent.setChildHierachy(getLabelHierarchyObject(child, childLabels));
-		}			
-		return parent;
+		return h.trim().split(LABEL_HIERARCHY_SEPARATOR_REGEX);
 	}
 	
-	public void setLabelHierarchyObject(LabelHierarchy hierarchy) {
-		StringBuilder s = buildLabelHierarchy(null, hierarchy);
-		if(s != null && !s.toString().trim().isEmpty())
-			labelHierarchy = s.toString();
-	}
-	
-	private StringBuilder buildLabelHierarchy(StringBuilder s, LabelHierarchy hierarchy) {
-		if(s == null)
-			s = new StringBuilder();
-		if(hierarchy == null)
-			return s;
-		if(hierarchy.getLabel() == null || hierarchy.getLabel().trim().isEmpty())
-			return buildLabelHierarchy(s, hierarchy.getChildHierachy());
-		if(!s.toString().isEmpty()) {
-			s.append(LABEL_HIERARCHY_SEPARATOR);
-		}
-		s.append(hierarchy.getLabel().trim());
-		return buildLabelHierarchy(s, hierarchy.getChildHierachy());
-	}
-
-	public static class LabelHierarchy {
-		private String label;
-		private LabelHierarchy childHierachy;
-		public LabelHierarchy() { }
-		public LabelHierarchy(String label) {
-			this.label = label;
-		}
-		public String getLabel() {
-			return label;
-		}
-		public void setLabel(String label) {
-			this.label = label;
-		}
-		public LabelHierarchy getChildHierachy() {
-			return childHierachy;
-		}
-		public void setChildHierachy(LabelHierarchy childHierachy) {
-			this.childHierachy = childHierachy;
-		}
-	}
+//	@Transient
+//	public LabelHierarchy getLabelHierarchyObject() {
+//		String h = getLabelHierarchy();
+//		if(Utils.isEmpty(h) || h.trim().isEmpty() || h.trim().equals(LABEL_HIERARCHY_SEPARATOR.trim())) {
+//			return null;
+//		}
+//		String[] labels = h.trim().split(LABEL_HIERARCHY_SEPARATOR.trim());
+//		return getLabelHierarchyObject(null, labels);
+//	}
+//	private LabelHierarchy getLabelHierarchyObject(LabelHierarchy parent, String[] labels) {
+//		if(labels == null || labels.length == 0)
+//			return null;
+//		if(parent == null) {
+//			parent = new LabelHierarchy(labels[0].trim());
+//			if(labels.length == 1) {
+//				return parent;
+//			}
+//			return getLabelHierarchyObject(parent, Arrays.copyOfRange(labels, 1, labels.length));
+//		}
+//		if(labels.length == 1) {
+//			LabelHierarchy child = new LabelHierarchy(labels[0].trim());
+//			parent.setChildHierachy(child);
+//		}
+//		else {
+//			LabelHierarchy child = new LabelHierarchy(labels[0].trim());
+//			String[] childLabels = Arrays.copyOfRange(labels, 1, labels.length);
+//			parent.setChildHierachy(getLabelHierarchyObject(child, childLabels));
+//		}			
+//		return parent;
+//	}
+//	
+//	public void setLabelHierarchyObject(LabelHierarchy hierarchy) {
+//		StringBuilder s = buildLabelHierarchy(null, hierarchy);
+//		if(s != null && !s.toString().trim().isEmpty())
+//			labelHierarchy = s.toString();
+//	}
+//	
+//	private StringBuilder buildLabelHierarchy(StringBuilder s, LabelHierarchy hierarchy) {
+//		if(s == null)
+//			s = new StringBuilder();
+//		if(hierarchy == null)
+//			return s;
+//		if(hierarchy.getLabel() == null || hierarchy.getLabel().trim().isEmpty())
+//			return buildLabelHierarchy(s, hierarchy.getChildHierachy());
+//		if(!s.toString().isEmpty()) {
+//			s.append(LABEL_HIERARCHY_SEPARATOR);
+//		}
+//		s.append(hierarchy.getLabel().trim());
+//		return buildLabelHierarchy(s, hierarchy.getChildHierachy());
+//	}
+//
+//	public static class LabelHierarchy {
+//		private String label;
+//		private LabelHierarchy childHierachy;
+//		public LabelHierarchy() { }
+//		public LabelHierarchy(String label) {
+//			this.label = label;
+//		}
+//		public String getLabel() {
+//			return label;
+//		}
+//		public void setLabel(String label) {
+//			this.label = label;
+//		}
+//		public LabelHierarchy getChildHierachy() {
+//			return childHierachy;
+//		}
+//		public void setChildHierachy(LabelHierarchy childHierachy) {
+//			this.childHierachy = childHierachy;
+//		}
+//	}
 }

@@ -30,6 +30,34 @@ div.navigated a {
 	text-decoration:none;
 }
 
+div.shortcut {
+	display:inline;
+	color:blue;
+}
+
+div.shortcut:hover {
+	cursor: pointer;
+}
+
+table.shortcut {
+	padding-bottom: 15px;	
+}
+
+table.shortcut th {
+	font: normal normal 12px arial;
+	padding-top:10px;
+	padding-right:15px;
+	# text-align:left;
+	border-bottom: solid 1pt #007acc;
+	color: #007acc;
+}
+
+table.shortcut td {
+	font: normal normal 12px arial;
+	padding-right:15px;
+	padding-top: 5px;
+}
+
 .section {
 	float: left; 
 	margin: 10px;
@@ -118,6 +146,10 @@ select {
 
 .width400 {
 	width: 400px;
+}
+
+.width700 {
+	width: 700px;
 }
 
 .cycleWrap {

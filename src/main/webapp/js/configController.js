@@ -1,4 +1,4 @@
-var configCtrlFactory = function() {
+var configCtrlFactory = function(cycleCtrl) {
 	return {
 		setScope: function(scope, configSvc, cycleSvc) {
 			console.log("Configuring application controller scope");
@@ -6,6 +6,8 @@ var configCtrlFactory = function() {
 			scope.action = '';
 			scope.cycle = '';
 			scope.cycles = [];
+			
+			cycleSvc.getElementTypes();
 			
 			// Load in the existing configuration
 			if(!scope.config) {
@@ -123,7 +125,23 @@ var configCtrlFactory = function() {
 				)
 			};
 			
+			scope.getElementTypes = function() {
+				return cycleSvc.getElementTypes();
+			}
+			
+			scope.getShortcutElementTypes = function() {
+				var types = cycleSvc.getElementTypes();
+				var filtered = {};
+				for(var et in types) {
+					if(et == 'HYPERLINK' || et == 'HOTSPOT') {
+						filtered[et] = types[et];
+					}
+				}
+				return filtered;
+			}
+			
 			scope.insertNewShortcut = function(index) {
+// RESUME NEXT:				
 				// emulate scope.insertNewModule
 				alert('not implemented!');
 			}

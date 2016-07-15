@@ -82,7 +82,7 @@
 </div>
 
 
-<div class="floatingbox width400">
+<div class="floatingbox width700">
 	<div class=sectionlabel>Head selection</div>
 	<div class=sectionarea>
 		<div style="float:right; width:250px; height:45px; border: solid 1px #007acc;">
@@ -146,48 +146,76 @@
 	
 	
 	<div class=sectionlabel>Shortcuts</div>
-	<div class=sectionarea>
-		<div style="float:right; width:250px; height:45px; border: solid 1px #007acc;">
-			<div class="basicfont pad5">A shortcut is a pre-defined method for locating and clicking a link. The link can be located under a label heading, which is under its own larger heading, and so on.</div>
+	<div class=sectionarea style="overflow-y:auto; height:400px;">
+		<div style="border: solid 1px #007acc;">
+			<div class="basicfont pad5">A shortcut is a pre-defined method for locating a link for clicking. The link can be situated under a label heading, which might be under its own larger heading, and so on.</div>
 		</div>
-		<div ng-repeat="sc in config.configShortcuts" style="padding-top:5px;">
+		<div ng-repeat="sc in config.configShortcuts">
+	    	<div  
+	    		class="basicfont shortcut"
+	    		title="Add a shortcut"
+	    		ng-click="insertNewShortcut($index);">add</div>	    
+			<div  href="#"
+	    		class="basicfont shortcut"
+	    		title="remove this shortcut"
+				ng-click="config.configShortcuts.splice($index, 1);">remove</div>
 			<input 
 				type="checkbox" 
 				ng-model="config.configShortcuts[$index].checked"> 
-			<input 
-				required name="shortcutname" 
-				style="width:200px"
-				type='text' 
-				ng-model="sc.name" >
-	    	<input 
-	    		type="button" 
-	    		value="add"
-	    		title="Add a heading label"
-	    		ng-disabled="!sc.name" 
-	    		ng-click="insertNewShortcut($index);">		    
-			<input 
-				type="button" 
-				value="remove" 
-				ng-click="sc.configShortcuts.splice($index, 1);">
+			<div class="basicfont" style="display:inline; width:150px;">
+				<span ng-if="sc.elementType">{{sc.elementType}}: </span>
+			</div>
+			<div class="basicfont" style="display:inline;" ng-repeat="p in sc.labelHierarchyParts">
+				{{p}}<span ng-if="!$last">&nbsp;&nbsp;&nbsp;>&nbsp;&nbsp;&nbsp;</span>
+			</div>
 			<div 
-				style="padding-left:50px; padding-top: {{$index==0 ? '5px;' : '0px;'}}" 
-				ng-show="config.configShortcuts[$parent.$index].checked">
-				<input type="text" style="width:200px" 
-					ng-model="sc.labelHierarchyObject.name"> 
-	    		<input 
-	    			type="button" value=" > label " 
-	    			title="Add a sub-heading label"
-	    			ng-disabled="!sc.labelHierarchyObject.name" 
-	    			ng-click="insertShortcutSubHeading(sc.labelHierarchyObject);">		    
-	    		<input 
-	    			type="button" value=" | link " 
-	    			title="Terminate the shortcut with a link"
-	    			ng-disabled="!sc.labelHierarchyObject.name" 
-	    			ng-click="insertShortcutLink(sc.labelHierarchyObject);">		    
-				<input 
-					type="button" 
-					value="remove" 
-					ng-click="sc.labelHierarchyObject = null;">
+				style="padding-left:50px; padding-top:5px;" 
+				ng-show="config.configShortcuts[$index].checked">
+				
+				<table cellpadding=0 cellspacing=0 class="shortcut">
+					<tr>
+						<th>ID</th>
+						<th>Element Type</th>
+						<th>Other Identifier</th>
+					</tr>
+					<tr>
+						<td>{{sc.id == 0 ? 'none' : sc.id}}</td>
+						<td>
+							<div>
+								<select ng-model="sc.elementType">
+									<option value="{{et}}" title="{{desc}}" ng-repeat="(et, desc) in getShortcutElementTypes()">{{et}}</option>
+								</select>
+							</div>
+						</td>
+						<td><input type="text" ng-model="sc.identifier"></td>
+					</tr>
+					<tr>
+						<th colspan=3>Path to shortcut link</th>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<div ng-repeat="p in sc.labelHierarchyParts track by sc.labelHierarchyParts[$index]" 
+									style="padding-bottom:5px; padding-left:{{$index * 15}}px;">
+								{{$last && sc.elementType == 'HYPERLINK' ? 'hyperlink text' : 'heading'}}
+								<input type="text" ng-model="sc.labelHierarchyParts[$index]">
+								<div  
+						    		class="basicfont shortcut"
+						    		title="Add a heading label"
+						    		ng-show="sc.labelHierarchyParts[$index]" 
+						    		ng-click="addToHierarchy($parent.$index, $index);">add</div>	    
+								<div  href="#"
+						    		class="basicfont shortcut"
+									ng-click="sc.labelHierarchyParts.splice($index, 1);">remove</div>
+								<div ng-if="$last && sc.elementType == 'HOTSPOT' && sc.identifier" style="padding-left:15px; padding-top:5px;" class="fieldlabel">
+									hotspot: <i>[First hotspot found under heading <b>'{{sc.labelHierarchyParts[$index]}}'</b> with attribute matching on <b>'{{sc.identifier}}'</b>]</i>
+								</div>
+								<div ng-if="$last && sc.elementType == 'HOTSPOT' && !sc.identifier" style="padding-left:15px; padding-top:5px;" class="fieldlabel">
+									hotspot: <i>[First hotspot found under heading <b>'{{sc.labelHierarchyParts[$index]}}'</b>]</i>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</table>
 			</div>
 		</div>
 	
