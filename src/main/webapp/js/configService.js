@@ -16,8 +16,10 @@ var configSvcFactory = function($http, $q) {
 	var SAVE_URL = '/rest/config/save';
 	var SET_DIR_URL = '/rest/config/relocate';
 	var GET_EMPTY_MODULE_URL = '/rest/config/module/empty';
+	var GET_EMPTY_SHORTCUT_URL = '/rest/config/shortcut/empty';
 	
 	var emptyModuleJson;
+	var emptyShortcutJson;
 	var configCache;
 	
 	return {
@@ -62,6 +64,32 @@ var configSvcFactory = function($http, $q) {
 					var module = null;
 					eval("module = " + angular.toJson(emptyModuleJson));
 					deferred.resolve(module);
+				}).error(function(ServiceResponse){
+					deferred.reject(ServiceResponse);
+				});				
+			}
+			return deferred.promise;
+		},
+		
+		getEmptyConfigShortcut : function(configId) {
+			var deferred = $q.defer();
+			if(emptyShortcutJson) {
+				var shortcut = null;
+				eval("shortcut = " + angular.toJson(emptyShortcutJson));
+				deferred.resolve(shortcut);				
+			}
+			else {
+				var url = GET_EMPTY_SHORTCUT_URL + "/" + configId;
+				if(configId == undefined || configId == null)
+					url = GET_EMPTY_SHORTCUT_URL + "/0";
+					
+				$http.get(url)
+				.success(function(ServiceResponse) {
+					emptyShortcutJson = ServiceResponse.data;
+					var shortcut = null;
+					eval("shortcut = " + angular.toJson(emptyShortcutJson));
+					shortcut.labelHierarchyParts[0] = ''; // add a single empty hierarchy part to get an empty textbox
+					deferred.resolve(shortcut);
 				}).error(function(ServiceResponse){
 					deferred.reject(ServiceResponse);
 				});				

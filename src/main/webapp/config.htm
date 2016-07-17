@@ -194,7 +194,11 @@
 					</tr>
 					<tr>
 						<td colspan=3>
-							<div ng-repeat="p in sc.labelHierarchyParts track by sc.labelHierarchyParts[$index]" 
+							<!-- NOTE: Angular reports an "ngRepeat:dupes" error on use of the "add" link despite the key used for 
+							     mapping the repeat items to their DOM elements being unique though use of "track by $index".  
+							     This does not result in a non-responsive behavior to adding and removing from the backing array 
+							     and no bad side effects seem to be evident. Therefore I am treating this error as a false report by angular. -->
+							<div ng-repeat="p in sc.labelHierarchyParts track by $index" 
 									style="padding-bottom:5px; padding-left:{{$index * 15}}px;">
 								{{$last && sc.elementType == 'HYPERLINK' ? 'hyperlink text' : 'heading'}}
 								<input type="text" ng-model="sc.labelHierarchyParts[$index]">
@@ -202,7 +206,7 @@
 						    		class="basicfont shortcut"
 						    		title="Add a heading label"
 						    		ng-show="sc.labelHierarchyParts[$index]" 
-						    		ng-click="addToHierarchy($parent.$index, $index);">add</div>	    
+						    		ng-click="sc.labelHierarchyParts.splice($index+1, 0, '');">add</div>	    
 								<div  href="#"
 						    		class="basicfont shortcut"
 									ng-click="sc.labelHierarchyParts.splice($index, 1);">remove</div>
@@ -218,7 +222,6 @@
 				</table>
 			</div>
 		</div>
-	
 	</div>
 	
 	<div class=sectionarea align="right" style="border:none;">

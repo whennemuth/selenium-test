@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response.Status;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigModule;
+import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
 import edu.bu.ist.apps.kualiautomation.entity.util.EntityPopulator;
 import edu.bu.ist.apps.kualiautomation.model.Directory;
 import edu.bu.ist.apps.kualiautomation.services.config.ConfigService;
@@ -83,12 +84,19 @@ public class ConfigResource {
 			return ServiceResponse.getExceptionResponse(e);
 		}
 	}
-		
+	
 	@GET
 	@Path("/config/module/empty/{configId}")
 	public Response getEmptyModule(@PathParam("configId") Integer configId) throws Exception {
 		ConfigModule mdl = (new ConfigService()).getEmptyConfigModule(configId);
 		return ServiceResponse.getSuccessResponse(mdl);
+	}	
+	
+	@GET
+	@Path("/config/shortcut/empty/{configId}")
+		public Response getEmptyShortcut(@PathParam("configId") Integer configId) throws Exception {
+		ConfigShortcut shortcut = (new ConfigService()).getEmptyShortcut(configId);
+		return ServiceResponse.getSuccessResponse(shortcut);
 	}	
 	
 	@POST

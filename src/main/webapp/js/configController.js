@@ -141,16 +141,26 @@ var configCtrlFactory = function(cycleCtrl) {
 			}
 			
 			scope.insertNewShortcut = function(index) {
-// RESUME NEXT:				
-				// emulate scope.insertNewModule
-				alert('not implemented!');
-			}
-			
-			scope.insertShortcutSubHeading = function(labelHierarchyObject) {
-				alert('not implemented!');
-			}
-			scope.insertShortcutLink = function(labelHierarchyObject) {
-				alert('not implemented!');
+				configSvc.getEmptyConfigShortcut(scope.config.id).then(
+					function(blankShortcut) {
+						scope.config.configShortcuts.splice(index+1, 0, blankShortcut);
+						scope.config.configShortcuts[index+1].checked = true;
+					},
+					function(error) {
+						if(error.message) {
+							alert(
+								"Blank shortcut lookup error!\n\n" + 
+								error.message + '\n\n' + 
+								error.data);
+						}
+						else if(error.data) {
+							alert(error.data);
+						}
+						else {
+							alert(error);
+						}
+					}
+				)
 			}
 			
 			scope.getConfigJson = function() {

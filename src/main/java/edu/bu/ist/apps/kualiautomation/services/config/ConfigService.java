@@ -12,6 +12,7 @@ import javax.persistence.TypedQuery;
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigModule;
+import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
 import edu.bu.ist.apps.kualiautomation.entity.User;
 import edu.bu.ist.apps.kualiautomation.entity.util.Entity;
@@ -102,6 +103,16 @@ public class ConfigService {
 		tab.setLabel("");
 		mdl.addConfigTab(tab);
 		return mdl;
+	}
+
+	public ConfigShortcut getEmptyShortcut(Integer configId) {
+		ConfigShortcut shortcut = new ConfigShortcut();
+		Config cfg = new Config();
+		if(configId > 0)
+			cfg.setId(configId);
+		cfg.setTransitory(true);
+		shortcut.setConfig(cfg);
+		return shortcut;
 	}
 
 	public Config saveConfig(Config cfg) throws Exception {
