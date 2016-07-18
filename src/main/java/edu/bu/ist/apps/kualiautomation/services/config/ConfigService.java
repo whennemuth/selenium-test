@@ -11,9 +11,9 @@ import javax.persistence.TypedQuery;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
-import edu.bu.ist.apps.kualiautomation.entity.ConfigModule;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
-import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
+import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
+import edu.bu.ist.apps.kualiautomation.entity.Suite;
 import edu.bu.ist.apps.kualiautomation.entity.User;
 import edu.bu.ist.apps.kualiautomation.entity.util.Entity;
 import edu.bu.ist.apps.kualiautomation.entity.util.EntityPopulator;
@@ -89,20 +89,6 @@ public class ConfigService {
 		Config cfg = new Config();
 		ConfigDefaults.populate(cfg);
 		return cfg;
-	}
-	
-	public ConfigModule getEmptyConfigModule(Integer configId) {
-		ConfigModule mdl = new ConfigModule();
-		Config cfg = new Config();
-		if(configId > 0)
-			cfg.setId(configId);
-		cfg.setTransitory(true);
-		mdl.setConfig(cfg);
-		mdl.setLabel("");
-		ConfigTab tab = new ConfigTab();
-		tab.setLabel("");
-		mdl.addConfigTab(tab);
-		return mdl;
 	}
 
 	public ConfigShortcut getEmptyShortcut(Integer configId) {
@@ -186,15 +172,6 @@ public class ConfigService {
 	    for(ConfigEnvironment env : cfg.getConfigEnvironments()) {
 	    	env.setParentConfig(cfg);
 	    }
-	    
-	    for(ConfigModule mdl : cfg.getConfigModules()) {
-	    	if(mdl.getConfig() == null)
-	    		mdl.setConfig(cfg);
-	    	for(ConfigTab tab : mdl.getConfigTabs()) {
-	    		if(tab.getConfigModule() == null)
-	    			tab.setConfigModule(mdl);
-	    	}
-	    }	
 	    
 	    for(ConfigShortcut shortcut : cfg.getConfigShortcuts()) {
 	    	if(shortcut.getConfig() == null)

@@ -3,14 +3,10 @@
 	<persistence-unit name="kualiautomation-H2">
 		<class>edu.bu.ist.apps.kualiautomation.entity.Cycle</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.LabelAndValue</class>
-		<class>edu.bu.ist.apps.kualiautomation.entity.Module</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.Suite</class>
-		<class>edu.bu.ist.apps.kualiautomation.entity.Tab</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.User</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.Config</class>
-		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigModule</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment</class>
-		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigTab</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut</class>
 		
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
@@ -35,14 +31,10 @@
 	<persistence-unit name="kualiautomation-HSQLDB">
 		<class>edu.bu.ist.apps.kualiautomation.entity.Cycle</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.LabelAndValue</class>
-		<class>edu.bu.ist.apps.kualiautomation.entity.Module</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.Suite</class>
-		<class>edu.bu.ist.apps.kualiautomation.entity.Tab</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.User</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.Config</class>
-		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigModule</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment</class>
-		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigTab</class>
 		<class>edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut</class>
 		
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>

@@ -1,5 +1,6 @@
 package edu.bu.ist.apps.kualiautomation.entity;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -10,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
@@ -17,9 +19,15 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment.ConfigFieldSerializer;
+import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 
@@ -29,7 +37,10 @@ import edu.bu.ist.apps.kualiautomation.util.Utils;
  */
 @Entity
 @Table(name="config_shortcut")
-@NamedQuery(name="ConfigShortcut.findAll", query="SELECT c FROM ConfigShortcut c")
+@NamedQueries({
+	@NamedQuery(name="ConfigShortcut.findAll", query="SELECT s FROM ConfigShortcut s"),
+	@NamedQuery(name="ConfigShortcut.findByConfigId", query="SELECT s FROM ConfigShortcut s WHERE s.config.id = :configid")
+})
 public class ConfigShortcut extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -50,6 +61,9 @@ public class ConfigShortcut extends AbstractEntity implements Serializable {
 
 	@Column(nullable=false)
 	private byte include;
+
+	@Column(nullable=false)
+	private byte navigate;
 
 	@Column(name="label_hierarchy", nullable=false, length=255)
 	private String labelHierarchy;
@@ -108,12 +122,37 @@ public class ConfigShortcut extends AbstractEntity implements Serializable {
 		this.identifier = identifier;
 	}
 
+	@JsonIgnore
 	public byte getInclude() {
 		return this.include;
 	}
+	public boolean getIncluded() {
+		return (include != 0);
+	}
 
+	@JsonIgnore
 	public void setInclude(byte include) {
 		this.include = include;
+	}
+	public void setIncluded(boolean included) {
+		this.include = (byte) (included ? 1 : 0);
+	}
+
+	
+	@JsonIgnore
+	public byte getNavigate() {
+		return navigate;
+	}
+	public boolean isNavigates() {
+		return (navigate != 0);
+	}
+
+	@JsonIgnore
+	public void setNavigate(byte navigate) {
+		this.navigate = navigate;
+	}
+	public void setNavigates(boolean navigates) {
+		this.navigate = (byte) (navigates ? 1 : 0);
 	}
 
 	public int getSequence() {
@@ -203,75 +242,4 @@ public class ConfigShortcut extends AbstractEntity implements Serializable {
 		// Do nothing - this field is for the UI only and not for persistence.
 	}
 	
-//	@Transient
-//	public LabelHierarchy getLabelHierarchyObject() {
-//		String h = getLabelHierarchy();
-//		if(Utils.isEmpty(h) || h.trim().isEmpty() || h.trim().equals(LABEL_HIERARCHY_SEPARATOR.trim())) {
-//			return null;
-//		}
-//		String[] labels = h.trim().split(LABEL_HIERARCHY_SEPARATOR.trim());
-//		return getLabelHierarchyObject(null, labels);
-//	}
-//	private LabelHierarchy getLabelHierarchyObject(LabelHierarchy parent, String[] labels) {
-//		if(labels == null || labels.length == 0)
-//			return null;
-//		if(parent == null) {
-//			parent = new LabelHierarchy(labels[0].trim());
-//			if(labels.length == 1) {
-//				return parent;
-//			}
-//			return getLabelHierarchyObject(parent, Arrays.copyOfRange(labels, 1, labels.length));
-//		}
-//		if(labels.length == 1) {
-//			LabelHierarchy child = new LabelHierarchy(labels[0].trim());
-//			parent.setChildHierachy(child);
-//		}
-//		else {
-//			LabelHierarchy child = new LabelHierarchy(labels[0].trim());
-//			String[] childLabels = Arrays.copyOfRange(labels, 1, labels.length);
-//			parent.setChildHierachy(getLabelHierarchyObject(child, childLabels));
-//		}			
-//		return parent;
-//	}
-//	
-//	public void setLabelHierarchyObject(LabelHierarchy hierarchy) {
-//		StringBuilder s = buildLabelHierarchy(null, hierarchy);
-//		if(s != null && !s.toString().trim().isEmpty())
-//			labelHierarchy = s.toString();
-//	}
-//	
-//	private StringBuilder buildLabelHierarchy(StringBuilder s, LabelHierarchy hierarchy) {
-//		if(s == null)
-//			s = new StringBuilder();
-//		if(hierarchy == null)
-//			return s;
-//		if(hierarchy.getLabel() == null || hierarchy.getLabel().trim().isEmpty())
-//			return buildLabelHierarchy(s, hierarchy.getChildHierachy());
-//		if(!s.toString().isEmpty()) {
-//			s.append(LABEL_HIERARCHY_SEPARATOR);
-//		}
-//		s.append(hierarchy.getLabel().trim());
-//		return buildLabelHierarchy(s, hierarchy.getChildHierachy());
-//	}
-//
-//	public static class LabelHierarchy {
-//		private String label;
-//		private LabelHierarchy childHierachy;
-//		public LabelHierarchy() { }
-//		public LabelHierarchy(String label) {
-//			this.label = label;
-//		}
-//		public String getLabel() {
-//			return label;
-//		}
-//		public void setLabel(String label) {
-//			this.label = label;
-//		}
-//		public LabelHierarchy getChildHierachy() {
-//			return childHierachy;
-//		}
-//		public void setChildHierachy(LabelHierarchy childHierachy) {
-//			this.childHierachy = childHierachy;
-//		}
-//	}
 }

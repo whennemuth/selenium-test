@@ -156,3 +156,17 @@ select {
 	padding: 5px;
 	font: normal normal 12px arial;
 }
+
+div.expandCollapse {
+	display:inline;
+	font: bold normal 14px monospace;
+	color: #007acc;
+	padding-left: 10px;
+}
+div.expandCollapse:hover {
+	cursor: pointer;
+}
+.suiteRowHighlighted {
+	background-color: beige;
+	border: solid 1px #007acc;
+}

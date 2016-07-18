@@ -103,48 +103,6 @@
 			ng-click="setConfig();">Headless Mode</div>
 	</div>
 	
-	
-	<div class=sectionlabel>Module definitions</div>
-	<div class=sectionarea>
-		<div ng-repeat="m in config.configModules" style="padding-top:5px;">
-			<input 
-				type="checkbox" 
-				ng-model="config.configModules[$index].checked"> 
-			<input 
-				type="text" 
-				style="width:200px" 
-				ng-model="m.label"> 
-	    	<input 
-	    		type="button" 
-	    		value="add"
-	    		ng-disabled="!m.label" 
-	    		ng-click="insertNewModule($index);">		    
-			<input 
-				type="button" 
-				value="remove" 
-				ng-click="config.configModules.splice($index, 1);">
-			<div 
-				ng-repeat="t in m.configTabs" 
-				style="padding-left:50px; padding-top: {{$index==0 ? '5px;' : '0px;'}}" 
-				ng-show="config.configModules[$parent.$index].checked">
-				<input 
-					type="text" 
-					style="width:200px" 
-					ng-model="t.label"> 
-	    		<input 
-	    			type="button" value="add" 
-	    			ng-disabled="!t.label" 
-	    			ng-click="insertNewTab($parent.$index, $index);">		    
-				<input 
-					type="button" 
-					value="remove" 
-					ng-show="config.configModules[$parent.$index].configTabs.length > 1"
-					ng-click="config.configModules[$parent.$index].configTabs.splice($index, 1);">
-			</div>
-		</div>
-	</div>
-	
-	
 	<div class=sectionlabel>Shortcuts</div>
 	<div class=sectionarea style="overflow-y:auto; height:400px;">
 		<div style="border: solid 1px #007acc;">

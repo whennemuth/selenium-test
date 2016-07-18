@@ -9,9 +9,7 @@ import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
-import edu.bu.ist.apps.kualiautomation.entity.Module;
 import edu.bu.ist.apps.kualiautomation.entity.Suite;
-import edu.bu.ist.apps.kualiautomation.entity.Tab;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementValue;
@@ -51,34 +49,22 @@ public class CycleRunner {
 		outerloop:
 		for(Suite suite : cycle.getSuites()) {
 			System.out.println("Processing Suite: " + suite.getName());
-//			for (Iterator<Module> moduleIterator = suite.getModules().iterator(); moduleIterator.hasNext();) {
-//				Module module =  moduleIterator.next();
-//				if(!module.isBlank()) {
-//					System.out.println("Processing Page/Module " + String.valueOf(module.getSequence()));
-//				}
-//				for(Tab tab : module.getTabs()) {
-//					if(!tab.isBlank()) {
-//						System.out.println("Clicking tab: " + tab.getName());
-//					}
-					for(LabelAndValue lv : suite.getLabelAndValues()) {
-						ElementType elementType = ElementType.valueOf(lv.getElementType());
-						LocatorRunner locator = new LocatorRunner(driver, elementType, lv.getLabel(), lv.getIdentifier());
-						List<Element> elements = locator.run(true);
-						if(elementLocated(lv, elements)) {
-							boolean endOfPage = moduleIterator.hasNext();
-							if(!applyElementValue(lv, elements.get(0), endOfPage)) {
-								driver.switchTo().defaultContent();
-								break outerloop;
-							}
-						}
-						else {
-							driver.switchTo().defaultContent();
-							break outerloop;
-						}
+			for(LabelAndValue lv : suite.getLabelAndValues()) {
+				ElementType elementType = ElementType.valueOf(lv.getElementType());
+				LocatorRunner locator = new LocatorRunner(driver, elementType, lv.getLabel(), lv.getIdentifier());
+				List<Element> elements = locator.run(true);
+				if(elementLocated(lv, elements)) {
+					if(!applyElementValue(lv, elements.get(0))) {
 						driver.switchTo().defaultContent();
+						break outerloop;
 					}
-//				}
-//			}
+				}
+				else {
+					driver.switchTo().defaultContent();
+					break outerloop;
+				}
+				driver.switchTo().defaultContent();
+			}
 		}
 		
 		return runlog;
@@ -108,10 +94,10 @@ public class CycleRunner {
 	 * @param lv
 	 * @param elements
 	 */
-	private boolean applyElementValue(LabelAndValue lv, Element element, boolean navigate) {
+	private boolean applyElementValue(LabelAndValue lv, Element element) {
 		ElementValue val = new ElementValue(driver, lv);
 		runlog.log(element, lv);
-		if(!val.applyTo(element, navigate)) {
+		if(!val.applyTo(element, lv.isNavigates())) {
 			runlog.valueApplicationError(lv, element);
 		}
 		

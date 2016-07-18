@@ -10,7 +10,7 @@ import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
-import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
+import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.entity.Suite;
@@ -172,6 +172,8 @@ public class ScriptService {
 		if(userId != null) 
 			user.setId(userId);
 		LabelAndValue lv = new LabelAndValue();
+		ConfigShortcut shortcut = new ConfigShortcut();
+		lv.setShortcut(shortcut);
 		
 		suite.setCycle(cycle);
 		cycle.setUser(user);

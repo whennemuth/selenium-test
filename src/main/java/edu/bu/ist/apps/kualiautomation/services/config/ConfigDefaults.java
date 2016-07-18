@@ -2,9 +2,7 @@ package edu.bu.ist.apps.kualiautomation.services.config;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
-import edu.bu.ist.apps.kualiautomation.entity.ConfigModule;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
-import edu.bu.ist.apps.kualiautomation.entity.ConfigTab;
 
 public enum ConfigDefaults {
 	CONFIG_FILE_NAME("kualiautomation.cfg"), 
@@ -17,49 +15,6 @@ public enum ConfigDefaults {
 				"https://kuali-stg.bu.edu/kc/portal.do",
 				"DEV",
 				"http://ist-kuali-sb1:8080/kc-dev")
-	),
-	MODULES(String.join("&&",
-			"Proposal Log"
-			+ ": ",
-			"Institutional Proposal"
-				+ ":Award"
-				+ ":Contacts"
-				+ ":Commitments"
-				+ ":Budget Versions"
-				+ ":Payment, Reports & Terms"
-				+ ":Special Review"
-				+ ":Custom Data"
-				+ ":Comments, Notes, & Attachments"
-				+ ":Award Actions"
-				+ ":History"
-				+ ":Medusa",
-			"Proposal Development Document"
-				+ ":Proposal"
-				+ ":S2S"
-				+ ":Key Personnel"
-				+ ":Special Review"
-				+ ":Custom Data"
-				+ ":Abstracts and Attachments"
-				+ ":Questions"
-				+ ":Budget Versions"
-				+ ":Permissions"
-				+ ":Proposal Summary"
-				+ ":Proposal Actions"
-				+ ":Medusa",
-			"Award"
-				+ ":Award"
-				+ ":Contacts"
-				+ ":Commitments"
-				+ ":Budget Versions"
-				+ ":Payment, Reports & Terms"
-				+ ":Special Review"
-				+ ":Custom Data"
-				+ ":Comments, Notes, & Attachments"
-				+ ":Award Actions"
-				+ ":History"
-				+ ":Medusa",
-			"Negotiations:"
-				+ "Negotiation")
 	);
 
 	private String value;
@@ -73,13 +28,13 @@ public enum ConfigDefaults {
 		return value.split("&&");
 	}
 	public static void populate(Config cfg) {
-		populate(cfg, ENVIRONMENTS.getValues(), DEFAULT_ENVIRONMENT.getValue(), MODULES.getValues());
+		populate(cfg, ENVIRONMENTS.getValues(), DEFAULT_ENVIRONMENT.getValue());
 	}
 	/**
 	 * Populate an empty Config instance with the enums values.
 	 * @param cfg
 	 */
-	public static void populate(Config cfg, String[] environments, String defaultEnvironment, String[] modules) {
+	public static void populate(Config cfg, String[] environments, String defaultEnvironment) {
 		
 		// Add the default environments
 		for(int i=0; i< environments.length; i+=2) {
@@ -90,22 +45,6 @@ public enum ConfigDefaults {
 			if(env.getName().equalsIgnoreCase(defaultEnvironment)) {
 				cfg.setCurrentEnvironment(env);
 			}
-		}
-		
-		// Add the default modules
-		for(int i=0; i<modules.length; i++) {
-			String[] parts = modules[i].split(":");
-			String label = parts[0];
-			ConfigModule m = new ConfigModule();
-			m.setLabel(label);
-			if(parts.length > 1) {
-				for(int x=1; x<parts.length; x++) {
-					ConfigTab tab = new ConfigTab();
-					tab.setLabel(parts[x].trim());
-					m.addConfigTab(tab);
-				}
-			}
-			cfg.addConfigModule(m);
 		}
 		
 		int sequence = 1;

@@ -15,10 +15,9 @@ var configSvcFactory = function($http, $q) {
 	var GET_URL = '/rest/config';
 	var SAVE_URL = '/rest/config/save';
 	var SET_DIR_URL = '/rest/config/relocate';
-	var GET_EMPTY_MODULE_URL = '/rest/config/module/empty';
+	var GET_EMPTY_LABEL_VALUE_URL = '/rest/config/lv/empty';
 	var GET_EMPTY_SHORTCUT_URL = '/rest/config/shortcut/empty';
 	
-	var emptyModuleJson;
 	var emptyShortcutJson;
 	var configCache;
 	
@@ -42,31 +41,6 @@ var configSvcFactory = function($http, $q) {
 				}).error(function(ServiceResponse){
 					deferred.reject(ServiceResponse);
 				});
-			}
-			return deferred.promise;
-		},
-		
-		getEmptyConfigModule : function(configId) {
-			var deferred = $q.defer();
-			if(emptyModuleJson) {
-				var module = null;
-				eval("module = " + angular.toJson(emptyModuleJson));
-				deferred.resolve(module);				
-			}
-			else {
-				var url = GET_EMPTY_MODULE_URL + "/" + configId;
-				if(configId == undefined || configId == null)
-					url = GET_EMPTY_MODULE_URL + "/0";
-					
-				$http.get(url)
-				.success(function(ServiceResponse) {
-					emptyModuleJson = ServiceResponse.data;
-					var module = null;
-					eval("module = " + angular.toJson(emptyModuleJson));
-					deferred.resolve(module);
-				}).error(function(ServiceResponse){
-					deferred.reject(ServiceResponse);
-				});				
 			}
 			return deferred.promise;
 		},

@@ -11,9 +11,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -38,7 +40,7 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	@Column(unique=true, nullable=false)
 	private Integer id;
 
-	@Column(nullable=false, length=45)
+	@Column(length=45)
 	private String label;
 
 	@Column(nullable=false)
@@ -52,23 +54,39 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	
 	@Column(nullable=true, length=100)
 	private String identifier;
+
+	@Column(nullable=false)
+	private byte navigate;
+	
+	// uni-directional one-to-one association to ConfigShortcut (ConfigShortcut cannot "see" LabelAndValue). 
+	@OneToOne
+	@JoinColumn(name="shortcut_id", nullable=true)
+	private ConfigShortcut shortcut;
 	
 	/**
 	 * This is a hack. I'm adding this property to be included into the json object created
 	 * from an instance of this class for convenience in angularjs 2-way binding UI manipulation.
 	 */
 	@Transient
-	public String getChecked() {
-		if(elementType == null)
-			return "";
-		if(value == null)
-			return "";
-		boolean checked = Boolean.valueOf(value);
-		return String.valueOf(checked);
+	public boolean isChecked() {
+		return false;
 	}
 	@Transient
-	public void setChecked(String checked) {
-		// Do nothing
+	public void setChecked(boolean checked) {
+		/* do nothing */
+	}
+	
+	@Transient
+	public boolean isBooleanValue() {
+		if(elementType == null)
+			return false;
+		if(value == null)
+			return false;
+		return value.trim().equalsIgnoreCase("true");
+	}
+	@Transient
+	public void setBooleanValue(boolean bool) {
+		/* do nothing */
 	}
 
 	
@@ -130,6 +148,36 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 		this.identifier = identifier;
 	}
 
+//	@JsonSerialize(using=ShortcutFieldSerializer.class)
+	public ConfigShortcut getShortcut() {
+		return shortcut;
+	}
+	
+	public void setShortcut(ConfigShortcut shortcut) {
+		this.shortcut = shortcut;
+	}
+	
+	@JsonIgnore
+	public byte getNavigate() {
+		return navigate;
+	}
+	public boolean isNavigates() {
+		boolean retval = (navigate != 0);
+		if(shortcut != null) {
+			retval |= shortcut.isNavigates();
+		}
+		
+		return retval;
+	}
+
+	@JsonIgnore
+	public void setNavigate(byte navigate) {
+		this.navigate = navigate;
+	}
+	public void setNavigates(boolean navigates) {
+		this.navigate = (byte) (navigates ? 1 : 0);
+	}
+	
 	@JsonSerialize(using=SuiteFieldSerializer.class)
 	public Suite getSuite() {
 		return this.suite;
@@ -148,5 +196,15 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 			(new CustomJsonSerializer<Suite>()).serialize(suite, generator, provider);
 		}
 	}
+	
+//	public static class ShortcutFieldSerializer extends JsonSerializer<ConfigShortcut> {
+//		@Override public void serialize(
+//				ConfigShortcut shortcut, 
+//				JsonGenerator generator, 
+//				SerializerProvider provider) throws IOException, JsonProcessingException {
+//			
+//			(new CustomJsonSerializer<ConfigShortcut>()).serialize(shortcut, generator, provider);
+//		}
+//	}
 
 }

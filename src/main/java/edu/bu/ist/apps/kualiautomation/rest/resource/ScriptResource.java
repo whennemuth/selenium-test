@@ -13,9 +13,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.services.automate.KerberosLoginParms;
-import edu.bu.ist.apps.kualiautomation.services.automate.ModuleAction;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.config.ScriptService;
 
@@ -35,13 +35,6 @@ public class ScriptResource {
 	@Path("/cycle/element/types")
 	public Response getElementTypes(@PathParam("userId") Integer userId) throws Exception {		
 		Response response = ServiceResponse.getResponse(ElementType.toJson(), Status.OK);
-		return response;		
-	}
-	
-	@GET
-	@Path("/cycle/module/actions")
-	public Response getModuleActions() throws Exception {		
-		Response response = ServiceResponse.getResponse(ModuleAction.toJson(), Status.OK);
 		return response;		
 	}
 	

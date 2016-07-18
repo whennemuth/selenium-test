@@ -3,9 +3,8 @@ var cycleCtrlFactory = function() {
 	return {
 		setScope: function(scope, cycleSvc) {
 			
-			// Load in Element Types and module actions from web service
+			// Load in Element Types and shortcuts from web service
 			cycleSvc.getElementTypes();
-			cycleSvc.getModuleActions();
 			
 			// Add an event handler to query if the service has intialized yet.
 			scope.isInitialized = function() {
@@ -13,21 +12,30 @@ var cycleCtrlFactory = function() {
 			}
 			
 			scope.getElementTypes = function() {
-				return cycleSvc.getElementTypes();
-			}
+				var types = cycleSvc.getElementTypes();
+				var filtered = {};
+				for(var et in types) {
+					if(et != 'BUTTONIMAGE') {
+						filtered[et] = types[et];
+					}
+				}
+				return filtered;
+			};
 			
-			scope.getModuleActions = function() {
-				return cycleSvc.getModuleActions();
-			}
+			scope.getShortcuts = function() {
+				return scope.config.configShortcuts;
+			};
 			
 			// Control which fields for label and value row get shown/hidden depending on element type selection.
 			scope.lvShow = function(lv, inputType) {
 				var checkable = false;
 				var clickonly = false;
 				var textvalue = false;
+				var shortcut = false;
 				switch(lv.elementType) {
-					case 'BUTTON': 	case 'BUTTONIMAGE': case 'HYPERLINK':
+					case 'BUTTON': 	case 'HOTSPOT': case 'HYPERLINK': case 'SHORTCUT':
 						clickonly = true;
+						shortcut = lv.elementType == 'SHORTCUT';
 						break;
 					case 'CHECKBOX': case 'RADIO': 
 						checkable = true;
@@ -35,6 +43,8 @@ var cycleCtrlFactory = function() {
 					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'PASSWORD': case 'OTHER':
 						textvalue = true;
 						break;
+					default:
+						return false;
 				}
 				
 				switch(inputType) {
@@ -42,39 +52,61 @@ var cycleCtrlFactory = function() {
 						return checkable;
 					case 'value':
 						return textvalue;
+					case 'navigates':
+						return clickonly && !shortcut;
+					case 'label': case 'identifier':
+						return !shortcut;
+					case 'shortcut':
+						return shortcut;
 					default:
-						return false;
+						return lv.elementType;
 				}
-			}
+			};
 			
 			// Clear out or pre-populate field values of a label and value row depending on element type and checked state selections
 			scope.lvChange = function(lv) {
 				switch(lv.elementType) {
-					case 'BUTTON': 	case 'BUTTONIMAGE': case 'HYPERLINK':
-						lv.value = '';
-						lv.checked = '';
+					case 'BUTTON': 	case 'HOTSPOT': case 'HYPERLINK':
+						lv.value = null;
+						lv.booleanValue = false;
+						lv.shortcut.id = 0;
 						break;
 					case 'CHECKBOX': case 'RADIO': 
-						lv.value = lv.checked;
+						lv.value = lv.booleanValue;
+						lv.navigates = false;
+						lv.shortcut.id = 0;
 						break;
 					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'PASSWORD': case 'OTHER':
-						lv.checked = '';
-						lv.value = /^(true)|(false)$/i.test(lv.value) ? '' : lv.value;
+						lv.booleanValue = false;
+						lv.value = /^(true)|(false)$/i.test(lv.value) ? null : lv.value;
+						lv.navigates = false;
+						lv.shortcut.id = 0;
+						break;
+					case 'SHORTCUT':
+						lv.identifier = null;
+						lv.label = null;
+						lv.value = null;
+						lv.booleanValue = false;
+						if(lv.shortcut) {
+							lv.navigates = (lv.navigates || lv.shortcut.navigates);
+						}
 						break;
 					default:
-						lv.identifier = '';
-						lv.label = '';
-						lv.value = '';
-						lv.checked = '';
+						lv.identifier = null;
+						lv.label = null;
+						lv.value = null;
+						lv.booleanValue = false;
+						lv.navigates = false;
+						lv.shortcut.id = 0;
 						break;
 				}
-			}
+			};
 			
 			scope.resequence = function(items) {
 				for(var i=0; i<items.length; i++) {
 					items[i].sequence = (i+1);
 				}
-			}
+			};
 			
 			// Define an event handler to load in an empty default cycle object bound to a ng-repeat block for new cycles
 			scope.newCycle = function() {
@@ -86,11 +118,11 @@ var cycleCtrlFactory = function() {
 						alert("Cycle retrieval error!\n" + error);
 					}
 				);
-			}
+			};
 			
 			scope.backupCycle = function() {
 				scope.cycleBackup = angular.copy(scope.cycle);
-			}
+			};
 				
 			scope.saveCycle = function() {
 				cycleSvc.saveCycle(scope.cycle).then(
@@ -150,64 +182,93 @@ var cycleCtrlFactory = function() {
 					);
 			};
 			
-			/**
-			 * If the module type is "custom", then there is to be no module name selection and no tabs, so blank and hide these.
-			 */
-			scope.toggleModuleType = function(module) {
-				module.tabs = [];
-				module.tabs[0] = scope.getBlankObject('tab');
-				module.name = null;
-				module.customName = null;
-			};
-			
 			scope.getBlankObject = function(objectType) {
 				var cycleTemplate = cycleSvc.getEmptyCycle(scope.config.user.id);
 				switch(objectType) {
 				case 'suite': return cycleTemplate.suites[0];
-				case 'module': return cycleTemplate.suites[0].modules[0];
-				case 'tab': return cycleTemplate.suites[0].modules[0].tabs[0];
-				case 'lv': return cycleTemplate.suites[0].modules[0].tabs[0].labelAndValues[0];
+				case 'lv': return cycleTemplate.suites[0].labelAndValues[0];
 				}
-			}
-			
-			scope.newSuite = function(suiteIdx) {
-				var cycleTemplate = cycleSvc.getEmptyCycle(scope.config.user.id);
-				scope.cycle.suites[suiteIdx+1] = cycleTemplate.suites[0];
 			};
 			
-			scope.newModule = function(modules, moduleIdx) {
-				var cycleTemplate = cycleSvc.getEmptyCycle(scope.config.user.id);
-				scope.cycle.suites[suiteIdx].modules[moduleIdx+1] = cycleTemplate.suites[0].modules[0];
+			scope.addSuite = function(cycle, suiteIdx) {
+				cycle.suites.splice(suiteIdx+1, 0, scope.getBlankObject('suite')); 
+				scope.resequence(cycle.suites);
 			};
 			
-			scope.newTab = function(suiteIdx, moduleIdx, tabIdx) {
-				var cycleTemplate = cycleSvc.getEmptyCycle(scope.config.user.id);
-				scope.cycle.suites[suiteIdx].modules[moduleIdx].tabs[tabIdx+1] = cycleTemplate.suites[0].modules[0].tabs[0];
+			scope.removeSuite = function(cycle, suiteIdx) {
+				cycle.suites.splice(suiteIdx, 1); 
+				scope.resequence(cycle.suites);
 			};
 			
-			scope.newLabelAndValue = function(suiteIdx, moduleIdx, tabIdx, lvIdx) {
-				var cycleTemplate = cycleSvc.getEmptyCycle(scope.config.user.id);
-				scope.cycle.suites[suiteIdx].modules[moduleIdx].tabs[tabIdx].labelAndValues[lvIdx+1] = cycleTemplate.suites[0].modules[0].tabs[0].labelAndValues[0];
-			}
+			scope.addLabelAndValue = function(suite, lvIdx) {
+				suite.labelAndValues.splice(lvIdx+1, 0, scope.getBlankObject('lv')); 
+				scope.resequence(suite.labelAndValues);
+			};
+				
+			scope.removeLabelAndValue = function(suite, lvIdx) {
+				suite.labelAndValues.splice(lvIdx, 1); 
+				scope.resequence(suite.labelAndValues);
+			};
 			
 			/**
-			 * This function repopulates tab picklist options to reflect a new parent module when that modules 
-			 * picklist selected value has changed.
+			 * Condense all field values of a LabelAndValue to one line of text.
 			 */
-			scope.getTabs = function(suiteIdx, moduleIdx) {
-				var moduleName = scope.cycle.suites[suiteIdx].modules[moduleIdx].name;
-				for(var i=0; i<scope.config.configModules.length; i++) {
-					var cfgMdl = scope.config.configModules[i];
-					if(moduleName == cfgMdl.label) {
-						return cfgMdl.configTabs;
+			scope.getLvLabel = function(lv) {
+				var s = lv.sequence + ') ';
+				s += (lv.id && lv.id > 0) ? 'id:' + lv.id : 'new';
+				s += ', type:';
+				var shortcut = '';
+				if(lv.elementType) {
+					s += lv.elementType;
+					if(lv.elementType == 'SHORTCUT') {
+						if(lv.shortcut) {
+							var id = lv.shortcut.id;
+							shortcut = '[id=' + (id > 0 ? id : '?') + ']';
+						}
+						else {
+							shortcut = '[id=?]';
+						}
 					}
 				}
-				return [];
+				else {
+					s += '?';
+				}
+				if(shortcut) {
+					s += (', shortcut:' + shortcut);
+				}
+				else {
+					s += ', label:';
+					s += lv.label ? lv.label : '?';
+					s += ', value:';
+					s += lv.value ? lv.value : '?';
+					s += ', other identifier:';
+					s += lv.identifier ? lv.identifier : '?';
+				}
+				s += ', navigates:';
+				s += lv.navigates ? 'true' : 'false';
+				
+				return s;
+			};
+			
+			/**
+			 * Flatten out an array like ['a', 'b', 'c'] to 'a   >   b   >   c'
+			 */
+			scope.getHierarchyLabel = function(shortcut) {
+				var s = shortcut.sequence + ') ' + 
+				shortcut.elementType + ': ';
+				var parts = shortcut.labelHierarchyParts;
+				for(var i=0; i<parts.length; i++) {
+					s += parts[i];
+					if((i+1) < parts.length) {
+						s += '   >   ';
+					}
+				}
+				return s;
 			};
 			
 			scope.getCycleJson = function() {
 				return 'CYCLE:\n' + angular.toJson(scope.cycle, true) + '\n\nCYCLES:\n' + angular.toJson(scope.cycles, true) + '\n\nBACKUP:\n' + angular.toJson(scope.cycleBackup, true);
-			}
+			};
 		}
 	};
 };

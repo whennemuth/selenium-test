@@ -52,12 +52,12 @@
 					<div class="cycleWrap">
 						{{suite.sequence}}) Suite name: <input type="text" value="{{suite.name}}" ng-model="suite.name"">
 						<input type="button" value="add" 
-							ng-click="cycle.suites.splice($index+1, 0, getBlankObject('suite')); resequence($parent.cycle.suites);">
+							ng-click="addSuite(cycle, $index);">
 						<input 
 							type="button" 
 							value="remove" 
 							ng-show="cycle.suites.length > 1"
-							ng-click="cycle.suites.splice($index, 1); resequence($parent.cycle.suites);">
+							ng-click="removeSuite(cycle, $index);">
 						<div style="display:inline; padding-left:50px; width:200px;" ng-show="cycle && cycle.suites[$index].id">
 							<input type='button' value=' Launch '>
 							<select 
@@ -69,6 +69,9 @@
 						</div>
 					</div>
 					<div  class="sectionarea">
+						<div ng-repeat="lv in suite.labelAndValues" style="background-color: #b3e0ff;">
+						
+						<!-- 
 						<div ng-repeat="module in suite.modules" style="background-color: #b3e0ff;" >
 							<div class="cycleWrap">
 								{{module.sequence}}) Page:
@@ -114,46 +117,76 @@
 											ng-click="module.tabs.splice($index, 1); resequence($parent.module.tabs);">
 									</div>
 									<div ng-repeat="lv in tab.labelAndValues">
-										<div class="cycleWrap" style="padding-left:35px;">
-											{{lv.sequence}}) type: 
-											<select ng-model="lv.elementType" ng-change="lvChange(lv)">
-												<option value=""><- Select One -></option>
-												<option value="{{et}}" title="{{desc}}" ng-repeat="(et, desc) in getElementTypes()">{{et}}</option>
-											</select>
-											<div ng-show="lv.elementType" style="display:inline">
+									-->
+									
+										<div class="cycleWrap"">
+											<div class="{{lv.navigates ? 'suiteRowHighlighted' : ''}}">
+												<div class=expandCollapse title="expand" ng-show="!lv.checked" ng-click="lv.checked = !lv.checked">&nbsp;edit</div>
+												<div class=expandCollapse title="collapse" ng-show="lv.checked" ng-click="lv.checked = !lv.checked">close</div>
+												<input 
+													type="button" 
+													value="add" 
+													ng-click="addLabelAndValue(suite, $index);">
+												<input 
+													type="button" 
+													value="remove" 
+													ng-show="cycle.suites[$parent.$index].labelAndValues.length > 1"
+													ng-click="removeLabelAndValue(suite, $index);">
+												<div style="display:inline;" class="basicfont">{{ getLvLabel(lv) }}</div>
+											</div>
+											<div ng-show="lv.checked" style="padding-left:30px;">
 											
-												&nbsp;&nbsp;&nbsp;
-												label: <input type="text" value="{{lv.label}}" ng-model="lv.label">
-												
-												&nbsp;&nbsp;&nbsp;
-												other identifier: <input type="text" value="{{lv.identifier}}" ng-model="lv.identifier">
-												
-												<div style="display:inline" ng-show="lvShow(lv, 'state')">
-													&nbsp;&nbsp;&nbsp;
-													state: <select 
-																ng-model="lv.checked" ng-change="lvChange(lv)" 
-																ng-options="key as val for (key, val) in {true:'checked', false:'unchecked'}">
+												<div style="padding-top:5px;">
+													type<br> 
+													<select ng-model="lv.elementType" ng-change="lvChange(lv)">
+														<option value=""><- Select One -></option>
+														<option value="{{et}}" title="{{desc}}" ng-repeat="(et, desc) in getElementTypes()">{{et}}</option>
+													</select>
+												</div>
+											
+												<div ng-show="lvShow(lv, 'identifier')" style="padding-top:5px;">
+													other identifier<br>
+													<input type="text" value="{{lv.identifier}}" ng-model="lv.identifier">
+												</div>
+											
+												<div ng-show="lvShow(lv, 'label')" style="padding-top:5px;">
+													label<br>
+													<input type="text" value="{{lv.label}}" ng-model="lv.label">
+												</div>
+											
+												<div ng-show="lvShow(lv, 'value')" style="padding-top:5px;">
+													value<br>
+													<input type="text" value="{{lv.value}}" ng-model="lv.value">
+												</div>
+											
+												<div ng-show="lvShow(lv, 'navigates')" style="padding-top:5px;">
+													navigates to another page
+													<input type="checkbox" ng-model="lv.navigates">
+												</div>
+											
+												<div ng-show="lvShow(lv, 'state')" style="padding-top:5px;">
+													state<br>
+													<select 
+															ng-model="lv.booleanValue" ng-change="lvChange(lv)" 
+															ng-options="key as val for (key, val) in {true:'checked', false:'unchecked'}">
 														<option value=""><- Select One -></option>
 													</select>
 												</div>
 												
-												<div style="display:inline" ng-show="lvShow(lv, 'value')">
-													&nbsp;&nbsp;&nbsp;
-													value: <input type="text" value="{{lv.value}}" ng-model="lv.value">
+												<div ng-show="lvShow(lv, 'shortcut')" style="padding-top:5px;">
+													shortcut selection<br>
+													<select ng-model="lv.shortcut.id" style="font-size:10px; height:20px;"
+														ng-change="lvChange(lv)" 
+														ng-options="shortcut.id as getHierarchyLabel(shortcut) for shortcut in getShortcuts() track by shortcut.id">
+														<option value=""><- Select One -></option>
+													</select>
 												</div>
 											</div>
-											<input 
-												type="button" 
-												value="add" 
-												ng-click="tab.labelAndValues.splice($index+1, 0, getBlankObject('lv')); resequence($parent.tab.labelAndValues);">
-											<input 
-												type="button" 
-												value="remove" 
-												ng-show="cycle.suites[$parent.$parent.$parent.$index].modules[$parent.$parent.$index].tabs[$parent.$index].labelAndValues.length > 1"
-												ng-click="tab.labelAndValues.splice($index, 1); resequence($parent.tab.labelAndValues);">
 										</div>
+										<!-- 
 									</div>
-								</div>									
+								</div>	
+								-->								
 							</div>
 						</div>							
 					</div>

@@ -56,7 +56,14 @@ public class Cycle extends AbstractEntity implements Serializable {
 	@Transient
 	private KerberosLoginParms kerberosLoginParms = new KerberosLoginParms();
 
-	//bi-directional many-to-one association to Suite
+	/**
+	 * bi-directional many-to-one association to Suite.
+	 * 
+	 * NOTE: This is a class whose counterpart on the other side of the @OneToMany relationship itself also
+	 * has an eagerly fetched collection. For some reason, JPA imposes a restriction in filling up the "bag"
+	 * to one level of eager fetching - nested fetching is restricted unless the bag is based on a Set collection, not a list.
+	 * If this collection were a list you would see a MultipleBagFetchException thrown when fetching is triggered.
+	 */
 	@OrderBy("sequence ASC")
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="cycle")
 	private Set<Suite> suites = new LinkedHashSet<Suite>();
