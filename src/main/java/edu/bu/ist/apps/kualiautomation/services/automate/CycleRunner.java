@@ -51,16 +51,16 @@ public class CycleRunner {
 		outerloop:
 		for(Suite suite : cycle.getSuites()) {
 			System.out.println("Processing Suite: " + suite.getName());
-			for (Iterator<Module> moduleIterator = suite.getModules().iterator(); moduleIterator.hasNext();) {
-				Module module =  moduleIterator.next();
-				if(!module.isBlank()) {
-					System.out.println("Processing Page/Module " + String.valueOf(module.getSequence()));
-				}
-				for(Tab tab : module.getTabs()) {
-					if(!tab.isBlank()) {
-						System.out.println("Clicking tab: " + tab.getName());
-					}
-					for(LabelAndValue lv : tab.getLabelAndValues()) {
+//			for (Iterator<Module> moduleIterator = suite.getModules().iterator(); moduleIterator.hasNext();) {
+//				Module module =  moduleIterator.next();
+//				if(!module.isBlank()) {
+//					System.out.println("Processing Page/Module " + String.valueOf(module.getSequence()));
+//				}
+//				for(Tab tab : module.getTabs()) {
+//					if(!tab.isBlank()) {
+//						System.out.println("Clicking tab: " + tab.getName());
+//					}
+					for(LabelAndValue lv : suite.getLabelAndValues()) {
 						ElementType elementType = ElementType.valueOf(lv.getElementType());
 						LocatorRunner locator = new LocatorRunner(driver, elementType, lv.getLabel(), lv.getIdentifier());
 						List<Element> elements = locator.run(true);
@@ -77,8 +77,8 @@ public class CycleRunner {
 						}
 						driver.switchTo().defaultContent();
 					}
-				}
-			}
+//				}
+//			}
 		}
 		
 		return runlog;
@@ -142,21 +142,17 @@ public class CycleRunner {
 		LabelAndValue lv2 = new LabelAndValue();
 		lv2.setElementType(ElementType.TEXTBOX.name());
 		lv2.setLabel("password");
-		lv2.setValue("passworder");
+		lv2.setValue("password");
 		
 		// Create 2nd login screen login button
 		LabelAndValue lv3 = new LabelAndValue();
 		lv3.setElementType(ElementType.BUTTON.name());
 		lv3.setLabel("sign in");
 		
-		Tab tab = new Tab();
-		tab.addLabelAndValue(lv1);
-		tab.addLabelAndValue(lv2);
-		tab.addLabelAndValue(lv3);
-		Module module = new Module();
-		module.addTab(tab);
 		Suite suite = new Suite();
-		suite.addModule(module);
+		suite.addLabelAndValue(lv1);
+		suite.addLabelAndValue(lv2);
+		suite.addLabelAndValue(lv3);
 		
 		// Create the cycle to run and add the suite to it
 		Cycle cycle = new Cycle();

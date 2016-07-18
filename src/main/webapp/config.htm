@@ -151,17 +151,21 @@
 			<div class="basicfont pad5">A shortcut is a pre-defined method for locating a link for clicking. The link can be situated under a label heading, which might be under its own larger heading, and so on.</div>
 		</div>
 		<div ng-repeat="sc in config.configShortcuts">
+			
 	    	<div  
 	    		class="basicfont shortcut"
 	    		title="Add a shortcut"
-	    		ng-click="insertNewShortcut($index);">add</div>	    
+	    		ng-click="insertShortcut($index);">
+	    			{{sc.sequence}}) add
+	    	</div>	    
 			<div  href="#"
 	    		class="basicfont shortcut"
 	    		title="remove this shortcut"
-				ng-click="config.configShortcuts.splice($index, 1);">remove</div>
+				ng-click="removeShortcut($index);">remove</div>
 			<input 
 				type="checkbox" 
-				ng-model="config.configShortcuts[$index].checked"> 
+				ng-model="config.configShortcuts[$index].checked"
+				ng-click="validateShortcut($index);"> 
 			<div class="basicfont" style="display:inline; width:150px;">
 				<span ng-if="sc.elementType">{{sc.elementType}}: </span>
 			</div>

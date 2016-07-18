@@ -1,15 +1,26 @@
 package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.Serializable;
-import javax.persistence.*;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment.ConfigFieldSerializer;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
-
-import java.util.Arrays;
-import java.util.Date;
 
 
 /**
@@ -19,7 +30,7 @@ import java.util.Date;
 @Entity
 @Table(name="config_shortcut")
 @NamedQuery(name="ConfigShortcut.findAll", query="SELECT c FROM ConfigShortcut c")
-public class ConfigShortcut implements Serializable {
+public class ConfigShortcut extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -31,23 +42,20 @@ public class ConfigShortcut implements Serializable {
 	@Column(name="created_date", nullable=false)
 	private Date createdDate;
 
-	@Column(length=255)
-	private String description;
-
 	@Column(name="element_type", nullable=false, length=45)
 	private String elementType;
 
-	@Column(nullable=false, length=45)
+	@Column(length=45)
 	private String identifier;
 
 	@Column(nullable=false)
 	private byte include;
 
-	@Column(name="label_hierarchy", length=255)
+	@Column(name="label_hierarchy", nullable=false, length=255)
 	private String labelHierarchy;
 
-	@Column(unique=true, nullable=false, length=45)
-	private String name;
+	@Transient
+	private String[] labelHierarchyParts;
 
 	@Column(nullable=false)
 	private int sequence;
@@ -84,14 +92,6 @@ public class ConfigShortcut implements Serializable {
 		this.createdDate = createdDate;
 	}
 
-	public String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	public String getElementType() {
 		return this.elementType;
 	}
@@ -116,22 +116,6 @@ public class ConfigShortcut implements Serializable {
 		this.include = include;
 	}
 
-	public String getLabelHierarchy() {
-		return this.labelHierarchy;
-	}
-
-	public void setLabelHierarchy(String labelHierarchy) {
-		this.labelHierarchy = labelHierarchy;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public int getSequence() {
 		return this.sequence;
 	}
@@ -147,6 +131,52 @@ public class ConfigShortcut implements Serializable {
 
 	public void setConfig(Config config) {
 		this.config = config;
+	}
+
+	public String getLabelHierarchy() {
+		return this.labelHierarchy;
+	}
+	public void setLabelHierarchy(String labelHierarchy) {
+		if(labelHierarchyParts == null) {
+			this.labelHierarchy = labelHierarchy;
+			// setLabelHierarchyParts() may yet be called and can override this setting
+		}
+		else {
+			// setLabelHierarchyParts() was called and its evaluation of labelHierarchy takes precedence.
+		}
+	}
+	
+	@Transient
+	public String[] getLabelHierarchyParts() {
+		String h = getLabelHierarchy();
+		if(Utils.isEmpty(h) || h.trim().isEmpty() || h.trim().equals(LABEL_HIERARCHY_SEPARATOR.trim())) {
+			return new String[]{};
+		}
+		return h.trim().split(LABEL_HIERARCHY_SEPARATOR_REGEX);
+	}
+	/**
+	 * Flatten the labelHierarchyParts array into a string and set the persistable labelHierarchy field with it.
+	 * @param parts
+	 */
+	public void setLabelHierarchyParts(String[] parts) {
+		if(parts == null)
+			return;
+		StringBuilder s = new StringBuilder();		
+		for(int i=0; i<parts.length; i++) {
+			if(!Utils.isEmpty(parts[i])) {
+				s.append(parts[i].trim());
+				if((i+1) != parts.length) {
+					String nextpart = parts[i+1].trim();
+					if(!nextpart.isEmpty()) {
+						s.append(LABEL_HIERARCHY_SEPARATOR);
+					}
+				}
+			}
+		}
+		if(!Utils.isEmpty(s.toString())) {
+			labelHierarchy = s.toString();
+			labelHierarchyParts = parts;
+		}
 	}
 
 	/**
@@ -165,17 +195,12 @@ public class ConfigShortcut implements Serializable {
 
 	public static final String LABEL_HIERARCHY_SEPARATOR = " >>> ";
 	public static final String LABEL_HIERARCHY_SEPARATOR_REGEX = "\\x20>>>\\x20";
+	@Transient
 	public String getSeparator() {
 		return LABEL_HIERARCHY_SEPARATOR;
 	}
-	
-	@Transient
-	public String[] getLabelHierarchyParts() {
-		String h = getLabelHierarchy();
-		if(Utils.isEmpty(h) || h.trim().isEmpty() || h.trim().equals(LABEL_HIERARCHY_SEPARATOR.trim())) {
-			return new String[]{};
-		}
-		return h.trim().split(LABEL_HIERARCHY_SEPARATOR_REGEX);
+	public void setSeparator(String separator) {
+		// Do nothing - this field is for the UI only and not for persistence.
 	}
 	
 //	@Transient

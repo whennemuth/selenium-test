@@ -13,9 +13,7 @@ import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
-import edu.bu.ist.apps.kualiautomation.entity.Module;
 import edu.bu.ist.apps.kualiautomation.entity.Suite;
-import edu.bu.ist.apps.kualiautomation.entity.Tab;
 import edu.bu.ist.apps.kualiautomation.entity.User;
 import edu.bu.ist.apps.kualiautomation.entity.util.Entity;
 import edu.bu.ist.apps.kualiautomation.entity.util.EntityPopulator;
@@ -160,14 +158,8 @@ public class ScriptService {
 	private void fixBidirectionalFields(Cycle cycle) {
 		for(Suite suite : cycle.getSuites()) {
 			suite.setCycle(cycle);
-			for(Module module : suite.getModules()) {
-				module.setSuite(suite);
-				for(Tab tab : module.getTabs()) {
-					tab.setModule(module);
-					for(LabelAndValue lv : tab.getLabelAndValues()) {
-						lv.setTab(tab);
-					}
-				}
+			for(LabelAndValue lv : suite.getLabelAndValues()) {
+				lv.setSuite(suite);
 			}
 		}
 	}
@@ -179,19 +171,13 @@ public class ScriptService {
 		user.setTransitory(true);
 		if(userId != null) 
 			user.setId(userId);
-		Module module = new Module();
-		Tab tab = new Tab();
 		LabelAndValue lv = new LabelAndValue();
 		
 		suite.setCycle(cycle);
 		cycle.setUser(user);
 		cycle.addSuite(suite);
-		module.setSuite(suite);
-		suite.addModule(module);
-		tab.setModule(module);
-		module.addTab(tab);
-		lv.setTab(tab);
-		tab.addLabelAndValue(lv);
+		lv.setSuite(suite);
+		suite.addLabelAndValue(lv);
 
 		return cycle;
 	}
@@ -241,23 +227,11 @@ public class ScriptService {
 			    cycle.addSuite(suite);
 			    em.persist(suite);
 			    
-			    Module module = new Module();
-			    module.setName("my module");
-			    module.setSequence(1);
-			    suite.addModule(module);
-			    em.persist(module);
-			    
-			    Tab tab = new Tab();
-			    tab.setName("my tab");
-			    tab.setSequence(1);
-			    module.addTab(tab);
-			    em.persist(tab);
-			    
 			    LabelAndValue lv = new LabelAndValue();
 			    lv.setLabel("my label");
 			    lv.setValue("my value");
 			    lv.setSequence(1);
-			    tab.addLabelAndValue(lv);
+			    suite.addLabelAndValue(lv);
 			    em.persist(lv);
 			    
 			    trans.commit();
@@ -267,11 +241,9 @@ public class ScriptService {
 				System.out.println("cycle name: " + cycle.getName());
 				System.out.println("suite name: " + ((Cycle) cycle.getSuites().toArray()[0]).getName());
 				System.out.println("user name: " + cycle.getUser().getFirstName());
-				System.out.println("module name: " + ((Cycle) ((Suite) cycle.getSuites().toArray()[0]).getModules().toArray()[0]).getName());
-				System.out.println("tab name: " + ((Cycle) ((Module) ((Suite) cycle.getSuites().toArray()[0]).getModules().toArray()[0]).getTabs().toArray()[0]).getName());
 				System.out.println("label name/value: " + 
-						((LabelAndValue) ((Tab) ((Module) ((Suite) cycle.getSuites().toArray()[0]).getModules().toArray()[0]).getTabs().toArray()[0]).getLabelAndValues().toArray()[0]).getLabel() + "/" +
-						((LabelAndValue) ((Tab) ((Module) ((Suite) cycle.getSuites().toArray()[0]).getModules().toArray()[0]).getTabs().toArray()[0]).getLabelAndValues().toArray()[0]).getValue());
+						((LabelAndValue) ((Suite) cycle.getSuites().toArray()[0]).getLabelAndValues().toArray()[0]).getLabel() + "/" +
+						((LabelAndValue) ((Suite) cycle.getSuites().toArray()[0]).getLabelAndValues().toArray()[0]).getValue());
 			}
 			System.out.println(cycle.getId());
 		} 

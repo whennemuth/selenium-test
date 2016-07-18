@@ -2,10 +2,8 @@ package edu.bu.ist.apps.kualiautomation.entity;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -55,10 +53,10 @@ public class Suite extends AbstractEntity implements Serializable {
 	@Transient
 	private int repeat = 1;
 
-	//bi-directional many-to-one association to Module
+	//bi-directional many-to-one association to LabelAndValue
 	@OrderBy("sequence ASC")
-	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="suite")
-	private Set<Module> modules = new LinkedHashSet<Module>();
+	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="tab")
+	private Set<LabelAndValue> labelAndValues = new LinkedHashSet<LabelAndValue>();
 
 	//bi-directional many-to-one association to Cycle
 	@ManyToOne
@@ -94,25 +92,27 @@ public class Suite extends AbstractEntity implements Serializable {
 		this.sequence = sequence;
 	}
 
-	public Set<Module> getModules() {
-		return modules;
+	public Set<LabelAndValue> getLabelAndValues() {
+		return labelAndValues;
 	}
 
-	public void setModules(Set<Module> modules) {
-		this.modules.clear();
-		this.modules.addAll(modules);
+	public void setLabelAndValues(Set<LabelAndValue> labelAndValues) {
+		this.labelAndValues.clear();
+		this.labelAndValues.addAll(labelAndValues);
 	}
 
-	public Module addModule(Module module) {
-		getModules().add(module);
-		module.setSuite(this);
-		return module;
+	public LabelAndValue addLabelAndValue(LabelAndValue labelAndValue) {
+		getLabelAndValues().add(labelAndValue);
+		labelAndValue.setSuite(this);
+
+		return labelAndValue;
 	}
 
-	public Module removeModule(Module module) {
-		getModules().remove(module);
-		module.setSuite(null);
-		return module;
+	public LabelAndValue removeLabelAndValue(LabelAndValue labelAndValue) {
+		getLabelAndValues().remove(labelAndValue);
+		labelAndValue.setSuite(null);
+
+		return labelAndValue;
 	}
 
 	@JsonSerialize(using=CycleFieldSerializer.class)

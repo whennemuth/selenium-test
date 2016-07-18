@@ -82,6 +82,14 @@ public enum ElementType {
 		"//input[@type='radio']",
 		false,
 		false),
+	SHORTCUT(
+		"A hyperlink or hotspot that is located by more than one label heading" ,
+		null,
+		null,
+		null,
+		false,
+		true
+	),
 	OTHER(
 		"None of the above, but clickable",
 		null,

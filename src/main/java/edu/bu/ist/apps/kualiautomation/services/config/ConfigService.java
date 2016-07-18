@@ -133,6 +133,10 @@ public class ConfigService {
 			    fixBidirectionalFields(cfg);
 			    em.persist(cfg);
 			    em.merge(cfg); // Causes child entities to be persisted as CascadeType does not include persist.
+			    
+			     // Do the following or the @OrderBy annotations never take effect.
+		    	cfgEntity = em.find(Config.class, cfg.getId());
+			    em.refresh(cfgEntity);
 		    }
 		    else {
 		    	cfgEntity = em.find(Config.class, cfg.getId());
@@ -140,6 +144,10 @@ public class ConfigService {
 		    	EntityPopulator populator = new EntityPopulator(entity, true);
 		    	populator.populate(cfgEntity, cfg);
 		    	em.merge(cfgEntity);
+			    
+			     // Do the following or the @OrderBy annotations never take effect.
+		    	cfgEntity = em.find(Config.class, cfg.getId());
+			    em.refresh(cfgEntity);
 		    }
 		    
 		    if(trans.isActive()) {
@@ -186,6 +194,11 @@ public class ConfigService {
 	    		if(tab.getConfigModule() == null)
 	    			tab.setConfigModule(mdl);
 	    	}
-	    }		
+	    }	
+	    
+	    for(ConfigShortcut shortcut : cfg.getConfigShortcuts()) {
+	    	if(shortcut.getConfig() == null)
+	    		shortcut.setConfig(cfg);
+	    }
 	}
 }

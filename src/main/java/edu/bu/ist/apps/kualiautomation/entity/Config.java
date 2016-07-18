@@ -17,6 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -71,7 +72,7 @@ public class Config extends AbstractEntity implements Serializable {
 	private Set<ConfigModule> configModules = new LinkedHashSet<ConfigModule>();
 
 	//bi-directional many-to-one association to ConfigModule
-// TODO: Give the ConfigModule entity a sequence field and make it sortable with the @OrderBy annotation	
+	@OrderBy("sequence ASC")
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="config")
 	private Set<ConfigShortcut> configShortcuts = new LinkedHashSet<ConfigShortcut>();
 

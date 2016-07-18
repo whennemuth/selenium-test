@@ -72,10 +72,10 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	}
 
 	
-	//bi-directional many-to-one association to Tab
+	//bi-directional many-to-one association to Suite
 	@ManyToOne
-	@JoinColumn(name="tab_id", nullable=false)
-	private Tab tab;
+	@JoinColumn(name="suite_id", nullable=false)
+	private Suite suite;
 
 	public LabelAndValue() {
 	}
@@ -129,23 +129,23 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
 	}
-	
-	@JsonSerialize(using=TabFieldSerializer.class)
-	public Tab getTab() {
-		return this.tab;
+
+	@JsonSerialize(using=SuiteFieldSerializer.class)
+	public Suite getSuite() {
+		return this.suite;
 	}
 
-	public void setTab(Tab tab) {
-		this.tab = tab;
+	public void setSuite(Suite suite) {
+		this.suite = suite;
 	}
 	
-	public static class TabFieldSerializer extends JsonSerializer<Tab> {
+	public static class SuiteFieldSerializer extends JsonSerializer<Suite> {
 		@Override public void serialize(
-				Tab tab, 
+				Suite suite, 
 				JsonGenerator generator, 
 				SerializerProvider provider) throws IOException, JsonProcessingException {
 			
-			(new CustomJsonSerializer<Tab>()).serialize(tab, generator, provider);
+			(new CustomJsonSerializer<Suite>()).serialize(suite, generator, provider);
 		}
 	}
 

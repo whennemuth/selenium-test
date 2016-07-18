@@ -76,6 +76,7 @@ var configSvcFactory = function($http, $q) {
 			if(emptyShortcutJson) {
 				var shortcut = null;
 				eval("shortcut = " + angular.toJson(emptyShortcutJson));
+				shortcut.labelHierarchyParts[0] = ''; // add a single empty hierarchy part to get an empty textbox
 				deferred.resolve(shortcut);				
 			}
 			else {
