@@ -44,7 +44,13 @@ public class CustomJsonSerializer <T> {
 			}
 			else {
 				generator.writeStartObject();
-				generator.writeNumberField("id", id);
+				if(id == -1) {
+					// -1 is a special value that means the id is unknown, but don't write out a null for obj
+					generator.writeNullField("id");
+				}
+				else {
+					generator.writeNumberField("id", id);
+				}
 				generator.writeBooleanField("transitory", true);
 				generator.writeEndObject();
 			}

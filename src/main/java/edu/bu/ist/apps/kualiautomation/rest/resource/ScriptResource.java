@@ -13,7 +13,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.services.automate.KerberosLoginParms;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;

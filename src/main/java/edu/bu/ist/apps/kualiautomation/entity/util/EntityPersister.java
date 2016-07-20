@@ -53,6 +53,17 @@ public class EntityPersister {
 	
 	@SuppressWarnings("unchecked")
 	private <T> void handleChildren() throws Exception {
+		
+		for(Field fld : inspector.getOneToOneFields()) {
+			T childEntity = (T) inspector.getValue(fld);
+				if(childEntity != null) {
+				childEntity = save(childEntity);			
+				Method getMethod = ReflectionUtils.getAccessorMethod(entity, fld);	
+				Method setMethod = ReflectionUtils.getMutator(getMethod, entity.getClass());
+				setMethod.invoke(entity, childEntity);
+			}
+		}
+		
 		for(Field manyFld : inspector.getOneToManyFields()) {
 			
 			/** 1) Cache the children */
@@ -83,20 +94,46 @@ public class EntityPersister {
 					/** The entity is managed and so its own @OneToMany field(s) should contain entities that are as well. */
 				}
 				else {
-					Object id = (new EntityInspector(childEntity)).getPrimaryKeyValue();
-					if(id == null) {
-						em.persist(childEntity);
-					}
-					else {
-						// Merging might also be handled by a CascadeType=MERGE further up the entity hierarchy.
-						em.merge(childEntity);
-					}
-					
-					/** 4) Recurse in case the childEntity has @OneToMany fields of its own. */
-					EntityPersister saver = new EntityPersister(em, childEntity);
-					saver.handleChildren();
+					save(childEntity);
 				}
 			}
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T> T save(T entity) throws Exception {
+		Object id = (new EntityInspector(entity)).getPrimaryKeyValue();
+		if(noId(id)) {
+			em.persist(entity);
+			// Recurse in case the childEntity has @OneToMany fields of its own.
+			EntityPersister saver = new EntityPersister(em, entity);
+			saver.handleChildren();
+		}
+		else {
+			// Merging might also be handled by a CascadeType=MERGE further up the entity hierarchy.
+			entity = (T) em.find(entity.getClass(), id);
+		}
+		return entity;
+	}
+
+	/**
+	 * Determines if the @Id field of an entity indicates the entity is unmanaged or unpersisted.
+	 * This assumes:
+	 *   1) a numeric field.
+	 *   2) an autoincrement is set on the field
+	 *   3) the autoincrement is set to start seeding at 1 or higher.
+	 * 
+	 * @param id
+	 * @return
+	 */
+	private boolean noId(Object id) {
+		if(id == null)
+			return true;
+		if(id instanceof Number) {
+			if(((Number) id).intValue() == 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

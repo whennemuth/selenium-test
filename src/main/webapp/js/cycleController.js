@@ -69,18 +69,24 @@ var cycleCtrlFactory = function() {
 					case 'BUTTON': 	case 'HOTSPOT': case 'HYPERLINK':
 						lv.value = null;
 						lv.booleanValue = false;
-						lv.shortcut.id = 0;
+						if(lv.shortcut) {
+							lv.shortcut.id = null;
+						}
 						break;
 					case 'CHECKBOX': case 'RADIO': 
 						lv.value = lv.booleanValue;
 						lv.navigates = false;
-						lv.shortcut.id = 0;
+						if(lv.shortcut) {
+							lv.shortcut.id = null;
+						}
 						break;
 					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'PASSWORD': case 'OTHER':
 						lv.booleanValue = false;
 						lv.value = /^(true)|(false)$/i.test(lv.value) ? null : lv.value;
 						lv.navigates = false;
-						lv.shortcut.id = 0;
+						if(lv.shortcut) {
+							lv.shortcut.id = null;
+						}
 						break;
 					case 'SHORTCUT':
 						lv.identifier = null;
@@ -97,7 +103,9 @@ var cycleCtrlFactory = function() {
 						lv.value = null;
 						lv.booleanValue = false;
 						lv.navigates = false;
-						lv.shortcut.id = 0;
+						if(lv.shortcut) {
+							lv.shortcut.id = null;
+						}
 						break;
 				}
 			};
@@ -113,6 +121,7 @@ var cycleCtrlFactory = function() {
 				cycleSvc.getCycle(null, scope.config.user.id).then(
 					function(data) {
 						scope.cycle = data;
+						scope.cycle.suites[0].labelAndValues[0].checked = true;
 					},
 					function(error) {
 						alert("Cycle retrieval error!\n" + error);
@@ -191,8 +200,9 @@ var cycleCtrlFactory = function() {
 			};
 			
 			scope.addSuite = function(cycle, suiteIdx) {
-				cycle.suites.splice(suiteIdx+1, 0, scope.getBlankObject('suite')); 
+				cycle.suites.splice(suiteIdx+1, 0, scope.getBlankObject('suite'));
 				scope.resequence(cycle.suites);
+				cycle.suites[suiteIdx+1].labelAndValues[0].checked = true;
 			};
 			
 			scope.removeSuite = function(cycle, suiteIdx) {
@@ -203,6 +213,7 @@ var cycleCtrlFactory = function() {
 			scope.addLabelAndValue = function(suite, lvIdx) {
 				suite.labelAndValues.splice(lvIdx+1, 0, scope.getBlankObject('lv')); 
 				scope.resequence(suite.labelAndValues);
+				suite.labelAndValues[lvIdx+1].checked = true;
 			};
 				
 			scope.removeLabelAndValue = function(suite, lvIdx) {

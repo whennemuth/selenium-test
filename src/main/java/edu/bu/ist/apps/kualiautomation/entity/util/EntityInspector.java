@@ -12,6 +12,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import edu.bu.ist.apps.kualiautomation.util.ReflectionUtils;
 
@@ -194,6 +195,10 @@ public class EntityInspector {
 	
 	public List<Field> getOneToManyFields() {
 		return getAnnotatedFields(inspectableClass, OneToMany.class);
+	}
+
+	public List<Field> getOneToOneFields() {
+		return getAnnotatedFields(inspectableClass, OneToOne.class);
 	}
 	
 	/**

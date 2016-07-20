@@ -70,123 +70,70 @@
 					</div>
 					<div  class="sectionarea">
 						<div ng-repeat="lv in suite.labelAndValues" style="background-color: #b3e0ff;">
-						
-						<!-- 
-						<div ng-repeat="module in suite.modules" style="background-color: #b3e0ff;" >
-							<div class="cycleWrap">
-								{{module.sequence}}) Page:
-								<select ng-model="module.actionType" ng-change="toggleModuleType(module);">
-									<option value="{{a.name}}" title="{{a.description}}" ng-repeat="a in getModuleActions()">{{a.label}}</option>
-								</select>								
-								<select ng-show="module.actionType == 'MODULE'"
-										ng-model="module.name"
-										ng-options="mdl.label as mdl.label for mdl in config.configModules">
-									<option value=""><- Select One -></option>
-								</select>
-								<input type="text" ng-model="module.customName" ng-show="module.actionType == 'CUSTOM'">
-								<input type="button" value="add" 
-									ng-click="suite.modules.splice($index+1, 0, getBlankObject('module')); resequence($parent.suite.modules);">
-								<input 
-									type="button" 
-									value="remove" 
-									ng-show="cycle.suites[$parent.$index].modules.length > 1"
-									ng-click="suite.modules.splice($index, 1); resequence($parent.suite.modules);">
-								<div style="display:inline; padding-left:50px; width:200px;" 
-									ng-show="cycle && cycle.suites[$parent.$index].modules[$index].id">
-									<input type='button' value=' Launch '>
-									<select ng-model="module.repeat" ng-options="idx as idx for idx in [1,2,3,4,5,6,7,8,9,10]">
-										<option value="" ng-if="false"></option>
-									</select>
-									&nbsp;times
-								</div>
-							</div>
-							<div  class="sectionarea noborder">
-								<div ng-repeat="tab in module.tabs" style="background-color: #e6f5ff;">
-									<div class="cycleWrap" ng-show="$parent.module.actionType == 'MODULE'">
-										{{tab.sequence}}) Tab: <select 
-												ng-model="tab.name" 
-												ng-options="t.label as t.label for t in getTabs($parent.$parent.$index, $parent.$index)">
-											<option value=""><- Select One -></option>
-										</select>
-										<input type="button" value="add" 
-											ng-click="module.tabs.splice($index+1, 0, getBlankObject('tab')); resequence($parent.module.tabs);">
+								<div class="cycleWrap"">
+									<div class="{{lv.navigates ? 'suiteRowHighlighted' : ''}}">
+										<div class=expandCollapse title="expand" ng-show="!lv.checked" ng-click="lv.checked = !lv.checked">&nbsp;edit</div>
+										<div class=expandCollapse title="collapse" ng-show="lv.checked" ng-click="lv.checked = !lv.checked">close</div>
+										<input 
+											type="button" 
+											value="add" 
+											ng-click="addLabelAndValue(suite, $index);">
 										<input 
 											type="button" 
 											value="remove" 
-											ng-show="cycle.suites[$parent.$parent.$index].modules[$parent.$index].tabs.length > 1"
-											ng-click="module.tabs.splice($index, 1); resequence($parent.module.tabs);">
+											ng-show="cycle.suites[$parent.$index].labelAndValues.length > 1"
+											ng-click="removeLabelAndValue(suite, $index);">
+										<div style="display:inline;" class="basicfont">{{ getLvLabel(lv) }}</div>
 									</div>
-									<div ng-repeat="lv in tab.labelAndValues">
-									-->
+									<div ng-show="lv.checked" style="padding-left:30px;">
 									
-										<div class="cycleWrap"">
-											<div class="{{lv.navigates ? 'suiteRowHighlighted' : ''}}">
-												<div class=expandCollapse title="expand" ng-show="!lv.checked" ng-click="lv.checked = !lv.checked">&nbsp;edit</div>
-												<div class=expandCollapse title="collapse" ng-show="lv.checked" ng-click="lv.checked = !lv.checked">close</div>
-												<input 
-													type="button" 
-													value="add" 
-													ng-click="addLabelAndValue(suite, $index);">
-												<input 
-													type="button" 
-													value="remove" 
-													ng-show="cycle.suites[$parent.$index].labelAndValues.length > 1"
-													ng-click="removeLabelAndValue(suite, $index);">
-												<div style="display:inline;" class="basicfont">{{ getLvLabel(lv) }}</div>
-											</div>
-											<div ng-show="lv.checked" style="padding-left:30px;">
-											
-												<div style="padding-top:5px;">
-													type<br> 
-													<select ng-model="lv.elementType" ng-change="lvChange(lv)">
-														<option value=""><- Select One -></option>
-														<option value="{{et}}" title="{{desc}}" ng-repeat="(et, desc) in getElementTypes()">{{et}}</option>
-													</select>
-												</div>
-											
-												<div ng-show="lvShow(lv, 'identifier')" style="padding-top:5px;">
-													other identifier<br>
-													<input type="text" value="{{lv.identifier}}" ng-model="lv.identifier">
-												</div>
-											
-												<div ng-show="lvShow(lv, 'label')" style="padding-top:5px;">
-													label<br>
-													<input type="text" value="{{lv.label}}" ng-model="lv.label">
-												</div>
-											
-												<div ng-show="lvShow(lv, 'value')" style="padding-top:5px;">
-													value<br>
-													<input type="text" value="{{lv.value}}" ng-model="lv.value">
-												</div>
-											
-												<div ng-show="lvShow(lv, 'navigates')" style="padding-top:5px;">
-													navigates to another page
-													<input type="checkbox" ng-model="lv.navigates">
-												</div>
-											
-												<div ng-show="lvShow(lv, 'state')" style="padding-top:5px;">
-													state<br>
-													<select 
-															ng-model="lv.booleanValue" ng-change="lvChange(lv)" 
-															ng-options="key as val for (key, val) in {true:'checked', false:'unchecked'}">
-														<option value=""><- Select One -></option>
-													</select>
-												</div>
-												
-												<div ng-show="lvShow(lv, 'shortcut')" style="padding-top:5px;">
-													shortcut selection<br>
-													<select ng-model="lv.shortcut.id" style="font-size:10px; height:20px;"
-														ng-change="lvChange(lv)" 
-														ng-options="shortcut.id as getHierarchyLabel(shortcut) for shortcut in getShortcuts() track by shortcut.id">
-														<option value=""><- Select One -></option>
-													</select>
-												</div>
-											</div>
+										<div style="padding-top:5px;">
+											type<br> 
+											<select ng-model="lv.elementType" ng-change="lvChange(lv)">
+												<option value=""><- Select One -></option>
+												<option value="{{et}}" title="{{desc}}" ng-repeat="(et, desc) in getElementTypes()">{{et}}</option>
+											</select>
 										</div>
-										<!-- 
+									
+										<div ng-show="lvShow(lv, 'identifier')" style="padding-top:5px;">
+											other identifier<br>
+											<input type="text" value="{{lv.identifier}}" ng-model="lv.identifier">
+										</div>
+									
+										<div ng-show="lvShow(lv, 'label')" style="padding-top:5px;">
+											label<br>
+											<input type="text" value="{{lv.label}}" ng-model="lv.label">
+										</div>
+									
+										<div ng-show="lvShow(lv, 'value')" style="padding-top:5px;">
+											value<br>
+											<input type="text" value="{{lv.value}}" ng-model="lv.value">
+										</div>
+									
+										<div ng-show="lvShow(lv, 'navigates')" style="padding-top:5px;">
+											navigates to another page
+											<input type="checkbox" ng-model="lv.navigates">
+										</div>
+									
+										<div ng-show="lvShow(lv, 'state')" style="padding-top:5px;">
+											state<br>
+											<select 
+													ng-model="lv.booleanValue" ng-change="lvChange(lv)" 
+													ng-options="key as val for (key, val) in {true:'checked', false:'unchecked'}">
+												<option value=""><- Select One -></option>
+											</select>
+										</div>
+										
+										<div ng-show="lvShow(lv, 'shortcut')" style="padding-top:5px;">
+											shortcut selection<br>
+											<select ng-model="lv.shortcut.id" style="font-size:10px; height:20px;"
+												ng-change="lvChange(lv)" 
+												ng-options="shortcut.id as getHierarchyLabel(shortcut) for shortcut in getShortcuts() track by shortcut.id">
+												<option value=""><- Select One -></option>
+											</select>
+										</div>
 									</div>
-								</div>	
-								-->								
+								</div>
 							</div>
 						</div>							
 					</div>

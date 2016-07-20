@@ -38,7 +38,7 @@ public class EntityPopulator {
 		this.entity = entityPopulator;
 	}
 		
-	public void populate(Object beanToPopulate, Object sourceBean) {
+	public void populate(Object entityToPopulate, Object sourceBean) {
 		
 		if(entity != null && entity.isTransactionActive() == false) {
 			System.out.println("No active transaction! Cancelling bean population");
@@ -50,7 +50,7 @@ public class EntityPopulator {
 		for(Method getterMethod : sourceBean.getClass().getMethods()) {
 			
 			try {
-				Method setterMethod = ReflectionUtils.getMutator(getterMethod, beanToPopulate.getClass());
+				Method setterMethod = ReflectionUtils.getMutator(getterMethod, entityToPopulate.getClass());
 				
 				if(setterMethod == null) {
 					continue;
@@ -58,11 +58,11 @@ public class EntityPopulator {
 				
 				Object val = getterMethod.invoke(sourceBean);
 
-				if(handledAsEntity(beanToPopulate, val, getterMethod, setterMethod)) {
+				if(handledAsEntity(entityToPopulate, val, getterMethod, setterMethod)) {
 					continue;
 				}
 				
-				if(handledAsEntityCollection(beanToPopulate, val, getterMethod, sourceBean)) {
+				if(handledAsEntityCollection(entityToPopulate, val, getterMethod, sourceBean)) {
 					continue;
 				}
 				
@@ -82,7 +82,7 @@ public class EntityPopulator {
 				}
 				
 				System.out.println("Invoking setter: " + setterMethod.getName() + " = " + String.valueOf(val));
-				setterMethod.invoke(beanToPopulate, val);				
+				setterMethod.invoke(entityToPopulate, val);				
 			} 
 			catch (Exception e) {
 				e.printStackTrace(System.out);
@@ -97,18 +97,18 @@ public class EntityPopulator {
 		}
 		
 		if(errors.length() > 0) {
-			System.out.println("Field setter failures for " + beanToPopulate.getClass().getName() + ": " + errors);
+			System.out.println("Field setter failures for " + entityToPopulate.getClass().getName() + ": " + errors);
 		}
 	}
 	
 	public static int count = 0;
-	private boolean handledAsEntity(Object beanToPopulate, Object val, Method getterMethod, Method setterMethod) throws Exception {
+	private boolean handledAsEntity(Object entityToPopulate, Object val, Method getterMethod, Method setterMethod) throws Exception {
 		if(EntityInspector.isEntity(val)) {
 			if(!isTransitory(val)) {
 				count++;
-				boolean populated = entity.populate(beanToPopulate, getterMethod.getName(), val);
+				boolean populated = entity.populate(entityToPopulate, getterMethod.getName(), val);
 				if(!populated) {
-					setterMethod.invoke(beanToPopulate, val);
+					setterMethod.invoke(entityToPopulate, val);
 					if(entity != null) {
 						entity.checkMerge(val);
 					}
@@ -119,12 +119,12 @@ public class EntityPopulator {
 		return false;
 	}
 	
-	private boolean handledAsEntityCollection(Object beanToPopulate, Object val, Method getterMethod, Object sourceBean) throws Exception {
+	private boolean handledAsEntityCollection(Object entityToPopulate, Object val, Method getterMethod, Object sourceBean) throws Exception {
 		if(val instanceof Collection) { 
 			if(EntityInspector.returnsEntityCollection(getterMethod)) {
 				if(!isTransitory(sourceBean)) {
 					Collection<?> sourceCollection = (Collection<?>) val;
-					entity.populateCollection(beanToPopulate, getterMethod, sourceCollection);
+					entity.populateCollection(entityToPopulate, getterMethod, sourceCollection);
 					return true;
 				}
 			}

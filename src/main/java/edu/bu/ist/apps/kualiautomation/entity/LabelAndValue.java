@@ -3,8 +3,10 @@ package edu.bu.ist.apps.kualiautomation.entity;
 import java.io.IOException;
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -46,7 +48,7 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	@Column(nullable=false)
 	private int sequence;
 
-	@Column(nullable=false, length=1000)
+	@Column(length=1000)
 	private String value;
 	
 	@Column(name="element_type", nullable=false, length=45)
@@ -59,7 +61,7 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	private byte navigate;
 	
 	// uni-directional one-to-one association to ConfigShortcut (ConfigShortcut cannot "see" LabelAndValue). 
-	@OneToOne
+	@OneToOne(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER)
 	@JoinColumn(name="shortcut_id", nullable=true)
 	private ConfigShortcut shortcut;
 	

@@ -9,7 +9,7 @@ import javax.persistence.EntityTransaction;
 import edu.bu.ist.apps.kualiautomation.util.ReflectionUtils;
 
 /**
- * This class is used by SimpleBeanPopulator, in conjunction with EntityPersister to recursively populate
+ * This class is used by EnityPopulator, in conjunction with EntityPersister to recursively populate
  * The fields of a JPA entity with those of another (probably a "shallow" version with updated fields 
  * de-serialized by Jersey/Jackson enroute through a web service endpoint.
  * 

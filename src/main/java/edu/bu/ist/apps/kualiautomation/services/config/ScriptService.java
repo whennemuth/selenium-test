@@ -16,6 +16,7 @@ import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.entity.Suite;
 import edu.bu.ist.apps.kualiautomation.entity.User;
 import edu.bu.ist.apps.kualiautomation.entity.util.Entity;
+import edu.bu.ist.apps.kualiautomation.entity.util.EntityPersister;
 import edu.bu.ist.apps.kualiautomation.entity.util.EntityPopulator;
 import edu.bu.ist.apps.kualiautomation.services.automate.Session;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
@@ -61,7 +62,7 @@ public class ScriptService {
 		}
 	}
 	
-	public List<Cycle> saveCycle(Cycle cycle) {
+	public List<Cycle> saveCycle(Cycle cycle) throws Exception {
         EntityManagerFactory factory = null;
         EntityManager em = null;
         EntityTransaction trans = null;
@@ -76,7 +77,9 @@ public class ScriptService {
 		    
 		    if(persist) {
 		    	fixBidirectionalFields(cycle);
-			    em.persist(cycle);
+		    	// Need to use EntityPersister instead of basic em.persist(cycle) to merge in the unmanaged suite.labelAndValue.shortcut.config instance 
+		    	EntityPersister persister = new EntityPersister(em, cycle);
+		    	persister.persist();	    	
 			    em.merge(cycle); // Causes child entities to be persisted as CascadeType does not include persist.
 		    }
 		    else {
@@ -172,8 +175,15 @@ public class ScriptService {
 		if(userId != null) 
 			user.setId(userId);
 		LabelAndValue lv = new LabelAndValue();
-		ConfigShortcut shortcut = new ConfigShortcut();
-		lv.setShortcut(shortcut);
+//		ConfigShortcut shortcut = new ConfigShortcut();
+//		Config cfg = new Config();
+//		/**
+//		 * Hack Alert!!! If cfg has an id of zero, the custom json serializer will render it as a null field.
+//		 * However, if id is zero, cfg will be rendered as if it had a positive id, but the id will be "0"
+//		 */
+//		cfg.setId(-1);
+//		shortcut.setConfig(cfg);
+//		lv.setShortcut(shortcut);
 		
 		suite.setCycle(cycle);
 		cycle.setUser(user);
