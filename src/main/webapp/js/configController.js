@@ -71,6 +71,7 @@ var configCtrlFactory = function(cycleCtrl) {
 				configSvc.saveConfig(scope).then(
 					function(config) {
 						scope.config = config;
+						alert("save complete!");
 					},
 					function(error) {
 						if(error.message) {

@@ -26,6 +26,16 @@ var cycleCtrlFactory = function() {
 				return scope.config.configShortcuts;
 			};
 			
+			scope.getShortcut = function(id) {
+				for(var i=0; i<scope.config.configShortcuts.length; i++) {
+					var shortcut = scope.config.configShortcuts[i];
+					if(shortcut.id == id) {
+						return shortcut;
+					}
+				}
+				return {id:0};	// return a dummy shortcut that will be interpreted as such by id being 0
+			};
+			
 			// Control which fields for label and value row get shown/hidden depending on element type selection.
 			scope.lvShow = function(lv, inputType) {
 				var checkable = false;
@@ -94,7 +104,7 @@ var cycleCtrlFactory = function() {
 						lv.value = null;
 						lv.booleanValue = false;
 						if(lv.shortcut) {
-							lv.navigates = (lv.navigates || lv.shortcut.navigates);
+							lv.navigates = (lv.navigates || scope.getShortcut(lv.shortcut.id).navigates);
 						}
 						break;
 					default:
