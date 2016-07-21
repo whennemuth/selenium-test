@@ -56,12 +56,18 @@ public class EntityPersister {
 		
 		for(Field fld : inspector.getOneToOneFields()) {
 			T childEntity = (T) inspector.getValue(fld);
-				if(childEntity != null) {
-				childEntity = save(childEntity);			
-				Method getMethod = ReflectionUtils.getAccessorMethod(entity, fld);	
-				Method setMethod = ReflectionUtils.getMutator(getMethod, entity.getClass());
-				setMethod.invoke(entity, childEntity);
+			Method getMethod = ReflectionUtils.getAccessorMethod(entity, fld);	
+			Method setMethod = ReflectionUtils.getMutator(getMethod, entity.getClass());
+			if(childEntity == null) {
+				T existing = (T) getMethod.invoke(entity);
+				if(existing != null) {
+					setMethod.invoke(entity, childEntity);	// Set to null so as to remove the entity.
+				}
 			}
+			else {
+				childEntity = save(childEntity);			
+			}
+			setMethod.invoke(entity, childEntity);
 		}
 		
 		for(Field manyFld : inspector.getOneToManyFields()) {
@@ -91,10 +97,10 @@ public class EntityPersister {
 				adderMethod.invoke(entity, childEntity);
 				
 				if(em.contains(childEntity)) {
-					/** The entity is managed and so its own @OneToMany field(s) should contain entities that are as well. */
+					/** The entity is managed and so its own @OneToMany field(s) should contain entities that are managed as well. */
 				}
 				else {
-					save(childEntity);
+					childEntity = save(childEntity);
 				}
 			}
 		}
@@ -102,16 +108,26 @@ public class EntityPersister {
 	
 	@SuppressWarnings("unchecked")
 	private <T> T save(T entity) throws Exception {
-		Object id = (new EntityInspector(entity)).getPrimaryKeyValue();
-		if(noId(id)) {
-			em.persist(entity);
-			// Recurse in case the childEntity has @OneToMany fields of its own.
-			EntityPersister saver = new EntityPersister(em, entity);
-			saver.handleChildren();
+		if(entity == null) {
+			
 		}
 		else {
-			// Merging might also be handled by a CascadeType=MERGE further up the entity hierarchy.
-			entity = (T) em.find(entity.getClass(), id);
+			Object id = (new EntityInspector(entity)).getPrimaryKeyValue();
+			if(noId(id)) {
+				em.persist(entity);
+				// Recurse in case the childEntity has @OneToMany fields of its own.
+				EntityPersister saver = new EntityPersister(em, entity);
+				saver.handleChildren();
+			}
+			else {
+				if(isTransitory(entity)) {
+					entity = (T) em.find(entity.getClass(), id);
+				}
+				else {
+					// Merging might also be handled by a CascadeType=MERGE further up the entity hierarchy.
+					entity = em.merge(entity);
+				}
+			}
 		}
 		return entity;
 	}
@@ -136,4 +152,12 @@ public class EntityPersister {
 		}
 		return false;
 	}
+	
+	private boolean isTransitory(Object bean) throws Exception {
+		Boolean transitory = (Boolean) ReflectionUtils.getAccessorValue(bean, "transitory");
+		if(transitory == null)
+			return false;
+		return transitory;
+	}
+	
 }

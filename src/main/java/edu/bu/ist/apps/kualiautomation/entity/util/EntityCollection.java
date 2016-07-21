@@ -28,13 +28,13 @@ import edu.bu.ist.apps.kualiautomation.util.ReflectionUtils;
  */
 public class EntityCollection {
 	private boolean ignoreEmpties;
-	private Entity entity;
+	private EntityPopulator entity;
 	private EntityManager em;
 	
 	@SuppressWarnings("unused")
 	private EntityCollection() { /* Restrict default constructor */ }
 	
-	public EntityCollection(Entity entity, boolean ignoreEmpties) {
+	public EntityCollection(EntityPopulator entity, boolean ignoreEmpties) {
 		this.entity = entity;
 		this.em = entity.getEntityManager();
 		this.ignoreEmpties = ignoreEmpties;
@@ -76,7 +76,7 @@ public class EntityCollection {
 				for (Iterator<EquatableEntity> iterator2 = targets.iterator(); iterator2.hasNext();) {
 					EquatableEntity target = (EquatableEntity) iterator2.next();
 					if(target.equals(source)) {
-						EntityPopulator populator = new EntityPopulator(entity, ignoreEmpties);
+						BeanPopulator populator = new BeanPopulator(entity, ignoreEmpties);
 						System.out.println("Start populating entity [" + target.getEntity().getClass().getSimpleName() + "]...");
 						populator.populate(target.getEntity(), source.getEntity());
 						System.out.println("End populating entity [" + target.getEntity().getClass().getSimpleName() + "]...");

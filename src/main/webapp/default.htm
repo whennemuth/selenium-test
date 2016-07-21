@@ -95,14 +95,14 @@
 											</select>
 										</div>
 									
-										<div ng-show="lvShow(lv, 'identifier')" style="padding-top:5px;">
-											other identifier<br>
-											<input type="text" value="{{lv.identifier}}" ng-model="lv.identifier">
-										</div>
-									
 										<div ng-show="lvShow(lv, 'label')" style="padding-top:5px;">
 											label<br>
 											<input type="text" value="{{lv.label}}" ng-model="lv.label">
+										</div>
+									
+										<div ng-show="lvShow(lv, 'identifier')" style="padding-top:5px;">
+											other identifier<br>
+											<input type="text" value="{{lv.identifier}}" ng-model="lv.identifier">
 										</div>
 									
 										<div ng-show="lvShow(lv, 'value')" style="padding-top:5px;">
@@ -126,9 +126,9 @@
 										
 										<div ng-show="lvShow(lv, 'shortcut')" style="padding-top:5px;">
 											shortcut selection<br>
-											<select ng-model="lv.shortcut.id" style="font-size:10px; height:20px;"
+											<select ng-model="lv.configShortcut" style="font-size:10px; height:20px;"
 												ng-change="lvChange(lv)" 
-												ng-options="shortcut.id as getHierarchyLabel(shortcut) for shortcut in getShortcuts() track by shortcut.id">
+												ng-options="shortcut as getHierarchyLabel(shortcut) for shortcut in getShortcuts() track by shortcut.id">
 												<option value=""><- Select One -></option>
 											</select>
 										</div>

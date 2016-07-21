@@ -97,7 +97,7 @@
 			}
 		});
 		
-		// 5) Setup injection for the various services.
+		// 5) Setup injection for the various services (If anything is injected, it will be as a variable whose name matches the string parameter of the factory method)
 		app.factory("configCtrl", configCtrlFactory);
 		app.factory("configSvc", configSvcFactory);
 		app.factory("navSvc", navigationFactory);

@@ -10,12 +10,11 @@ import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
-import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.entity.Suite;
 import edu.bu.ist.apps.kualiautomation.entity.User;
-import edu.bu.ist.apps.kualiautomation.entity.util.Entity;
+import edu.bu.ist.apps.kualiautomation.entity.util.BeanPopulator;
 import edu.bu.ist.apps.kualiautomation.entity.util.EntityPersister;
 import edu.bu.ist.apps.kualiautomation.entity.util.EntityPopulator;
 import edu.bu.ist.apps.kualiautomation.services.automate.Session;
@@ -84,8 +83,8 @@ public class ScriptService {
 		    }
 		    else {
 		    	cycleEntity = em.find(Cycle.class, cycle.getId());
-		    	Entity ep = new Entity(em, true);
-		    	EntityPopulator populator = new EntityPopulator(ep, true);
+		    	EntityPopulator ep = new EntityPopulator(em, true);
+		    	BeanPopulator populator = new BeanPopulator(ep, true);
 		    	populator.populate(cycleEntity, cycle);
 		    	em.merge(cycleEntity);
 		    }
@@ -175,16 +174,6 @@ public class ScriptService {
 		if(userId != null) 
 			user.setId(userId);
 		LabelAndValue lv = new LabelAndValue();
-//		ConfigShortcut shortcut = new ConfigShortcut();
-//		Config cfg = new Config();
-//		/**
-//		 * Hack Alert!!! If cfg has an id of zero, the custom json serializer will render it as a null field.
-//		 * However, if id is zero, cfg will be rendered as if it had a positive id, but the id will be "0"
-//		 */
-//		cfg.setId(-1);
-//		shortcut.setConfig(cfg);
-//		lv.setShortcut(shortcut);
-		
 		suite.setCycle(cycle);
 		cycle.setUser(user);
 		cycle.addSuite(suite);

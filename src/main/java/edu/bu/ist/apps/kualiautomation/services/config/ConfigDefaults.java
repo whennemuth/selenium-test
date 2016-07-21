@@ -41,6 +41,7 @@ public enum ConfigDefaults {
 			ConfigEnvironment env = new ConfigEnvironment();
 			env.setName(environments[i]);
 			env.setUrl(environments[i+1]);
+			env.setSequence(i+1);
 			cfg.addConfigEnvironment(env);
 			if(env.getName().equalsIgnoreCase(defaultEnvironment)) {
 				cfg.setCurrentEnvironment(env);

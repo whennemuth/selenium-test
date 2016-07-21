@@ -12,10 +12,8 @@ import javax.persistence.TypedQuery;
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
-import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
-import edu.bu.ist.apps.kualiautomation.entity.Suite;
 import edu.bu.ist.apps.kualiautomation.entity.User;
-import edu.bu.ist.apps.kualiautomation.entity.util.Entity;
+import edu.bu.ist.apps.kualiautomation.entity.util.BeanPopulator;
 import edu.bu.ist.apps.kualiautomation.entity.util.EntityPopulator;
 
 public class ConfigService {
@@ -119,32 +117,28 @@ public class ConfigService {
 			    fixBidirectionalFields(cfg);
 			    em.persist(cfg);
 			    em.merge(cfg); // Causes child entities to be persisted as CascadeType does not include persist.
-			    
-			     // Do the following or the @OrderBy annotations never take effect.
-		    	cfgEntity = em.find(Config.class, cfg.getId());
-			    em.refresh(cfgEntity);
 		    }
 		    else {
 		    	cfgEntity = em.find(Config.class, cfg.getId());
-		    	Entity entity = new Entity(em, true);
-		    	EntityPopulator populator = new EntityPopulator(entity, true);
+		    	EntityPopulator ep = new EntityPopulator(em, true);
+		    	BeanPopulator populator = new BeanPopulator(ep, true);
 		    	populator.populate(cfgEntity, cfg);
 		    	em.merge(cfgEntity);
-			    
-			     // Do the following or the @OrderBy annotations never take effect.
-		    	cfgEntity = em.find(Config.class, cfg.getId());
-			    em.refresh(cfgEntity);
 		    }
 		    
 		    if(trans.isActive()) {
 			    System.out.println("Committing...");
 			    trans.commit();
 		    }
-			
-		    if(cfgEntity == null)
+		    
+		    if(cfgEntity == null) {
+		    	em.refresh(cfg);
 		    	return cfg;
-		    else
+		    }
+		    else {
+		    	em.refresh(cfgEntity);
 		    	return cfgEntity;
+		    }
 		} 
         catch(Exception e) {
         	e.printStackTrace(System.out);

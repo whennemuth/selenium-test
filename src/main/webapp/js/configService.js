@@ -10,7 +10,7 @@
  * stored as service properties and is restored on the $scope variable each time the controller is run/re-run.
  * The stored state in this case is the configCache variable.
  */
-var configSvcFactory = function($http, $q) {
+var configSvcFactory = function($http, $q, configCtrl) {
 
 	var GET_URL = '/rest/config';
 	var SAVE_URL = '/rest/config/save';
@@ -106,9 +106,11 @@ var configSvcFactory = function($http, $q) {
 						url:  envUrl,
 						parentConfig: {id: scope.config.id, transitory: true}
 					};
+
+					configCtrl.resequence(scope.config.configEnvironments);
+					
 					// Avoids repeating persistence for the same new environment when it is present in the environments list and as the currentEnvironment
 					// Alternatively you could set currentEnvironment equal to one of the pre-existing environments if any exist.
-					scope.config.currentEnvironment = null;
 					return deferred.promise;
 				}
 				else if(scope.action == 'edit environment') {
@@ -126,6 +128,11 @@ var configSvcFactory = function($http, $q) {
 						var env = scope.config.configEnvironments[i];
 						if(areEqualIgnoreCase(envName, env.name)) {
 							scope.config.configEnvironments.splice(i, 1);
+							if(scope.config.configEnvironments.length > 0) {
+								scope.config.currentEnvironment = scope.config.configEnvironments[0];
+								configCtrl.resequence(scope.config.configEnvironments);
+							}
+							break;
 						}
 					}
 					return deferred.promise;

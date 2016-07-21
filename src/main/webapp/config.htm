@@ -26,7 +26,7 @@
 				style="width:180px;"
 				ng-change="setConfig();"
 				ng-model="config.currentEnvironment"
-				ng-options="environment.name 
+				ng-options="environment as environment.name 
 							for environment in config.configEnvironments 
 							track by environment.url">
 			</select>

@@ -14,7 +14,7 @@ import edu.bu.ist.apps.kualiautomation.util.ReflectionUtils;
 /**
  * Due to bi-directional references between entity classes, the json ObjectMapper gets stuck in a 
  * recursion loop when serializing them to json. This custom serializer will avoid this by only
- * serializing the id of the child object field.
+ * serializing the id of the child object field. 
  * 
  * @author Warren
  *
@@ -51,6 +51,11 @@ public class CustomJsonSerializer <T> {
 				else {
 					generator.writeNumberField("id", id);
 				}
+				/**
+				 * The transitory field is output here as true so that the object produced when 
+				 * deserialization is invoked later will be flagged to tell custom entity
+				 * updating code to ignore this private entity field (and avoid the recursion loop). 
+				 */
 				generator.writeBooleanField("transitory", true);
 				generator.writeEndObject();
 			}

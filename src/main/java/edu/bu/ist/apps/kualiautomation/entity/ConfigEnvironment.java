@@ -47,6 +47,9 @@ public class ConfigEnvironment extends AbstractEntity implements Serializable {
 	@Column(nullable=false)
 	private boolean current;
 
+	@Column(nullable=false)
+	private int sequence;
+
 	//bi-directional many-to-one association to Config
 	@ManyToOne
 	@JoinColumn(name="config_id", nullable=false)
@@ -85,6 +88,14 @@ public class ConfigEnvironment extends AbstractEntity implements Serializable {
 
 	public void setCurrent(boolean current) {
 		this.current = current;
+	}
+
+	public int getSequence() {
+		return this.sequence;
+	}
+
+	public void setSequence(int sequence) {
+		this.sequence = sequence;
 	}
 
 	@JsonSerialize(using=ConfigFieldSerializer.class)

@@ -63,7 +63,7 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	// uni-directional one-to-one association to ConfigShortcut (ConfigShortcut cannot "see" LabelAndValue). 
 	@OneToOne(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER)
 	@JoinColumn(name="shortcut_id", nullable=true)
-	private ConfigShortcut shortcut;
+	private ConfigShortcut configShortcut;
 	
 	/**
 	 * This is a hack. I'm adding this property to be included into the json object created
@@ -151,12 +151,12 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	}
 
 //	@JsonSerialize(using=ShortcutFieldSerializer.class)
-	public ConfigShortcut getShortcut() {
-		return shortcut;
+	public ConfigShortcut getConfigShortcut() {
+		return configShortcut;
 	}
 	
-	public void setShortcut(ConfigShortcut shortcut) {
-		this.shortcut = shortcut;
+	public void setConfigShortcut(ConfigShortcut shortcut) {
+		this.configShortcut = shortcut;
 	}
 	
 	@JsonIgnore
@@ -165,8 +165,8 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	}
 	public boolean isNavigates() {
 		boolean retval = (navigate != 0);
-		if(shortcut != null) {
-			retval |= shortcut.isNavigates();
+		if(configShortcut != null) {
+			retval |= configShortcut.isNavigates();
 		}
 		
 		return retval;

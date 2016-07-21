@@ -62,7 +62,7 @@ public class Config extends AbstractEntity implements Serializable {
 	private User user;
 	
 	//bi-directional many-to-one association to configEnvironment (all the environments "owned" by this config.
-// TODO: Give the ConfigEnvironment entity a sequence field and make it sortable with the @OrderBy annotation	
+	@OrderBy("sequence ASC")
 	@OneToMany(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER, mappedBy="parentConfig")
 	private Set<ConfigEnvironment> configEnvironments = new LinkedHashSet<ConfigEnvironment>();
 

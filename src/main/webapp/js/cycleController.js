@@ -3,7 +3,7 @@ var cycleCtrlFactory = function() {
 	return {
 		setScope: function(scope, cycleSvc) {
 			
-			// Load in Element Types and shortcuts from web service
+			// Load in Element Types
 			cycleSvc.getElementTypes();
 			
 			// Add an event handler to query if the service has intialized yet.
@@ -79,23 +79,23 @@ var cycleCtrlFactory = function() {
 					case 'BUTTON': 	case 'HOTSPOT': case 'HYPERLINK':
 						lv.value = null;
 						lv.booleanValue = false;
-						if(lv.shortcut) {
-							lv.shortcut.id = null;
+						if(lv.configShortcut) {
+							lv.configShortcut = null;
 						}
 						break;
 					case 'CHECKBOX': case 'RADIO': 
 						lv.value = lv.booleanValue;
 						lv.navigates = false;
-						if(lv.shortcut) {
-							lv.shortcut.id = null;
+						if(lv.configShortcut) {
+							lv.configShortcut = null;
 						}
 						break;
 					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'PASSWORD': case 'OTHER':
 						lv.booleanValue = false;
 						lv.value = /^(true)|(false)$/i.test(lv.value) ? null : lv.value;
 						lv.navigates = false;
-						if(lv.shortcut) {
-							lv.shortcut.id = null;
+						if(lv.configShortcut) {
+							lv.configShortcut = null;
 						}
 						break;
 					case 'SHORTCUT':
@@ -103,8 +103,8 @@ var cycleCtrlFactory = function() {
 						lv.label = null;
 						lv.value = null;
 						lv.booleanValue = false;
-						if(lv.shortcut) {
-							lv.navigates = (lv.navigates || scope.getShortcut(lv.shortcut.id).navigates);
+						if(lv.configShortcut) {
+							lv.navigates = (lv.navigates || scope.getShortcut(lv.configShortcut.id).navigates);
 						}
 						break;
 					default:
@@ -113,8 +113,8 @@ var cycleCtrlFactory = function() {
 						lv.value = null;
 						lv.booleanValue = false;
 						lv.navigates = false;
-						if(lv.shortcut) {
-							lv.shortcut.id = null;
+						if(lv.configShortcut) {
+							lv.configShortcut = null;
 						}
 						break;
 				}
@@ -242,8 +242,8 @@ var cycleCtrlFactory = function() {
 				if(lv.elementType) {
 					s += lv.elementType;
 					if(lv.elementType == 'SHORTCUT') {
-						if(lv.shortcut) {
-							var id = lv.shortcut.id;
+						if(lv.configShortcut) {
+							var id = lv.configShortcut.id;
 							shortcut = '[id=' + (id > 0 ? id : '?') + ']';
 						}
 						else {

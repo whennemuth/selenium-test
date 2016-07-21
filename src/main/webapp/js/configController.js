@@ -21,13 +21,13 @@ var configCtrlFactory = function(cycleCtrl) {
 										cycleSvc.getEmptyCycle(config.user.id);
 									},
 									function(error) {
-										if(error.message) {
+										if(error && error.message) {
 											alert(
 												"Cycles fetch error!\n\n" + 
 												error.message + '\n\n' + 
 												error.data);
 										}
-										else if(error.data) {
+										else if(error && error.data) {
 											alert(error.data);
 										}
 										else {
@@ -59,7 +59,6 @@ var configCtrlFactory = function(cycleCtrl) {
 				scope.action = action;
 				scope.config.currentEnvironment.current = true;
 // TODO: The new environment is saved, but the listbox should be refreshed so that it becomes the selected item. currentEnvironment might not be referring to the new environment. Fix this.
-// TODO: The "Add" button results in an empty row showing up at the top of the listbox (angular problem). Fix this (currentEnvironment above will be null).
 				if(action == 'save config') {
 					var msg = scope.getShortcutValidationMessages(scope.config); 
 					if(msg) {
@@ -177,10 +176,14 @@ var configCtrlFactory = function(cycleCtrl) {
 			};
 			
 			scope.resequence = function(items) {
-				for(var i=0; i<items.length; i++) {
-					items[i].sequence = (i+1);
-				}
+				resequence(items);
 			};
+		},
+		
+		resequence: function(items){
+			for(var i=0; i<items.length; i++) {
+				items[i].sequence = (i+1);
+			}
 		}
 	};
 };
