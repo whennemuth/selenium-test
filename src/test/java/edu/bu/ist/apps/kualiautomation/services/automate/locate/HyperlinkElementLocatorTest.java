@@ -1,15 +1,13 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
-import static org.junit.Assert.*;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -17,8 +15,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
-import edu.bu.ist.apps.kualiautomation.services.automate.locate.HyperlinkElementLocator;
-import edu.bu.ist.apps.kualiautomation.services.automate.locate.LabelledElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

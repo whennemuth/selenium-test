@@ -79,51 +79,24 @@ var configSvcFactory = function($http, $q, configCtrl) {
 			var deferred = $q.defer();
 			
 			if(scope.action) {
-				var envName = null;
-				var envUrl = null;
-				if(scope.config.currentEnvironment) {
-					envName = scope.config.currentEnvironment.name;
-					envUrl = scope.config.currentEnvironment.url;
-				}
 				
 				if(scope.action == 'add environment') {
-					// Validate by ensuring the name and or url are not already present in config.environments
-					for(var e in scope.config.configEnvironments) {
-						var env = scope.config.configEnvironments[e];
-						if(areEqualIgnoreCase(envName, env.name)) {
-							deferred.reject(envName + ' already used!');
-							return deferred.promise;
-						}
-						if(areEqualIgnoreCase(envUrl, env.url)) {
-							deferred.reject(envUrl + ' already used!');
-							return deferred.promise;
-						}
-					}
-
 					// Validation success, so add a new environment to the collection in config object
 					scope.config.configEnvironments[scope.config.configEnvironments.length] = {
-						name: envName,
-						url:  envUrl,
+						name: 'Enter a name',
+						url:  '',
 						parentConfig: {id: scope.config.id, transitory: true}
 					};
 
+					scope.config.currentEnvironment = scope.config.configEnvironments[scope.config.configEnvironments.length - 1];
 					configCtrl.resequence(scope.config.configEnvironments);
 					
 					// Avoids repeating persistence for the same new environment when it is present in the environments list and as the currentEnvironment
 					// Alternatively you could set currentEnvironment equal to one of the pre-existing environments if any exist.
 					return deferred.promise;
 				}
-				else if(scope.action == 'edit environment') {
-					for(var i=0; i< scope.config.configEnvironments.length; i++) {
-						var env = scope.config.configEnvironments[i];
-						if(scope.config.currentEnvironment.id == env.id) {
-							env.name = scope.config.currentEnvironment.name;
-							env.url = scope.config.currentEnvironment.url;
-						}
-					}
-					return deferred.promise;
-				}
 				else if(scope.action == 'remove environment') {
+					var envName = scope.config.currentEnvironment.name;
 					for(var i=0; i< scope.config.configEnvironments.length; i++) {
 						var env = scope.config.configEnvironments[i];
 						if(areEqualIgnoreCase(envName, env.name)) {
@@ -137,7 +110,15 @@ var configSvcFactory = function($http, $q, configCtrl) {
 					}
 					return deferred.promise;
 				}
-				else if(scope.action == 'save config') {					
+				else if(scope.action == 'save config') {	
+					var invalid = getInvalidSaveMessage(scope);
+					if(invalid) {
+						deferred.reject(invalid);
+						return deferred.promise;						
+					}
+deferred.reject('IS VALID!!!');
+return deferred.promise;
+
 					$http({
 						method: 'POST',
 						url: SAVE_URL,
@@ -160,6 +141,70 @@ var configSvcFactory = function($http, $q, configCtrl) {
 		}
 	};
 };
+
+
+function getInvalidSaveMessage(scope) {
+	var msg = getInvalidUserMessage(scope);
+	msg += msg ? '\n\n' : '';
+	msg += getInvalidEnvironmentMessage(scope);
+	return msg;
+}
+
+function getInvalidUserMessage(scope) {
+	if(empty(scope.config.user.firstName) || empty(scope.config.user.lastName)) {
+		return 'Current User: First name and Last name are required!';
+	}
+	return '';
+}
+
+/**
+ * Validate by ensuring no blanks and the name and or url are not already present in config.environments
+ */
+ function getInvalidEnvironmentMessage(scope) {			
+	var nameDups = [];
+	var urlDups = [];
+	var msg = ''
+
+	for(var e in scope.config.configEnvironments) {
+		var env = scope.config.configEnvironments[e];
+		
+		if(empty(env.name)) {
+			msg = 'Missing environment name';
+			break;
+		}
+		
+		if(empty(env.url)) {
+			msg = 'Missing environment url';
+			break;
+		}
+		
+		for(var i=0; i<nameDups.length; i++) {
+			if(areEqualIgnoreCase(nameDups[i], env.name)) {
+				msg = 'Duplicated environment name: ' + env.name;
+				break;
+			}
+		}
+		nameDups[nameDups.length] = env.name;
+		
+		for(var i=0; i<urlDups.length; i++) {
+			if(areEqualIgnoreCase(urlDups[i], env.url)) {
+				msg = 'Duplicated environment url: ' + env.url;
+				break;
+			}
+		}
+		urlDups[urlDups.length] = env.url;
+		
+	}
+	return msg;
+}
+
+function empty(o) {
+ 	if(o == null)
+ 		return true;
+ 	if(o == undefined)
+ 		return true;
+ 	return !(o + '').trim();
+}
 
 function areEqualIgnoreCase(val1, val2) {
 	if(val1 == undefined || val1 == null)

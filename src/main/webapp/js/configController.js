@@ -178,7 +178,20 @@ var configCtrlFactory = function(cycleCtrl) {
 			scope.resequence = function(items) {
 				resequence(items);
 			};
+			
+			scope.syncEnvironment = function() {
+				var current = scope.config.currentEnvironment;
+				for(var e in scope.config.configEnvironments) {
+					var env = scope.config.configEnvironments[e];
+					if(env.sequence == current.sequence) {
+						env.name = current.name;
+						env.url = current.url;
+						return;
+					}
+				}
+			};
 		},
+		
 		
 		resequence: function(items){
 			for(var i=0; i<items.length; i++) {

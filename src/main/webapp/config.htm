@@ -30,6 +30,19 @@
 							for environment in config.configEnvironments 
 							track by environment.url">
 			</select>
+			<!-- 
+			<select 
+				required
+				name="server" 
+				size="5" 
+				style="width:180px;"
+				ng-change="setConfig();"
+				ng-model="config.currentEnvironment"
+				ng-options="environment.name 
+							for environment in config.configEnvironments 
+							track by environment.url">
+			</select>
+			-->
 		</div>
 		<div class=fieldlabel>Name</div>
 		<div>
@@ -37,6 +50,8 @@
 				required 
 				name="servername" 
 				type='text' 
+				ng-keyup="syncEnvironment();"
+				ng-blur="syncEnvironment();"
 				ng-model="config.currentEnvironment.name" >
 		</div>
 		<div class=fieldlabel>URL</div>
@@ -45,6 +60,8 @@
 				required 
 				name="serverurl" 
 				type='text' 
+				ng-keyup="syncEnvironment();"
+				ng-blur="syncEnvironment();"
 				ng-model="config.currentEnvironment.url">
 		</div>
 		
@@ -62,15 +79,7 @@
 				ng-disabled="configfrm.servername.$error.required || 
 							 configfrm.serverurl.$error.required"
 				ng-click="setConfig('add environment');">
-				
-			<input 
-				type='button' 
-				value='Edit' 
-				style='padding:5px;'
-				ng-disabled="configfrm.servername.$error.required || 
-							 configfrm.serverurl.$error.required"
-				ng-click="setConfig('edit environment');">
-				
+								
 			<input 
 				type='button' 
 				value='Remove' 

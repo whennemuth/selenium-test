@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -127,5 +128,13 @@ public class Utils {
 	public static String getClassPathResourceContent(String resource) {
 		InputStream in = Utils.class.getClassLoader().getResourceAsStream(resource);
 		return getStringFromInputStream(in);
+	}
+	
+	public static File getClassPathResource(String resource) {
+		URL url = Utils.class.getClassLoader().getResource(resource);
+		if(url == null) {
+			return null;
+		}
+		return new File(url.getFile());
 	}
 }

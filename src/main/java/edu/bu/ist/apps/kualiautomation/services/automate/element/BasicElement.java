@@ -78,6 +78,16 @@ public class BasicElement implements Element {
 			break;
 		case OTHER:
 			break;
+		case BUTTON:
+			break;
+		case BUTTONIMAGE:
+			break;
+		case HOTSPOT:
+			break;
+		case HYPERLINK:
+			break;
+		case SHORTCUT:
+			break;
 		default:
 			break;
 		}

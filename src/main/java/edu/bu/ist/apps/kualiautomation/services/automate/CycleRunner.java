@@ -1,6 +1,5 @@
 package edu.bu.ist.apps.kualiautomation.services.automate;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.openqa.selenium.WebDriver;
@@ -51,7 +50,7 @@ public class CycleRunner {
 			System.out.println("Processing Suite: " + suite.getName());
 			for(LabelAndValue lv : suite.getLabelAndValues()) {
 				ElementType elementType = ElementType.valueOf(lv.getElementType());
-				LocatorRunner locator = new LocatorRunner(driver, elementType, lv.getLabel(), lv.getIdentifier());
+				LocatorRunner locator = new LocatorRunner(driver, lv);
 				List<Element> elements = locator.run(true);
 				if(elementLocated(lv, elements)) {
 					if(!applyElementValue(lv, elements.get(0))) {

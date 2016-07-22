@@ -144,7 +144,10 @@ public class KerberosLogin {
 	}
 	
 	private boolean usernameLocated() {
-		boolean located = username.isInteractive() && username.getElementType().acceptsKeystrokes();
+		boolean located = username != null;
+		if(located) {
+			located = username.isInteractive() && username.getElementType().acceptsKeystrokes();
+		}
 		StringBuilder s = new StringBuilder(loginParms.getUsernameLabel())
 				.append(" ");
 		if(!located)

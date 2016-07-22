@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
 
 /**
@@ -137,7 +138,17 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	public String getElementType() {
 		return elementType;
 	}
-
+	
+	@JsonIgnore @Transient
+	public ElementType getElementTypeEnum() {
+		try {
+			return ElementType.valueOf(elementType);
+		} 
+		catch (RuntimeException e) {
+			return null;
+		}
+	}
+	
 	public void setElementType(String elementType) {
 		this.elementType = elementType;
 	}

@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.openqa.selenium.WebDriver;
 
+import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
+import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
@@ -20,23 +22,15 @@ import edu.bu.ist.apps.kualiautomation.util.Utils;
 public class LocatorRunner {
 
 	private WebDriver driver;
-	private ElementType elementType;
-	private String label;
-	private String attribute;
+	private LabelAndValue lv;
 	private Locator locator;
 	
 	@SuppressWarnings("unused")
 	private LocatorRunner() { /* Restrict the default constructor */ }
 	
-	public LocatorRunner(WebDriver driver, ElementType elementType, String label) {
+	public LocatorRunner(WebDriver driver, LabelAndValue lv) {
 		this.driver = driver;
-		this.elementType = elementType;
-		this.label = label;
-	}
-	
-	public LocatorRunner(WebDriver driver, ElementType elementType, String label, String attribute) {
-		this(driver, elementType, label);
-		this.attribute = attribute;
+		this.lv = lv;
 	}
 	
 	public List<Element> run() {
@@ -52,7 +46,7 @@ public class LocatorRunner {
 		
 		List<Element> element = null;
 		
-		switch(elementType) {
+		switch(lv.getElementTypeEnum()) {
 		case BUTTON:
 			element = runBatch(new Class<?>[]{
 				BasicElementLocator.class,
@@ -72,7 +66,7 @@ public class LocatorRunner {
 			break;
 		case TEXTBOX: case PASSWORD:
 			locator = new LabelledElementLocator(driver);
-			element = locator.locateAll(elementType, Arrays.asList(new String[]{ label }));
+			element = locator.locateAll(lv.getElementTypeEnum(), Arrays.asList(new String[]{ lv.getLabel() }));
 			break;
 		case TEXTAREA:
 			break;
@@ -81,6 +75,12 @@ public class LocatorRunner {
 		case RADIO:
 			break;
 		case OTHER:
+			break;
+		case HOTSPOT:
+			break;
+		case SHORTCUT:
+			break;
+		default:
 			break;
 		}
 		
@@ -101,13 +101,13 @@ public class LocatorRunner {
 		for(int i=0; i<classes.length; i++) {
 			StringBuilder s = new StringBuilder(classes[i].getName())
 				.append(BatchElementLocator.PARAMETER_DELIMITER)
-				.append(label);
-			if(!Utils.isEmpty(attribute)) {
-				s.append(BatchElementLocator.PARAMETER_DELIMITER).append(attribute);
+				.append(lv.getLabel());
+			if(!Utils.isEmpty(lv.getIdentifier())) {
+				s.append(BatchElementLocator.PARAMETER_DELIMITER).append(lv.getIdentifier());
 			}
 			parameters[i] = s.toString();
 		}
-		List<Element> elements = locator.locateAll(elementType, Arrays.asList(parameters));
+		List<Element> elements = locator.locateAll(lv.getElementTypeEnum(), Arrays.asList(parameters));
 		
 		return elements;
 	}

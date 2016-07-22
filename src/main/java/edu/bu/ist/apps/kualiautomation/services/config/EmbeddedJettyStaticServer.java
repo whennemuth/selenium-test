@@ -1,5 +1,6 @@
 package edu.bu.ist.apps.kualiautomation.services.config;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -31,8 +32,9 @@ public class EmbeddedJettyStaticServer {
 	private Map<String, String> handlers = new HashMap<String, String>();
 	
 	public void start(Map<String, String> handlers) throws Exception {
-		this.handlers = handlers;
-
+		
+		loadHandlers("html/", handlers);
+		
         server = new Server(8080);
         try {
         	server.setStopAtShutdown(true);
@@ -45,6 +47,42 @@ public class EmbeddedJettyStaticServer {
 		} 
         catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void loadHandlers(String dir, Map<String, String> handlers) {
+		
+		for(String source : handlers.keySet()) {
+			String target = handlers.get(source);
+			
+			if(target == null)
+				target = source;
+			
+			if(dir != null) {
+				target = dir + target;
+				target = target.replaceAll("//", "/");
+			}
+// RESUME NEXT: This is not working, fix it.			
+			File parent = Utils.getClassPathResource(target);
+			if(parent.isDirectory()) {
+				Map<String, String> subhandlers = new HashMap<String, String>();
+				for(File child : parent.listFiles()) {
+					if(child.isDirectory()) {
+						subhandlers.put(target + "/" + child.getName(), null);
+					}
+					else {
+						this.handlers.put(parent.getName() + "/" + child.getName(), null);
+						System.out.println(parent.getName() + "/" + child.getName() + " = null");
+					}
+				}
+				if(!subhandlers.isEmpty()) {
+					loadHandlers(null, subhandlers);
+				}
+			}
+			else {
+				this.handlers.put(source, target);
+				System.out.println(source + " = " + target);
+			}
 		}
 	}
 
@@ -61,16 +99,23 @@ public class EmbeddedJettyStaticServer {
 				
 				PrintWriter out = response.getWriter();
 				String[] parts = target.split("/");
-				target = parts[parts.length-1];
-				String source = handlers.get(target);
+				String page = parts[parts.length-1];
+				String source = handlers.get(page);
 				
-				if(source != null && !source.contains("<")) {
+				if(source == null) {
+					System.out.println("No source found for: " + target);
+				}
+				else if(!source.contains("<")) {
+					File f = Utils.getClassPathResource(source);
+					if(f.isDirectory()) {
+						System.out.println(f.getAbsolutePath());
+					}
 					// source is not raw html, but a reference to a classpath resource that contains html
-					source = Utils.getClassPathResourceContent(
-							"html/" + source);
+					source = Utils.getClassPathResourceContent(source);
 				}
 				
-				out.println(source == null ? target : source);
+				out.print(source == null ? target : source);
+				out.flush();
 				baseRequest.setHandled(true);
 			}});
 	}
