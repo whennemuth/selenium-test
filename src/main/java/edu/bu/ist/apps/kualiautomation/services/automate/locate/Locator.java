@@ -2,6 +2,7 @@ package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.List;
 
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
@@ -13,7 +14,9 @@ public interface Locator {
 
 	public List<Element> locateAll(ElementType elementType, List<String> parameters);
 	
-	public WebDriver getDriver();
+	public SearchContext getSearchContext();
+	
+	public WebDriver getWebDriver();
 	
 	public boolean busy();
 }

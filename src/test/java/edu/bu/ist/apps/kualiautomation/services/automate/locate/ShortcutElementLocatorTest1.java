@@ -72,7 +72,7 @@ public class ShortcutElementLocatorTest1 {
 		}
 		else {
 			driver = new FirefoxDriver();
-		}		
+		}
 	}
 	
 	@AfterClass

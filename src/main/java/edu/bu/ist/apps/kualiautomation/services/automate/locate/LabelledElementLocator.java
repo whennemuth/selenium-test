@@ -7,6 +7,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -25,12 +26,11 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
  */
 public class LabelledElementLocator extends AbstractElementLocator {
 	
-	private LabelledElementLocator() {
-		super(null); // Restrict the default constructor
-	}
-	
 	public LabelledElementLocator(WebDriver driver){
 		super(driver);
+	}
+	public LabelledElementLocator(WebDriver driver, SearchContext searchContext){
+		super(driver, searchContext);
 	}
 	
 	@Override
@@ -43,7 +43,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 			if(parameters.size() > 1) {
 				attributeValues = parameters.subList(1, parameters.size());
 			}
-			LabelElementLocator labelLocator = new LabelElementLocator(driver);
+			LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext);
 			List<Element> candidates = labelLocator.locateAll(elementType, Arrays.asList(new String[]{label}));
 			for(Element labelElement : candidates) {
 				List<WebElement> flds = getInputField(labelElement.getWebElement(), attributeValues);
@@ -100,7 +100,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	 */
 	@SuppressWarnings("unused")
 	private WebElement getParentElement(WebElement childElement) {
-		JavascriptExecutor executor = (JavascriptExecutor)driver;
+		JavascriptExecutor executor = (JavascriptExecutor)searchContext;
 		WebElement parentElement = (WebElement)executor.executeScript("return arguments[0].parentNode;", childElement);
 		return parentElement;
 	}

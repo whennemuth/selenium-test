@@ -40,7 +40,7 @@ public class HyperlinkElementLocatorTest {
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		server.stop();
-		locator.getDriver().quit();
+		locator.getWebDriver().quit();
 	}
 	
 	public static void setLocator(boolean specifyWindows) {			

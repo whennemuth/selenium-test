@@ -37,8 +37,8 @@ public class LocateResultAssertion {
 	 * @return
 	 */
 	public List<Element> findAndAssertElements() {
-		if(locator.getDriver().getCurrentUrl() == null || !locator.getDriver().getCurrentUrl().equalsIgnoreCase(url)) {
-			locator.getDriver().get(url);
+		if(locator.getWebDriver().getCurrentUrl() == null || !locator.getWebDriver().getCurrentUrl().equalsIgnoreCase(url)) {
+			locator.getWebDriver().get(url);
 		}
 		
 		List<Element> elements = locator.locateAll(elementType, attributeValues);

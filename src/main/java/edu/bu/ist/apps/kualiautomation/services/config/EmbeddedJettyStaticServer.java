@@ -143,16 +143,16 @@ public class EmbeddedJettyStaticServer {
 				if(targetUrl.endsWith(".css")) {
 					response.setContentType("text/css; charset=UTF-8");
 				}
-				if(targetUrl.endsWith(".js")) {
+				else if(targetUrl.endsWith(".js")) {
 					response.setContentType("text/javascript; charset=UTF-8");
 				}
-				if(targetUrl.endsWith(".gif")) {
+				else if(targetUrl.endsWith(".gif")) {
 					response.setContentType("image/gif");
 				}
-				if(targetUrl.endsWith(".jpeg") || targetUrl.endsWith(".jpg")) {
+				else if(targetUrl.endsWith(".jpeg") || targetUrl.endsWith(".jpg")) {
 					response.setContentType("image/jpeg");
 				}
-				if(targetUrl.endsWith(".ico")) {
+				else if(targetUrl.endsWith(".ico")) {
 					response.setContentType("image/ico");
 				}
 				out.print(resource == null ? targetUrl : resource);

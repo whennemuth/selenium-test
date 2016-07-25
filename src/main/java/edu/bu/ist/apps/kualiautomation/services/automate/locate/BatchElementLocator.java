@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
@@ -27,11 +28,24 @@ public class BatchElementLocator implements Locator {
 	public static final String PARAMETER_DELIMITER = "||";
 	
 	private WebDriver driver;
+	private SearchContext searchContext;
 	private boolean defaultRan;
 	private boolean busy;
 	
-	public BatchElementLocator(WebDriver driver) {
+	
+	public BatchElementLocator(SearchContext searchContext) {
+		if(searchContext instanceof WebDriver) {
+			this.driver = (WebDriver) searchContext;
+			this.searchContext = searchContext;
+		}
+		else {
+			throw new IllegalStateException("Parameter 'searchContext' not an instance of WebDriver!");
+		}		
+	}
+	
+	public BatchElementLocator(WebDriver driver, SearchContext searchContext) {
 		this.driver = driver;
+		this.searchContext = searchContext;
 	}
 
 	public Element locateFirst(ElementType elementType, Map<Class<?>, List<String>> parms) {		
@@ -57,9 +71,9 @@ public class BatchElementLocator implements Locator {
 			busy = true;
 			for(Class<?> clazz : parms.keySet()) {
 				try {
-					Constructor<?> ctr = clazz.getConstructor(WebDriver.class);
+					Constructor<?> ctr = clazz.getConstructor(WebDriver.class, SearchContext.class);
 					List<String> attributes = parms.get(clazz);
-					Locator locator = (Locator) ctr.newInstance(driver);
+					Locator locator = (Locator) ctr.newInstance(driver, searchContext);
 					
 					Element result = runLocator(locator, elementType, attributes);
 					
@@ -154,8 +168,18 @@ public class BatchElementLocator implements Locator {
 	}
 
 	@Override
-	public WebDriver getDriver() {
+	public SearchContext getSearchContext() {
+		return searchContext;
+	}
+
+	@Override
+	public WebDriver getWebDriver() {
 		return driver;
+	}
+
+	@Override
+	public boolean busy() {
+		return busy;
 	}
 
 	private static String getDelimiterRegex() {
@@ -167,7 +191,7 @@ public class BatchElementLocator implements Locator {
 		try {
 			driver = new HtmlUnitDriver();
 			driver.get("file:///C:/whennemuth/workspaces/bu_workspace/selenium-test/src/test/resources/html/ProposalLogLookupFrame.htm");
-			BatchElementLocator locator = new BatchElementLocator(driver);
+			BatchElementLocator locator = new BatchElementLocator(driver, driver);
 			List<Element> elements = locator.locateAll(ElementType.TEXTBOX, Arrays.asList(new String[]{
 					"edu.bu.ist.apps.kualiautomation.services.automate.element.LabelElementLocator" + PARAMETER_DELIMITER + "Proposal Number",
 					"edu.bu.ist.apps.kualiautomation.services.automate.element.LabelledElementLocator" + PARAMETER_DELIMITER + "Proposal Number"
@@ -186,10 +210,5 @@ public class BatchElementLocator implements Locator {
 			}
 		}
 
-	}
-
-	@Override
-	public boolean busy() {
-		return busy;
 	}
 }

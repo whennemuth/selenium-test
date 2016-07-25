@@ -2,6 +2,7 @@ package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.List;
 
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -15,6 +16,10 @@ public class BasicElementLocator extends AbstractElementLocator {
 
 	public BasicElementLocator(WebDriver driver) {
 		super(driver);
+	}
+
+	public BasicElementLocator(WebDriver driver, SearchContext searchContext) {
+		super(driver, searchContext);
 	}
 
 	@Override

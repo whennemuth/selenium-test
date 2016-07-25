@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -16,6 +17,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
 public abstract class AbstractElementLocator implements Locator {
 
+	protected SearchContext searchContext;
 	protected WebDriver driver;
 	protected ElementType elementType;
 	protected List<String> parameters = new ArrayList<String>();
@@ -30,6 +32,12 @@ public abstract class AbstractElementLocator implements Locator {
 	
 	public AbstractElementLocator(WebDriver driver) {
 		this.driver = driver;
+		this.searchContext = driver;
+	}
+	
+	public AbstractElementLocator(WebDriver driver, SearchContext searchContext) {
+		this.driver = driver;
+		this.searchContext = searchContext;
 	}
 	
 	@Override
@@ -64,10 +72,10 @@ public abstract class AbstractElementLocator implements Locator {
 			if(webElements.isEmpty() && !skipFrameSearch) {
 				// Check for frames and search those as well
 				WebDriverWait wait = new WebDriverWait(driver, 100);
-				List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
+				List<WebElement> iframes = searchContext.findElements(By.tagName("iframe"));
 				if(!iframes.isEmpty()) {
 					for(WebElement iframe : iframes) {
-						driver = wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
+						searchContext = wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
 						List<Element> frameResults = locateAll(elementType, parameters);
 						results.addAll(frameResults);
 						if(frameResults.isEmpty()) {
@@ -131,7 +139,7 @@ public abstract class AbstractElementLocator implements Locator {
 		case SELECT:
 		case RADIO:
 		case OTHER:
-			candidates = elementType.findAll(driver);
+			candidates = elementType.findAll(searchContext);
 			results.addAll(Attribute.findForValues(candidates, parameters));
 			break;
 		}
@@ -142,8 +150,13 @@ public abstract class AbstractElementLocator implements Locator {
 	}
 
 	@Override
-	public WebDriver getDriver() {
-		return driver;
+	public SearchContext getSearchContext() {
+		return searchContext;
 	}
 
+	@Override
+	public WebDriver getWebDriver() {
+		return driver;
+	}
+	
 }

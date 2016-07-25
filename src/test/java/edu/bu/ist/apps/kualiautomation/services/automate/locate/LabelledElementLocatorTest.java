@@ -37,7 +37,7 @@ public class LabelledElementLocatorTest {
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		server.stop();
-		locator.getDriver().quit();
+		locator.getWebDriver().quit();
 	}
 	
 	public static void setLocator(boolean specifyWindows) {			

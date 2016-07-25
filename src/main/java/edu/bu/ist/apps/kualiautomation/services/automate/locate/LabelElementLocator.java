@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -17,6 +18,9 @@ public class LabelElementLocator extends AbstractElementLocator {
 	}
 	public LabelElementLocator(WebDriver driver){
 		super(driver);
+	}
+	public LabelElementLocator(WebDriver driver, SearchContext searchContext){
+		super(driver, searchContext);
 	}
 	
 	public Element locate(String label) {
@@ -35,7 +39,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 			//driver.findElements(By.xpath("//*[text()[normalize-space(lower-case(.))=\"" + cleanedLabel.toLowerCase() + "\"]]"));
 			//driver.findElements(By.xpath("//*[normalize-space(lower-case(text()))=\"" + label.trim().toLowerCase() + "\"]"));
 			// lower-case if for xpath v2.0, but firefox uses v1.0, so have to use the translate function.
-			driver.findElements(By.xpath("//*[normalize-space(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'))=\"" + label.trim().toLowerCase() + "\"]"));
+			searchContext.findElements(By.xpath("//*[normalize-space(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'))=\"" + label.trim().toLowerCase() + "\"]"));
 		
 		if(elements.isEmpty()) {
 			// Find a match that starts with the specified label. This is for long labels that can be uniquely identified by the way they start.
@@ -43,7 +47,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 				//driver.findElements(By.xpath("//*[text()[contains(lower-case(.), \"" + cleanedLabel.toLowerCase() + "\")]]"));
 				//driver.findElements(By.xpath("//*[starts-with(normalize-space(lower-case(text())), \"" + cleanedLabel.toLowerCase() + "\")]"));
 				// lower-case if for xpath v2.0, but firefox uses v1.0, so have to use the translate function.
-				driver.findElements(By.xpath("//*[starts-with(normalize-space(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')), \"" + cleanedLabel.toLowerCase() + "\")]"));
+				searchContext.findElements(By.xpath("//*[starts-with(normalize-space(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')), \"" + cleanedLabel.toLowerCase() + "\")]"));
 		}
 		
 		// Double check the startswith/normalization filtering 

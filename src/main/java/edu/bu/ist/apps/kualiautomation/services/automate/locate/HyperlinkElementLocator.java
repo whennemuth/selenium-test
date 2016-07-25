@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -15,6 +16,10 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 
 	public HyperlinkElementLocator(WebDriver driver) {
 		super(driver);
+	}
+
+	public HyperlinkElementLocator(WebDriver driver, SearchContext searchContext) {
+		super(driver, searchContext);
 	}
 
 	@Override
@@ -29,7 +34,7 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 			}
 			
 			// 1) A hyperlink will come up as a result of a more basic label search, so start there and filter later.
-			LabelElementLocator labelLocator = new LabelElementLocator(driver);
+			LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext);
 			List<Element> candidates = labelLocator.locateAll(elementType, Arrays.asList(new String[]{ innerText }));
 			List<WebElement> webElements = getWebElements(candidates);
 			
@@ -46,7 +51,7 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 			// 3) If a WebElement is not an anchor tag, regard it as an element that labels an anchor tag and use the LabelledElementLocator to find it.
 			for(@SuppressWarnings("unused") WebElement label : labels) {
 				//if(!attributeValues.isEmpty()) {
-					LabelledElementLocator labelledLocator = new LabelledElementLocator(driver);
+					LabelledElementLocator labelledLocator = new LabelledElementLocator(driver, searchContext);
 					List<Element> anchorTagElements = labelledLocator.locateAll(ElementType.HYPERLINK, parameters);
 					for(Element anchorTagElement : anchorTagElements) {
 						if(!anchortags.contains(anchorTagElement.getWebElement())) {

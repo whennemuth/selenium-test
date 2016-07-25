@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.util.Utils;
@@ -138,8 +138,8 @@ public enum ElementType {
 		return canNavigate;
 	}
 
-	public List<WebElement> findAll(WebDriver driver) {
-		List<WebElement> flds = driver.findElements(By.xpath(getXpath(true)));
+	public List<WebElement> findAll(SearchContext ctx) {
+		List<WebElement> flds = ctx.findElements(By.xpath(getXpath(true)));
 		return flds;
 	}
 	

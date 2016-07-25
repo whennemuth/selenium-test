@@ -41,7 +41,7 @@ import edu.bu.ist.apps.kualiautomation.util.Utils;
 	@NamedQuery(name="ConfigShortcut.findAll", query="SELECT s FROM ConfigShortcut s"),
 	@NamedQuery(name="ConfigShortcut.findByConfigId", query="SELECT s FROM ConfigShortcut s WHERE s.config.id = :configid")
 })
-public class ConfigShortcut extends AbstractEntity implements Serializable {
+public class ConfigShortcut extends AbstractEntity implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -241,5 +241,22 @@ public class ConfigShortcut extends AbstractEntity implements Serializable {
 	public void setSeparator(String separator) {
 		// Do nothing - this field is for the UI only and not for persistence.
 	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		ConfigShortcut clone = new ConfigShortcut();
+		clone.id = this.getId();
+		clone.config = this.getConfig();
+		clone.createdDate = this.getCreatedDate();
+		clone.elementType = this.getElementType();
+		clone.identifier = this.getIdentifier();
+		clone.include = this.getInclude();
+		clone.labelHierarchy = this.getLabelHierarchy();
+		clone.labelHierarchyParts = this.getLabelHierarchyParts();
+		clone.navigate = this.getNavigate();
+		clone.sequence = this.getSequence();
+		return clone;
+	}
+	
 	
 }

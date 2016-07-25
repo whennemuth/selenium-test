@@ -49,7 +49,7 @@ public class LabelElementLocatorTest {
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		server.stop();
-		locator.getDriver().quit();
+		locator.getWebDriver().quit();
 	}
 		
 	public static void setLocator(boolean specifyWindows) {
@@ -71,17 +71,17 @@ public class LabelElementLocatorTest {
 	
 	@Test
 	public void testFindByInnerText() {
-		locator.getDriver().get("http://localhost:8080/hello1");
+		locator.getWebDriver().get("http://localhost:8080/hello1");
 		Element element = locator.locate("hello");
 		assertNotNull(element);
 		assertEquals("div", element.getWebElement().getTagName().toLowerCase());
 		
-		locator.getDriver().get("http://localhost:8080/hello2");
+		locator.getWebDriver().get("http://localhost:8080/hello2");
 		element = locator.locate("hello");
 		assertNotNull(element);
 		assertEquals("div", element.getWebElement().getTagName().toLowerCase());
 		
-		locator.getDriver().get("http://localhost:8080/hello3");
+		locator.getWebDriver().get("http://localhost:8080/hello3");
 		element = locator.locate("hello");
 		assertNotNull(element);
 		assertEquals("div", element.getWebElement().getTagName().toLowerCase());
@@ -89,12 +89,12 @@ public class LabelElementLocatorTest {
 	
 	@Test
 	public void testAvoidSimilarInnerText() {
-		locator.getDriver().get("http://localhost:8080/similar1");
+		locator.getWebDriver().get("http://localhost:8080/similar1");
 		Element element = locator.locate("similar");
 		assertNotNull(element);
 		assertEquals("similarity", element.getWebElement().getText());
 		
-		locator.getDriver().get("http://localhost:8080/similar2");
+		locator.getWebDriver().get("http://localhost:8080/similar2");
 		element = locator.locate("similar");
 		assertNull(element);
 	}
@@ -104,7 +104,7 @@ public class LabelElementLocatorTest {
 	 */
 	@Test
 	public void testFindByInnerTextWithQuote() {
-		locator.getDriver().get("http://localhost:8080/quote");
+		locator.getWebDriver().get("http://localhost:8080/quote");
 		Element element = locator.locate("text with single 'quote'");
 		assertNotNull(element);
 		assertEquals("div", element.getWebElement().getTagName().toLowerCase());
@@ -112,16 +112,16 @@ public class LabelElementLocatorTest {
 
 	@Test
 	public void testFindByInnerTextWithColon() {
-		locator.getDriver().get("http://localhost:8080/colon1");
+		locator.getWebDriver().get("http://localhost:8080/colon1");
 		Element element = locator.locate("label");
 		assertNotNull(element);
 		assertEquals("span", element.getWebElement().getTagName().toLowerCase());
 		
-		locator.getDriver().get("http://localhost:8080/colon2");
+		locator.getWebDriver().get("http://localhost:8080/colon2");
 		element = locator.locate("label");
 		assertNull(element);
 		
-		locator.getDriver().get("http://localhost:8080/colon3");
+		locator.getWebDriver().get("http://localhost:8080/colon3");
 		element = locator.locate("label");
 		assertNotNull(element);
 		assertEquals("span", element.getWebElement().getTagName().toLowerCase());
@@ -129,7 +129,7 @@ public class LabelElementLocatorTest {
 	
 	@Test 
 	public void findProposalLogLabel() {
-		locator.getDriver().get("http://localhost:8080/prop-log-lookup");
+		locator.getWebDriver().get("http://localhost:8080/prop-log-lookup");
 		Element element = locator.locate("Proposal Number");
 		assertNotNull(element);
 		assertEquals("label", element.getWebElement().getTagName().toLowerCase());
@@ -138,7 +138,7 @@ public class LabelElementLocatorTest {
 	
 	@Test 
 	public void findProposalLogLabelInFrame() {
-		locator.getDriver().get("http://localhost:8080/prop-log-lookup-frame");
+		locator.getWebDriver().get("http://localhost:8080/prop-log-lookup-frame");
 		Element element = locator.locate("Proposal Number");
 		assertNotNull(element);
 		assertEquals("label", element.getWebElement().getTagName().toLowerCase());
