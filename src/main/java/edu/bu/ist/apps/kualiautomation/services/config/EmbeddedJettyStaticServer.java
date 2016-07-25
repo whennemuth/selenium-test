@@ -33,7 +33,7 @@ public class EmbeddedJettyStaticServer {
 	
 	public void start(Map<String, String> handlers) throws Exception {
 		
-		loadHandlers("html/", handlers);
+		loadHandlers(null, handlers);
 		
         server = new Server(8080);
         try {
@@ -50,74 +50,146 @@ public class EmbeddedJettyStaticServer {
 		}
 	}
 
-	private void loadHandlers(String dir, Map<String, String> handlers) {
-		
-		for(String source : handlers.keySet()) {
-			String target = handlers.get(source);
+	private void loadHandlers(String rootUrl, Map<String, String> handlers) {
+		for(String subUrl : handlers.keySet()) {
 			
-			if(target == null)
-				target = source;
+			String resource = handlers.get(subUrl);
 			
-			if(dir != null) {
-				target = dir + target;
-				target = target.replaceAll("//", "/");
+			if(resource == null) {
+				resource = subUrl;
 			}
-// RESUME NEXT: This is not working, fix it.			
-			File parent = Utils.getClassPathResource(target);
-			if(parent.isDirectory()) {
-				Map<String, String> subhandlers = new HashMap<String, String>();
-				for(File child : parent.listFiles()) {
-					if(child.isDirectory()) {
-						subhandlers.put(target + "/" + child.getName(), null);
+			String rootResource = concatenateUrl("html/", resource);
+			
+			String url = concatenateUrl(rootUrl, subUrl);
+
+			File parent = Utils.getClassPathResource(rootResource);
+			
+			if(parent != null) {
+				if(parent.isDirectory()) {
+					Map<String, String> subhandlers = new HashMap<String, String>();
+					for(File child : parent.listFiles()) {
+						if(child.isDirectory()) {
+							String _url = concatenateUrl(resource, child.getName());
+							String _resource = _url;
+							subhandlers.put(_url, _resource);
+						}
+						else {
+							String _url = concatenateUrl(url, child.getName());
+							String _resource = concatenateUrl(rootResource, child.getName());
+							this.handlers.put(_url, _resource);
+						}
 					}
-					else {
-						this.handlers.put(parent.getName() + "/" + child.getName(), null);
-						System.out.println(parent.getName() + "/" + child.getName() + " = null");
+					if(!subhandlers.isEmpty()) {
+						loadHandlers(rootUrl, subhandlers);
 					}
 				}
-				if(!subhandlers.isEmpty()) {
-					loadHandlers(null, subhandlers);
+				else {
+					this.handlers.put(url, rootResource);
 				}
-			}
-			else {
-				this.handlers.put(source, target);
-				System.out.println(source + " = " + target);
 			}
 		}
 	}
 
+	private String concatenateUrl(String part1, String...remainingParts) {
+		StringBuilder s = new StringBuilder();
+		if(part1 != null) {
+			s.append(part1);
+		}
+		for(String part : remainingParts) {
+			if(!s.toString().isEmpty() && !s.toString().endsWith("/")) {
+				s.append("/");
+			}
+			s.append(part);
+		}
+		return s.toString().replaceAll("//", "/");
+	}
+	
 	private void addHandler() {
         server.setHandler(new AbstractHandler(){
 			@Override public void handle(
-					String target, 
+					String targetUrl, 
 					Request baseRequest, 
 					HttpServletRequest request, 
 					HttpServletResponse response) throws IOException, ServletException {
 				
 				response.setContentType("text/html; charset=utf-8");
 				response.setStatus(HttpServletResponse.SC_OK);
+				String domain = "http://localhost:8080/";
 				
 				PrintWriter out = response.getWriter();
-				String[] parts = target.split("/");
-				String page = parts[parts.length-1];
-				String source = handlers.get(page);
+				String subUrl = targetUrl.startsWith(domain) ? 
+						targetUrl.substring(domain.length()) : 
+						targetUrl;
+				String resource = tryHandlers(subUrl);
 				
-				if(source == null) {
-					System.out.println("No source found for: " + target);
+				if(resource == null) {
+					System.out.println("No source found for: " + targetUrl);
 				}
-				else if(!source.contains("<")) {
-					File f = Utils.getClassPathResource(source);
+				else if(!resource.contains("<")) {
+					File f = Utils.getClassPathResource(resource);
 					if(f.isDirectory()) {
 						System.out.println(f.getAbsolutePath());
 					}
-					// source is not raw html, but a reference to a classpath resource that contains html
-					source = Utils.getClassPathResourceContent(source);
+					// resource is not raw html, but a reference to a classpath resource that contains html
+					resource = Utils.getClassPathResourceContent(resource);
+					if(resource == null) {
+						System.out.println("could not find: " + targetUrl);
+					}
+					else {
+						System.out.println("found: " + targetUrl);
+					}
 				}
 				
-				out.print(source == null ? target : source);
+				if(targetUrl.endsWith(".css")) {
+					response.setContentType("text/css; charset=UTF-8");
+				}
+				if(targetUrl.endsWith(".js")) {
+					response.setContentType("text/javascript; charset=UTF-8");
+				}
+				if(targetUrl.endsWith(".gif")) {
+					response.setContentType("image/gif");
+				}
+				if(targetUrl.endsWith(".jpeg") || targetUrl.endsWith(".jpg")) {
+					response.setContentType("image/jpeg");
+				}
+				if(targetUrl.endsWith(".ico")) {
+					response.setContentType("image/ico");
+				}
+				out.print(resource == null ? targetUrl : resource);
 				out.flush();
 				baseRequest.setHandled(true);
 			}});
+	}
+	
+	/**
+	 * Try variations of url if handlers has no value for it when used as a key.
+	 * The variations come from adding and removing "/" characters from the beginning and end of url.
+	 * 
+	 * @param url
+	 * @return
+	 */
+	private String tryHandlers(String url) {
+		String resource = handlers.get(url);
+
+		if(resource == null && url.startsWith("/"))
+			resource = handlers.get(url.substring(1));
+
+		if(resource == null && url.endsWith("/"))
+			resource = handlers.get(url.substring(url.length()-1));
+		
+		if(resource == null && url.startsWith("/") && url.endsWith("/"))
+			resource = handlers.get(url.substring(1, url.length()-1));
+		
+		if(resource == null)
+			resource = handlers.get("/" + url);
+		
+		if(resource == null)
+			resource = handlers.get(url + "/");
+		
+		if(resource == null)
+			resource = handlers.get("/" + url + "/");
+			
+		return resource;
 	}
 	
 	public void stop() throws Exception {

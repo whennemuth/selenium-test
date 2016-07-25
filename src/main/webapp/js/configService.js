@@ -116,8 +116,6 @@ var configSvcFactory = function($http, $q, configCtrl) {
 						deferred.reject(invalid);
 						return deferred.promise;						
 					}
-deferred.reject('IS VALID!!!');
-return deferred.promise;
 
 					$http({
 						method: 'POST',

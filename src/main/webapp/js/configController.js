@@ -58,7 +58,15 @@ var configCtrlFactory = function(cycleCtrl) {
 			scope.setConfig = function(action) {
 				scope.action = action;
 				scope.config.currentEnvironment.current = true;
-// TODO: The new environment is saved, but the listbox should be refreshed so that it becomes the selected item. currentEnvironment might not be referring to the new environment. Fix this.
+				for(var env in scope.config.configEnvironments) {
+					if(env.name == scope.config.currentEnvironment.name) {
+						env.current = true;
+					}
+					else {
+						env.current = false;
+					}
+				}
+
 				if(action == 'save config') {
 					var msg = scope.getShortcutValidationMessages(scope.config); 
 					if(msg) {
@@ -97,7 +105,7 @@ var configCtrlFactory = function(cycleCtrl) {
 				var types = cycleSvc.getElementTypes();
 				var filtered = {};
 				for(var et in types) {
-					if(et == 'HYPERLINK' || et == 'HOTSPOT') {
+					if(et == 'HYPERLINK' || et == 'HOTSPOT' || et == 'BUTTON') {
 						filtered[et] = types[et];
 					}
 				}

@@ -25,7 +25,8 @@ public abstract class AbstractElementLocator implements Locator {
 	 * The find methods of the WebDriver will no longer return immediately with results but will instead inherit
 	 * the timeout of the WebDriverWait method.
 	 */
-	protected boolean busy = false; 
+	protected boolean busy; 
+	protected boolean skipFrameSearch;
 	
 	public AbstractElementLocator(WebDriver driver) {
 		this.driver = driver;
@@ -60,7 +61,7 @@ public abstract class AbstractElementLocator implements Locator {
 				webElements.addAll(defaults);
 			}
 			
-			if(webElements.isEmpty()) {
+			if(webElements.isEmpty() && !skipFrameSearch) {
 				// Check for frames and search those as well
 				WebDriverWait wait = new WebDriverWait(driver, 100);
 				List<WebElement> iframes = driver.findElements(By.tagName("iframe"));

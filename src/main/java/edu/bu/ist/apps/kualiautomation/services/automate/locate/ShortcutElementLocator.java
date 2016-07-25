@@ -3,41 +3,30 @@ package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 import java.util.List;
 
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
+import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
-public class ShortcutElementLocator implements Locator {
+public class ShortcutElementLocator  extends AbstractElementLocator {
 
-	private WebDriver driver;
+	private ConfigShortcut shortcut;
 	
-	public ShortcutElementLocator(WebDriver driver) {
-		this.driver = driver;
+	private ShortcutElementLocator() {
+		super(null); // Restrict the default constructor
+	}
+	
+	public ShortcutElementLocator(WebDriver driver, ConfigShortcut shortcut) {
+		super(driver);
+		this.shortcut = shortcut;
 	}
 
 	@Override
-	public Element locateFirst(ElementType elementType, List<String> parameters) {
-		// TODO Auto-generated method stub
+	protected List<WebElement> customLocate() {
+// RESUME NEXT:		
 		return null;
-	}
-
-	@Override
-	public List<Element> locateAll(ElementType elementType, List<String> parameters) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public WebDriver getDriver() {
-		// TODO Auto-generated method stub
-		return driver;
-	}
-
-	@Override
-	public boolean busy() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }
