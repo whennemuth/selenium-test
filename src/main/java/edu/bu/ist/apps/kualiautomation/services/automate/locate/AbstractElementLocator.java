@@ -158,5 +158,4 @@ public abstract class AbstractElementLocator implements Locator {
 	public WebDriver getWebDriver() {
 		return driver;
 	}
-	
 }

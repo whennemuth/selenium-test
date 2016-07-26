@@ -35,7 +35,7 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 			
 			// 1) A hyperlink will come up as a result of a more basic label search, so start there and filter later.
 			LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext);
-			List<Element> candidates = labelLocator.locateAll(elementType, Arrays.asList(new String[]{ innerText }));
+			List<Element> candidates = labelLocator.locateAll(null, Arrays.asList(new String[]{ innerText }));
 			List<WebElement> webElements = getWebElements(candidates);
 			
 			// 2) Separate the anchor tags from the other labels

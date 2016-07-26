@@ -123,9 +123,19 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 			if(parms.doWait()) {
 				parms.waitPatiently().until(webElementLocated(locators));
 			}
+			else {
+				// RESUME NEXT
+			}
 		}
 		else {
-			// RESUME NEXT: Write code here.
+			locators.add(new HotspotElementLocator(parms.getDriver(), parms.getSearchContext()));
+			locators.add(new BasicElementLocator(ElementType.BUTTON, parms.getDriver(), parms.getSearchContext()));
+			if(parms.doWait()) {
+				parms.waitPatiently().until(webElementLocated(locators));
+			}
+			else {
+				// TODO
+			}
 		}
 		
 		List<WebElement> webElements = new ArrayList<WebElement>(lastResults.size());

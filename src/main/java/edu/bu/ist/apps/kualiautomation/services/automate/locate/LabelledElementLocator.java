@@ -33,6 +33,11 @@ public class LabelledElementLocator extends AbstractElementLocator {
 		super(driver, searchContext);
 	}
 	
+	/**
+	 * Locate all WebElement instances that sufficiently match ElementType and parameters.
+	 * Treat the first parameter as a label. 
+	 * All remaining parameters will be considered values to test WebElement attributes against.
+	 */
 	@Override
 	protected List<WebElement> customLocate() {
 		List<WebElement> located = new ArrayList<WebElement>();

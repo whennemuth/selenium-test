@@ -43,8 +43,10 @@ public class HotspotElementLocator extends AbstractElementLocator {
 				List<Element> elements = locator1.locateAll(ElementType.HYPERLINK, parameters);
 				
 				if(elements.isEmpty()) {
-					BasicElementLocator locator2 = new BasicElementLocator(driver, searchContext);
-					elements = locator2.locateAll(ElementType.BUTTONIMAGE, parameters);
+					elements = (new BasicElementLocator(
+							ElementType.BUTTONIMAGE,
+							driver, 
+							searchContext)).locateAll(parameters);
 				}
 				
 				for(Element e : elements) {
