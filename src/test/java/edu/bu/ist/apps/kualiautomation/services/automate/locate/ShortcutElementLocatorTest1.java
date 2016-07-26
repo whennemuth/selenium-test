@@ -40,8 +40,6 @@ public class ShortcutElementLocatorTest1 {
 	private WebDriver driver;
 	private ShortcutElementLocator locator;
 
-	private @Mock ConfigShortcut shortcut;
-
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		
@@ -87,18 +85,28 @@ public class ShortcutElementLocatorTest1 {
 	}
 	
 	@Test
-	public void test() {
-		when(shortcut.getLabelHierarchyParts()).thenReturn(new String[]{});
-		when(shortcut.getElementType()).thenReturn(ElementType.HYPERLINK.name());
-		when(shortcut.isNavigates()).thenReturn(true);
-		when(shortcut.getIdentifier()).thenReturn(null);
+	public void test1() throws CloneNotSupportedException {
+		ConfigShortcut shortcut = new ConfigShortcut();
+		shortcut.setElementType(ElementType.HYPERLINK.name());
+		shortcut.setNavigates(true);
+		shortcut.setIdentifier(null);
+		shortcut.setLabelHierarchyParts(new String[]{
+			"headingA 1", "headingA 2", "headingA 3", "target 1"
+		});
 		
 		locator = new ShortcutElementLocator(driver, shortcut);
-		String url = "http://localhost:8080/shortcut-page1";
 		LocateResultAssertion asserter = new LocateResultAssertion(locator);
-		asserter.setUrl(url);
+		asserter.setUrl("http://localhost:8080/shortcut-page1");
 		asserter.setElementType(ElementType.HYPERLINK);
 		asserter.setNumResults(1);
+		asserter.findAndAssertElements();
+		
+// RESUME NEXT: Make this test work.		
+		shortcut.setLabelHierarchyParts(new String[]{
+				"headingA 1", "headingA 2", "headingA 3", "icon-plus"
+			});
+		locator = new ShortcutElementLocator(driver, shortcut);
+		asserter = new LocateResultAssertion(locator);
 		asserter.findAndAssertElements();
 	}
 

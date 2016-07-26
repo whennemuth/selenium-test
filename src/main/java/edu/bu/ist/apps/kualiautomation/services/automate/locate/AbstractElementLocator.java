@@ -55,7 +55,9 @@ public abstract class AbstractElementLocator implements Locator {
 		try {
 			busy = true;
 			defaultRan = false;
-			this.elementType = elementType;
+			if(elementType != null) {
+				this.elementType = elementType;
+			}
 			this.parameters = parameters;
 			final List<WebElement> webElements = new ArrayList<WebElement>();
 			results = new ArrayList<Element>();
@@ -138,9 +140,14 @@ public abstract class AbstractElementLocator implements Locator {
 		case TEXTAREA:
 		case SELECT:
 		case RADIO:
+		case HOTSPOT:
 		case OTHER:
 			candidates = elementType.findAll(searchContext);
 			results.addAll(Attribute.findForValues(candidates, parameters));
+			break;
+		case SHORTCUT:
+			break;
+		default:
 			break;
 		}
 		

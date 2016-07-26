@@ -2,17 +2,12 @@ package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
-import org.jgroups.tests.perf.UPerf.Results;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -20,20 +15,35 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
+/**
+ * Find a WebElement instance whose location has been described as part of a "hierarch". That is,
+ * the WebElement will exist within enclosing html that itself contains other labelling html. For
+ * example, a hierarchy might be "label1 > label2 > mylink", which would indicate a hyperlink having
+ * text "mylink" that exists inside html containing another element that has text  attribute "label2",
+ * that itself is likewise contained in another element that has the text or attribute "label1".
+ * 
+ * @author wrh
+ *
+ */
 public class ShortcutElementLocator  extends AbstractElementLocator {
 
 	private static final int TIMEOUT_SECONDS = 10;
 	private Parameters parms;
-	private List<Element> lastResults = new ArrayList<Element>();
+	private final List<Element> searchResults = new ArrayList<Element>();
 	
 	private ShortcutElementLocator() {
 		super(null); // Restrict the default constructor
 	}
 	
 	public ShortcutElementLocator(WebDriver driver, ConfigShortcut shortcut) {
+		this(driver, driver, shortcut);
+	}
+	
+	public ShortcutElementLocator(WebDriver driver, SearchContext searchContext, ConfigShortcut shortcut) {
 		super(driver);
 		parms = new Parameters();
 		parms.setDriver(driver);
+		parms.setSearchContext(searchContext);
 		parms.setShortcut(shortcut);
 	}
 	
@@ -48,7 +58,7 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 		try {
 			String node = parms.getShortcut().getLabelHierarchyParts()[0];
 			
-			results = find(node);
+			results = find(node, parms.doWait());
 			
 			if(!results.isEmpty()) {
 				if(results.size() == 1) {
@@ -99,9 +109,11 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 		}
 		
 		newparms.setDriver(parms.getDriver());
-		newparms.setSearchContext(webElmt);
+		WebElement parentElmt = webElmt.findElement(By.xpath("./.."));
+		newparms.setSearchContext(parentElmt);
 		newparms.setShortcut(getNestedShortcut());
 		ShortcutElementLocator locator = new ShortcutElementLocator(newparms);
+		locator.elementType = elementType;
 		return locator.customLocate();
 	}
 
@@ -113,36 +125,49 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 	 * @param heading
 	 * @return
 	 */
-	private List<WebElement> find(String heading) {
+	private List<WebElement> find(String heading, boolean wait) {
 		
-		List<Locator> locators = new ArrayList<Locator>();
-		if(parms.isHeader()) {
-			locators.add(new LabelElementLocator(parms.getDriver(), parms.getSearchContext()));
-			locators.add(new HotspotElementLocator(parms.getDriver(), parms.getSearchContext()));
-
-			if(parms.doWait()) {
-				parms.waitPatiently().until(webElementLocated(locators));
+		List<WebElement> webElements = new ArrayList<WebElement>();
+		
+		if(wait) {
+			parms.waitPatiently().until(webElementLocated(heading));
+			
+			for(Element elmt : searchResults) {
+				webElements.add(elmt.getWebElement());
 			}
-			else {
-				// RESUME NEXT
-			}
+			searchResults.clear();
 		}
 		else {
-			locators.add(new HotspotElementLocator(parms.getDriver(), parms.getSearchContext()));
-			locators.add(new BasicElementLocator(ElementType.BUTTON, parms.getDriver(), parms.getSearchContext()));
-			if(parms.doWait()) {
-				parms.waitPatiently().until(webElementLocated(locators));
+			List<String> searchparms = Arrays.asList(new String[]{ heading });
+			if(parms.isHeader()) {
+				
+				// 1) Assume heading is a label value and search accordingly
+				Locator locator = new LabelElementLocator(parms.getDriver(), parms.getSearchContext());
+				searchResults.addAll(locator.locateAll(elementType, searchparms));
+				
+				// 2) Assume that heading indicates an attribute value of a hotspot element and search accordingly
+				if(searchResults.isEmpty()) {
+					locator = new HotspotElementLocator(parms.getDriver(), parms.getSearchContext());
+					searchResults.addAll(locator.locateAll(elementType, searchparms));
+				}
 			}
 			else {
-				// TODO
+				
+				// 1) Assume heading is the text or attribute value for a hotspot
+				Locator locator = new HotspotElementLocator(parms.getDriver(), parms.getSearchContext());
+				searchResults.addAll(locator.locateAll(elementType, searchparms));
+				
+				// 2) Assume that we are looking for any other kind of element.
+				if(searchResults.isEmpty()) {
+					locator = new BasicElementLocator(parms.getDriver(), parms.getSearchContext());
+					searchResults.addAll(locator.locateAll(elementType, searchparms));
+				}
 			}
-		}
+			for(Element elmt : searchResults) {
+				webElements.add(elmt.getWebElement());
+			}
+		}	
 		
-		List<WebElement> webElements = new ArrayList<WebElement>(lastResults.size());
-		for(Element elmt : lastResults) {
-			webElements.add(elmt.getWebElement());
-		}
-		lastResults.clear();
 		return webElements;
 	}
 
@@ -162,20 +187,22 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 		return subshortcut;
 	}
 	
-	private ExpectedCondition<Boolean> webElementLocated(List<Locator> locators) {	
+	/**
+	 * This condition evaluates if one or more elements have been found as the result of a 
+	 * search by checking the list that stores the results for content. 
+	 * 
+	 * @param locators
+	 * @return
+	 */
+	private ExpectedCondition<Boolean> webElementLocated(final String heading) {	
 		ExpectedCondition<Boolean> condition = new ExpectedCondition<Boolean>() {			  
 			public Boolean apply(WebDriver drv) {
-				for(Locator locator : locators) {
-					lastResults = locator.locateAll(elementType, parameters);
-					if(lastResults.isEmpty()) {
-						continue;
-					}
-				}
-				return !lastResults.isEmpty();
+				find(heading, false);
+				return !searchResults.isEmpty();
 			}
 		};
 		return condition;
-	}
+	} 
 	
 	private static class Parameters {
 		private ConfigShortcut shortcut;

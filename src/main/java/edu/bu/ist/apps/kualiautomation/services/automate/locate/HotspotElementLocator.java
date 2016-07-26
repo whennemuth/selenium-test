@@ -22,9 +22,9 @@ public class HotspotElementLocator extends AbstractElementLocator {
 
 	/**
 	 * Locate a hotspot element by searching for elements of various clickable types in the following order:
-	 *    1) HOTSPOT (matches the ElementType.HOTSPOT regex)
-	 *    2) HYPERLINK (overlaps much of what a HOTSPOT search will do, with some extra functionality)
-	 *    3) BUTTONIMAGE (matches the ElementType.BUTTONIMAGE regex)
+	 *    1) HYPERLINK (matches the ElementType.HYPERLINK regex)
+	 *    2) BUTTONIMAGE (matches the ElementType.BUTTONIMAGE regex)
+	 *    3) HOTSPOT (overlaps much of what a the prior searches did, with some extra functionality)
 	 */
 	@Override
 	protected List<WebElement> customLocate() {
@@ -32,28 +32,22 @@ public class HotspotElementLocator extends AbstractElementLocator {
 		
 		if(elementType != null && elementType.getTagname() != null) {
 			
-			located.addAll(super.defaultLocate());
-
-			// If customLocate() fails then the upcoming default search will try to find fields. 
-			// Prevent this by indicating the default search has already run.
-			defaultRan = true;
+			HyperlinkElementLocator locator1 = new HyperlinkElementLocator(driver, searchContext);
+			List<Element> elements = locator1.locateAll(ElementType.HYPERLINK, parameters);
 			
-			if(located.isEmpty()) {
-				HyperlinkElementLocator locator1 = new HyperlinkElementLocator(driver, searchContext);
-				List<Element> elements = locator1.locateAll(ElementType.HYPERLINK, parameters);
-				
-				if(elements.isEmpty()) {
-					elements = (new BasicElementLocator(
-							ElementType.BUTTONIMAGE,
-							driver, 
-							searchContext)).locateAll(parameters);
-				}
-				
-				for(Element e : elements) {
-					located.add(e.getWebElement());
-				}
-			}		
-		}
+			if(elements.isEmpty()) {
+				elements = (new BasicElementLocator(
+						ElementType.BUTTONIMAGE,
+						driver, 
+						searchContext)).locateAll(parameters);
+			}
+			
+			for(Element e : elements) {
+				located.add(e.getWebElement());
+			}
+		}		
+		
+		// If located is empty, then the ElementType.HOTSPOT regex will be used to attempt the search
 		
 		return located;
 	}

@@ -139,12 +139,10 @@ public enum ElementType {
 	}
 
 	public List<WebElement> findAll(SearchContext ctx) {
-		List<WebElement> flds = ctx.findElements(By.xpath(getXpath(true)));
-		return flds;
-	}
-	
-	public List<WebElement> findFrom(WebElement element) {
-		List<WebElement> flds = element.findElements(By.xpath(getXpath(false)));
+		boolean global = true;
+		if(ctx instanceof WebElement)
+			global = false;
+		List<WebElement> flds = ctx.findElements(By.xpath(getXpath(global)));
 		return flds;
 	}
 	

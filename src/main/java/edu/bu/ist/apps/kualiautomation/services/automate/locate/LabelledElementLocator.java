@@ -67,7 +67,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	 */
 	private List<WebElement> getInputField(WebElement element, List<String> attributeValues) {
 
-		List<WebElement> flds = elementType.findFrom(element);
+		List<WebElement> flds = elementType.findAll(element);
 
 		if(flds.isEmpty()) {
 			// WebElement parent = getParentElement(element);
