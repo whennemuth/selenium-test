@@ -10,6 +10,12 @@ import org.openqa.selenium.WebElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
+/**
+ * Locate a hotspot element by searching for elements of various clickable types in the following order:
+ *    1) HYPERLINK (matches the ElementType.HYPERLINK regex)
+ *    2) BUTTONIMAGE (matches the ElementType.BUTTONIMAGE regex)
+ *    3) HOTSPOT (matches the ElementType.HOTSPOT regex, which overlaps much of what a the prior searches did, with some extra possibilities)
+ */
 public class HotspotElementLocator extends AbstractElementLocator {
 
 	public HotspotElementLocator(WebDriver driver) {
@@ -20,12 +26,6 @@ public class HotspotElementLocator extends AbstractElementLocator {
 		super(driver, searchContext);
 	}
 
-	/**
-	 * Locate a hotspot element by searching for elements of various clickable types in the following order:
-	 *    1) HYPERLINK (matches the ElementType.HYPERLINK regex)
-	 *    2) BUTTONIMAGE (matches the ElementType.BUTTONIMAGE regex)
-	 *    3) HOTSPOT (overlaps much of what a the prior searches did, with some extra functionality)
-	 */
 	@Override
 	protected List<WebElement> customLocate() {
 		List<WebElement> located = new ArrayList<WebElement>();

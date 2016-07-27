@@ -122,15 +122,15 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 	 * If clickable, click it and invoke a WebDriverWait assuming that the next element in the hierarchy may not
 	 * appear instantaneously.
 	 * 
-	 * @param heading
+	 * @param clue
 	 * @return
 	 */
-	private List<WebElement> find(String heading, boolean wait) {
+	private List<WebElement> find(String clue, boolean wait) {
 		
 		List<WebElement> webElements = new ArrayList<WebElement>();
 		
 		if(wait) {
-			parms.waitPatiently().until(webElementLocated(heading));
+			parms.waitPatiently().until(webElementLocated(clue));
 			
 			for(Element elmt : searchResults) {
 				webElements.add(elmt.getWebElement());
@@ -138,14 +138,14 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 			searchResults.clear();
 		}
 		else {
-			List<String> searchparms = Arrays.asList(new String[]{ heading });
+			List<String> searchparms = Arrays.asList(new String[]{ clue });
 			if(parms.isHeader()) {
 				
-				// 1) Assume heading is a label value and search accordingly
+				// 1) Assume clue is a heading label value and search accordingly
 				Locator locator = new LabelElementLocator(parms.getDriver(), parms.getSearchContext());
 				searchResults.addAll(locator.locateAll(elementType, searchparms));
 				
-				// 2) Assume that heading indicates an attribute value of a hotspot element and search accordingly
+				// 2) Assume clue indicates an attribute value of a heading hotspot element and search accordingly
 				if(searchResults.isEmpty()) {
 					locator = new HotspotElementLocator(parms.getDriver(), parms.getSearchContext());
 					searchResults.addAll(locator.locateAll(elementType, searchparms));
@@ -153,13 +153,19 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 			}
 			else {
 				
-				// 1) Assume heading is the text or attribute value for a hotspot
+				// 1) Assume clue is the text or attribute value for a hotspot
 				Locator locator = new HotspotElementLocator(parms.getDriver(), parms.getSearchContext());
 				searchResults.addAll(locator.locateAll(elementType, searchparms));
 				
 				// 2) Assume that we are looking for any other kind of element.
 				if(searchResults.isEmpty()) {
 					locator = new BasicElementLocator(parms.getDriver(), parms.getSearchContext());
+					searchResults.addAll(locator.locateAll(elementType, searchparms));
+				}
+				
+				// 3) Assume that clue can refer to the name of a class (CSS) or a member of a multi-valued class
+				if(searchResults.isEmpty()) {
+					locator = new ClassBasedElementLocator(parms.getDriver(), parms.getSearchContext());
 					searchResults.addAll(locator.locateAll(elementType, searchparms));
 				}
 			}
