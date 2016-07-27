@@ -58,7 +58,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 		List<WebElement> filtered = new ArrayList<WebElement>();
 		Integer shortest = null;
 		for(WebElement we : elements) {
-			String cleanedElementText = getCleanedValue(we.getText());
+			String cleanedElementText = getCleanedValue(getText(driver, we));
 			
 			if(cleanedElementText.toLowerCase().startsWith(cleanedLabel.toLowerCase())) {
 				if(shortest == null) {
@@ -75,7 +75,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 		
 		// Of the filtered matches, keep the shortest match(s).
 		for(WebElement we : filtered) {
-			String cleanedElementText = getCleanedValue(we.getText());
+			String cleanedElementText = getCleanedValue(getText(driver, we));
 			int len = cleanedElementText.length();
 			if(shortest.equals(len)) {
 				located.add(we);

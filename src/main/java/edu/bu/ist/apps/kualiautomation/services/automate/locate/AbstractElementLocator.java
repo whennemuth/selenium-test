@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -21,6 +22,7 @@ public abstract class AbstractElementLocator implements Locator {
 	protected WebDriver driver;
 	protected ElementType elementType;
 	protected List<String> parameters = new ArrayList<String>();
+	protected boolean skipParameterMatching;
 	protected boolean defaultRan;
 	/**
 	 * busy variable is queried to prevent repeated calls in case locator inside a WebDriverWait.until() method.
@@ -143,7 +145,12 @@ public abstract class AbstractElementLocator implements Locator {
 		case HOTSPOT:
 		case OTHER:
 			candidates = elementType.findAll(searchContext);
-			results.addAll(Attribute.findForValues(candidates, parameters));
+			if(skipParameterMatching) {
+				results.addAll(candidates);
+			}
+			else {
+				results.addAll(Attribute.findForValues(candidates, parameters));
+			}
 			break;
 		case SHORTCUT:
 			break;
@@ -155,6 +162,27 @@ public abstract class AbstractElementLocator implements Locator {
 		
 		return results;
 	}
+	
+	/**
+	 * WebElement.getText() will always return an empty string if the WebElement is not displayed,
+	 * even if it has innerText. This function gets the text regardless of the WebElements display status.
+	 *  
+	 * @param driver
+	 * @param we
+	 * @return
+	 */
+	public static String getText(WebDriver driver, WebElement we) {
+		if(we.isDisplayed()) {
+			return we.getText();
+		}
+		String txt = we.getAttribute("textContent");
+		
+		if(txt != null && !txt.trim().isEmpty())
+			return txt;
+		
+		txt = (String) ((JavascriptExecutor) driver).executeScript("return arguments[0].innerHTML", we);
+		return txt;
+	}
 
 	@Override
 	public SearchContext getSearchContext() {
@@ -165,4 +193,10 @@ public abstract class AbstractElementLocator implements Locator {
 	public WebDriver getWebDriver() {
 		return driver;
 	}
+
+	public void setSkipParameterMatching(boolean skipParameterMatching) {
+		this.skipParameterMatching = skipParameterMatching;
+	}
+	
+	
 }

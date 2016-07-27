@@ -170,7 +170,7 @@ public enum ElementType {
 				}
 			}
 		}
-		if(we.getTagName().equalsIgnoreCase("input")) {
+		if("input".equalsIgnoreCase(we.getTagName())) {
 			if("submit".equalsIgnoreCase(type)) {
 				return BUTTON;
 			}
@@ -178,7 +178,7 @@ public enum ElementType {
 				return TEXTBOX;	// The default type of input is text
 			}
 		}
-		if(we.getTagName().equalsIgnoreCase("button")) {
+		if("button".equalsIgnoreCase(we.getTagName())) {
 			return BUTTON;
 		}
 		return OTHER;

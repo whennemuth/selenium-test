@@ -58,7 +58,12 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 		try {
 			String node = parms.getShortcut().getLabelHierarchyParts()[0];
 			
-			results = find(node, parms.doWait());
+			results = find(node, parms.doWait());			
+				
+			results = removeUnqualified(results, "hidden");
+			
+			if(!parms.isHeader())
+				results = removeUnqualified(results, "disabled");
 			
 			if(!results.isEmpty()) {
 				if(results.size() == 1) {
@@ -67,11 +72,13 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 					}
 					return results;
 				}
-				else {
+				else if(parms.isHeader()) {
 					/**
 					 * There is more than one matching heading, but it may still be possible that only one
 					 * is part of a hierarchy that terminates at the sought WebElement. Explore down each
 					 * hierarchy and determine if this is so.
+					 * 
+					 * TODO: Make a Junit test that covers this scenario.
 					 */
 					List<WebElement> aggregateResults = new ArrayList<WebElement>();
 					for(WebElement result : results) {						
@@ -84,6 +91,33 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 		catch (Exception e) {
 			e.printStackTrace();
 			return new ArrayList<WebElement>();
+		}
+		
+		return results;
+	}
+	
+	/**
+	 * Hidden or disabled WebElements can be removed from the search results if necessary.
+	 *  
+	 * @param results
+	 * @param type
+	 * @return
+	 */
+	private List<WebElement> removeUnqualified(List<WebElement> results, String type) {
+		int initialSize = results.size();
+		for(WebElement wb : results) {
+			if("hidden".equalsIgnoreCase(type) && !wb.isDisplayed()) {
+				results.remove(wb);
+				break;
+			}
+			else if("disabled".equalsIgnoreCase(type) && !wb.isEnabled()) {
+				results.remove(wb);
+				break;
+			}
+		}
+		
+		if(results.size() < initialSize) {
+			return removeUnqualified(results, type);
 		}
 		
 		return results;
@@ -157,15 +191,15 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 				Locator locator = new HotspotElementLocator(parms.getDriver(), parms.getSearchContext());
 				searchResults.addAll(locator.locateAll(elementType, searchparms));
 				
-				// 2) Assume that we are looking for any other kind of element.
+				// 2) Assume that clue can refer to the name of a class (CSS) or a member of a multi-valued class
 				if(searchResults.isEmpty()) {
-					locator = new BasicElementLocator(parms.getDriver(), parms.getSearchContext());
+					locator = new ClassBasedElementLocator(parms.getDriver(), parms.getSearchContext());
 					searchResults.addAll(locator.locateAll(elementType, searchparms));
 				}
 				
-				// 3) Assume that clue can refer to the name of a class (CSS) or a member of a multi-valued class
+				// 3) Assume that we are looking for any other kind of element.
 				if(searchResults.isEmpty()) {
-					locator = new ClassBasedElementLocator(parms.getDriver(), parms.getSearchContext());
+					locator = new BasicElementLocator(parms.getDriver(), parms.getSearchContext());
 					searchResults.addAll(locator.locateAll(elementType, searchparms));
 				}
 			}

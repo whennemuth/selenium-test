@@ -42,11 +42,16 @@ public class LocateResultAssertion {
 		}
 		
 		List<Element> elements = locator.locateAll(elementType, attributeValues);
-		assertNotNull(elements);	
-		assertFalse(elements.isEmpty());
-		assertEquals(numResults, elements.size());
-		for(Element element : elements) {
-			assertElement(element);
+		assertNotNull(elements);
+		if(numResults <= 0 ) {
+			assertTrue(elements.isEmpty());
+		}
+		else {
+			assertFalse(elements.isEmpty());
+			assertEquals(numResults, elements.size());
+			for(Element element : elements) {
+				assertElement(element);
+			}
 		}
 		
 		return elements;
