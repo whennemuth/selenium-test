@@ -1,60 +1,28 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-
-import com.gargoylesoftware.htmlunit.BrowserVersion;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
-import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class HyperlinkElementLocatorTest {
-	
-	private static EmbeddedJettyStaticServer server;
-	private static Map<String, String> handlers = new HashMap<String, String>();
-	private static HyperlinkElementLocator locator;
+public class HyperlinkElementLocatorTest extends AbstractLocatorTest {
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		
+	private HyperlinkElementLocator locator;
+	
+	@Override
+	public void setupBefore() { 
+		locator = new HyperlinkElementLocator(driver);
+	}
+
+	@Override
+	public void loadHandlers(Map<String, String> handlers) {
 		handlers.put("hyperlink-page", "HyperlinkPage.htm");
 		handlers.put("prop-log-lookup", "ProposalLogLookup.htm");
 		handlers.put("prop-log-lookup-frame", "ProposalLogLookupFrame.htm");
-		
-		server = new EmbeddedJettyStaticServer();
-		server.start(handlers);
-		
-		setLocator(false);
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		server.stop();
-		locator.getWebDriver().quit();
-	}
-	
-	public static void setLocator(boolean specifyWindows) {			
-		if(specifyWindows) {
-			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-			capabilities.setCapability("version", "latest");
-			capabilities.setCapability("platform", Platform.WINDOWS);
-			capabilities.setCapability("name", "Testing Selenium");	
-			capabilities.setJavascriptEnabled(true);
-			locator = new HyperlinkElementLocator(new HtmlUnitDriver(capabilities)); 
-		}
-		else {
-			locator = new HyperlinkElementLocator(new HtmlUnitDriver(BrowserVersion.FIREFOX_38, false));
-		}
 	}
 
 	@Test

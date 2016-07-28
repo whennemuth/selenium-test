@@ -58,6 +58,12 @@ public class EmbeddedJettyStaticServer {
 			if(resource == null) {
 				resource = subUrl;
 			}
+			else if(resource.contains("<")) {
+				// resource raw html, not a reference to a classpath resource that contains html
+				this.handlers.put(subUrl, resource);
+				continue;
+			}
+
 			String rootResource = concatenateUrl("html/", resource);
 			
 			String url = concatenateUrl(rootUrl, subUrl);

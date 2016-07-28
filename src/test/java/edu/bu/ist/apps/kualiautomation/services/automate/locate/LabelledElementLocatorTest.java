@@ -1,57 +1,37 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-
-import com.gargoylesoftware.htmlunit.BrowserVersion;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
-import edu.bu.ist.apps.kualiautomation.services.automate.locate.LabelledElementLocator;
-import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 
-public class LabelledElementLocatorTest {
+public class LabelledElementLocatorTest extends AbstractLocatorTest {
 	
-	private static EmbeddedJettyStaticServer server;
-	private static Map<String, String> handlers = new HashMap<String, String>();
-	private static LabelledElementLocator locator;
+	private LabelledElementLocator locator;
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		
-		handlers.put("prop-log-lookup", "ProposalLogLookup.htm");
+	static {
+		javascriptEnabled = false;
+	}
+	
+	@Override
+	public void setupBefore() {
+		locator = new LabelledElementLocator(driver);
+	}
+
+	@Override
+	public void loadHandlers(Map<String, String> handlers) {
+		handlers.put("hello1", "<html><body><div>hello<div> hello </div></div><div><input type='text'></div></body></html>");
+		handlers.put("hello2", "<html><body><div> hello <div>hello</div></div><div><input type='text'></div></body></html>");
+		handlers.put("hello3", "<html><body><div> hello <div></div></div><div><input type='text'></div></body></html>");
+		handlers.put("similar1", "<html><body><div>matched similar<div> similarity </div></div><div><input type='text'></div></body></html>");
+		handlers.put("similar2", "<html><body><div> simila </div><div><input type='text'></div></body></html>");
+		handlers.put("quote", "<html><body><div> text with  single 'quote' </div></body></html>");
+		handlers.put("colon1", "<html><body><span> label: </span></body></html>");
+		handlers.put("colon2", "<html><body><span> :label </span></body></html>");
+		handlers.put("colon3", "<html><body><span> label : : </span></body></html>");
 		handlers.put("prop-log-lookup-frame", "ProposalLogLookupFrame.htm");
-		
-		server = new EmbeddedJettyStaticServer();
-		server.start(handlers);
-		
-		setLocator(false);
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		server.stop();
-		locator.getWebDriver().quit();
-	}
-	
-	public static void setLocator(boolean specifyWindows) {			
-		if(specifyWindows) {
-			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-			capabilities.setCapability("version", "latest");
-			capabilities.setCapability("platform", Platform.WINDOWS);
-			capabilities.setCapability("name", "Testing Selenium");	
-			capabilities.setJavascriptEnabled(true);
-			locator = new LabelledElementLocator(new HtmlUnitDriver(capabilities)); 
-		}
-		else {
-			locator = new LabelledElementLocator(new HtmlUnitDriver(BrowserVersion.FIREFOX_38, false));
-		}
+		handlers.put("prop-log-lookup", "ProposalLogLookup.htm");
 	}
 	
 	/**

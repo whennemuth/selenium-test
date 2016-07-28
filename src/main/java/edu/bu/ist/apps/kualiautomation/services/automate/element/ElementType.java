@@ -156,13 +156,13 @@ public enum ElementType {
 	
 	public static ElementType getInstance(WebElement we) {
 		String type = we.getAttribute("type");
-		if(we != null && we.getTagName() != null) {
+		if(we != null && !Utils.isEmpty(we.getTagName())) {
 			for(ElementType et : ElementType.values()) {
 				if(we.getTagName().equalsIgnoreCase(et.getTagname())) {
-					if(type == null && et.getTypeAttribute() == null) {
+					if(Utils.isEmpty(type) && Utils.isEmpty(et.getTypeAttribute())) {
 						return et;
 					}
-					if(type != null && et.getTypeAttribute() != null) {
+					if(!Utils.isEmpty(type) && !Utils.isEmpty(et.getTypeAttribute())) {
 						if(type.equalsIgnoreCase(et.getTypeAttribute())) {
 							return et;
 						}

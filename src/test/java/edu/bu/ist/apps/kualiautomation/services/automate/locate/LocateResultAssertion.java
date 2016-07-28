@@ -13,6 +13,7 @@ import java.util.Map;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.Locator;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 public class LocateResultAssertion {
 	private String url;
@@ -37,9 +38,8 @@ public class LocateResultAssertion {
 	 * @return
 	 */
 	public List<Element> findAndAssertElements() {
-		if(locator.getWebDriver().getCurrentUrl() == null || !locator.getWebDriver().getCurrentUrl().equalsIgnoreCase(url)) {
-			locator.getWebDriver().get(url);
-		}
+		
+		openWebPage();
 		
 		List<Element> elements = locator.locateAll(elementType, attributeValues);
 		assertNotNull(elements);
@@ -57,24 +57,30 @@ public class LocateResultAssertion {
 		return elements;
 	}
 	
+	public void openWebPage() {
+		if(locator.getWebDriver().getCurrentUrl() == null || !locator.getWebDriver().getCurrentUrl().equalsIgnoreCase(url)) {
+			locator.getWebDriver().get(url);
+		}
+	}
+	
 	/**
 	 * Make all the assertions in attributeAssertions against the provided element.
 	 * @param element
 	 */
 	private void assertElement(Element element) {
 		assertEquals(elementType.getTagname(), element.getWebElement().getTagName().toLowerCase());
-		assertTrue(areNullOrEqual(elementType.getTypeAttribute(), element.getWebElement().getAttribute("type")));
+		assertTrue(areEmptyOrEqual(elementType.getTypeAttribute(), element.getWebElement().getAttribute("type")));
 		for(String attributeName: attributeAssertions.keySet()) {
 			String assertValue = attributeAssertions.get(attributeName);
 			String actualValue = element.getWebElement().getAttribute(attributeName);
-			assertTrue(areNullOrEqual(assertValue, actualValue));
+			assertTrue(areEmptyOrEqual(assertValue, actualValue));
 		}
 	}
 	
-	private boolean areNullOrEqual(String val1, String val2) {
-		if(val1 == null && val2 == null)
+	private boolean areEmptyOrEqual(String val1, String val2) {
+		if(Utils.isEmpty(val1) && Utils.isEmpty(val2))
 			return true;
-		if(val1 == null || val2 == null)
+		if(Utils.isEmpty(val1) || Utils.isEmpty(val2))
 			return false;
 		return val1.equalsIgnoreCase(val2);
 	}

@@ -4,30 +4,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-
-import com.gargoylesoftware.htmlunit.BrowserVersion;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
-import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 
-public class LabelElementLocatorTest {
+public class LabelElementLocatorTest extends AbstractLocatorTest {
+
+	static {
+		javascriptEnabled = false;
+	}
 	
-	private static EmbeddedJettyStaticServer server;
-	private static Map<String, String> handlers = new HashMap<String, String>();
-	private static LabelElementLocator locator;
+	private LabelElementLocator locator;
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		
+	@Override
+	public void setupBefore() {
+		locator = new LabelElementLocator(driver);
+	}
+
+	@Override
+	public void loadHandlers(Map<String, String> handlers) {
 		handlers.put("hello1", "<html><body><div>hello<div> hello </div></div><div><input type='text'></div></body></html>");
 		handlers.put("hello2", "<html><body><div> hello <div>hello</div></div><div><input type='text'></div></body></html>");
 		handlers.put("hello3", "<html><body><div> hello <div></div></div><div><input type='text'></div></body></html>");
@@ -39,34 +36,6 @@ public class LabelElementLocatorTest {
 		handlers.put("colon3", "<html><body><span> label : : </span></body></html>");
 		handlers.put("prop-log-lookup-frame", "ProposalLogLookupFrame.htm");
 		handlers.put("prop-log-lookup", "ProposalLogLookup.htm");
-		
-		server = new EmbeddedJettyStaticServer();
-		server.start(handlers);
-		
-		setLocator(false);
-	}
-		
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		server.stop();
-		locator.getWebDriver().quit();
-	}
-		
-	public static void setLocator(boolean specifyWindows) {
-			
-		if(specifyWindows) {
-			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-			capabilities.setCapability("version", "latest");
-			capabilities.setCapability("platform", Platform.WINDOWS);
-			capabilities.setCapability("name", "Testing Selenium");	
-			capabilities.setJavascriptEnabled(true);
-			//locator = new LabelElementLocator(new HtmlUnitDriver(capabilities));
-			locator = new LabelElementLocator(new HtmlUnitDriver(capabilities));
-		}
-		else {
-			//locator = new LabelElementLocator(new HtmlUnitDriver(BrowserVersion.FIREFOX_38, false));
-			locator = new LabelElementLocator(new HtmlUnitDriver(BrowserVersion.FIREFOX_38, false));
-		}
 	}
 	
 	@Test

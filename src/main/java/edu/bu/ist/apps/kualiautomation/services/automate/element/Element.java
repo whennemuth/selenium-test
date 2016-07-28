@@ -15,4 +15,5 @@ public interface Element {
 	public void setValue(String value);
 	
 	public ElementType getElementType();
+	
 }

@@ -62,7 +62,7 @@ public class LocatorRunner {
 		case CHECKBOX:
 			break;
 		case HYPERLINK:
-			// TODO: write code here.
+			// RESUME NEXT: write code here.
 			break;
 		case TEXTBOX: case PASSWORD:
 			locator = new LabelledElementLocator(driver);

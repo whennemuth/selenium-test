@@ -16,15 +16,14 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
 /**
- * This provides content for unit tests that concern links that are to be located through the ShortcutElementLocator.
- * The tests focus on items that rely on parent elements to be clicked before becoming accessible.
+ * Test menu selection on the main kuali-research welcome page.
  * 
  * @author wrh
  *
  */
 @RunWith(MockitoJUnitRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class ShortcutElementLocatorTest2 extends AbstractLocatorTest {
+public class ShortcutElementLocatorTest4 extends AbstractLocatorTest {
 	
 	private ShortcutElementLocator locator;
 
@@ -33,7 +32,8 @@ public class ShortcutElementLocatorTest2 extends AbstractLocatorTest {
 
 	@Override
 	public void loadHandlers(Map<String, String> handlers) {
-		handlers.put("shortcut-page2", "ShortcutTestPage2.htm");
+		handlers.put("welcome-page", "welcome.htm");
+		handlers.put("welcome_files", "welcome_files");
 	}
 	
 	@Test
@@ -42,58 +42,65 @@ public class ShortcutElementLocatorTest2 extends AbstractLocatorTest {
 		LocateResultAssertion asserter = null;
 		List<Element> results = null;
 		
+		
+		// 1) RESEARCHER menu
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
 		shortcut.setLabelHierarchyParts(new String[] {
-			"headingA 1", "headingA 2", "headingA 3", "target 1"
+			"RESEARCHER", "IACUC Protocols", "Lists", "All My Schedules"
 		});		
 		locator = new ShortcutElementLocator(driver, shortcut);
 		asserter = new LocateResultAssertion(locator);
-		asserter.setUrl("http://localhost:8080/shortcut-page2");
+		asserter.setUrl("http://localhost:8080/welcome-page");
 		asserter.setElementType(ElementType.HYPERLINK);
 		asserter.setNumResults(1);
 		results = asserter.findAndAssertElements();
-		assertEquals("target 1", results.get(0).getWebElement().getText());		
-	}
-	
-	@Test
-	public void test2() {
-		ConfigShortcut shortcut = null;
-		LocateResultAssertion asserter = null;
-		List<Element> results = null;
+		assertEquals("All My Schedules", results.get(0).getWebElement().getText());	
 		
+		
+		// 2) UNIT menu
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
 		shortcut.setLabelHierarchyParts(new String[] {
-			"headingB 1", "headingB 2", "headingB 3", "icon-plus"
+			"unit", "Pre-submission compliance", "protocols", "animals", "icon-plus"
 		});		
 		locator = new ShortcutElementLocator(driver, shortcut);
 		asserter = new LocateResultAssertion(locator);
-		asserter.setUrl("http://localhost:8080/shortcut-page2");
+		asserter.setUrl("http://localhost:8080/welcome-page");
 		asserter.setElementType(ElementType.HOTSPOT);
 		asserter.setNumResults(1);
 		results = asserter.findAndAssertElements();
-		assertEquals("u10mjulv", results.get(0).getWebElement().getAttribute("id"));		
-	}
-	
-	@Test
-	public void test3() {
-		ConfigShortcut shortcut = null;
-		LocateResultAssertion asserter = null;
-		List<Element> results = null;
+		assertEquals("uhs1jvz", results.get(0).getWebElement().getAttribute("id"));
 		
+		
+		// 3) CENTRAL ADMIN menu
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
 		shortcut.setLabelHierarchyParts(new String[] {
-			"headingC 1", "headingC 2", "headingC 3", "icon-search"
+			"central admin", "pre-award", "proposal log", "icon-search"
 		});		
 		locator = new ShortcutElementLocator(driver, shortcut);
 		asserter = new LocateResultAssertion(locator);
-		asserter.setUrl("http://localhost:8080/shortcut-page2");
+		asserter.setUrl("http://localhost:8080/welcome-page");
 		asserter.setElementType(ElementType.HOTSPOT);
 		asserter.setNumResults(1);
 		results = asserter.findAndAssertElements();
-		assertEquals("u11mjulv", results.get(0).getWebElement().getAttribute("id"));		
+		assertEquals("u1qogous", results.get(0).getWebElement().getAttribute("id"));		
+		
+		
+		// 4) User dropdown menu
+		shortcut = new ConfigShortcut();
+		shortcut.setNavigates(true);
+		shortcut.setLabelHierarchyParts(new String[] {
+			"User: wrh", "preferences"
+		});		
+		locator = new ShortcutElementLocator(driver, shortcut);
+		asserter = new LocateResultAssertion(locator);
+		asserter.setUrl("http://localhost:8080/welcome-page");
+		asserter.setElementType(ElementType.HYPERLINK);
+		asserter.setNumResults(1);
+		results = asserter.findAndAssertElements();
+		assertEquals("u13jrel9", results.get(0).getWebElement().getAttribute("id"));		
+		
 	}
-
 }

@@ -6,12 +6,14 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
@@ -25,9 +27,10 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
  * @author wrh
  *
  */
-public class ShortcutElementLocator  extends AbstractElementLocator {
+public class ShortcutElementLocator extends AbstractElementLocator {
 
-	private static final int TIMEOUT_SECONDS = 10;
+	private static final int DEFAULT_TIMEOUT_SECONDS = 10;
+	private Integer timeoutSeconds;
 	private Parameters parms;
 	private final List<Element> searchResults = new ArrayList<Element>();
 	
@@ -58,12 +61,9 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 		try {
 			String node = parms.getShortcut().getLabelHierarchyParts()[0];
 			
-			results = find(node, parms.doWait());			
-				
-			results = removeUnqualified(results, "hidden");
+			results = find(node, parms.doWait());	
 			
-			if(!parms.isHeader())
-				results = removeUnqualified(results, "disabled");
+			removeUnqualified(results);
 			
 			if(!results.isEmpty()) {
 				if(results.size() == 1) {
@@ -77,8 +77,6 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 					 * There is more than one matching heading, but it may still be possible that only one
 					 * is part of a hierarchy that terminates at the sought WebElement. Explore down each
 					 * hierarchy and determine if this is so.
-					 * 
-					 * TODO: Make a Junit test that covers this scenario.
 					 */
 					List<WebElement> aggregateResults = new ArrayList<WebElement>();
 					for(WebElement result : results) {						
@@ -103,24 +101,27 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 	 * @param type
 	 * @return
 	 */
-	private List<WebElement> removeUnqualified(List<WebElement> results, String type) {
-		int initialSize = results.size();
-		for(WebElement wb : results) {
-			if("hidden".equalsIgnoreCase(type) && !wb.isDisplayed()) {
-				results.remove(wb);
-				break;
+	private <T> void removeUnqualified(List<T> results) {
+		List<T> temp = new ArrayList<T>();
+		
+		for(T elmt : results) {
+			Element tempElmt = null;
+			if(elmt instanceof Element) 
+				tempElmt = (Element) elmt;
+			else if(elmt instanceof WebElement) 
+				tempElmt = new BasicElement(driver, ((WebElement) elmt));
+
+			if(!tempElmt.isInteractive()) {
+				continue;
 			}
-			else if("disabled".equalsIgnoreCase(type) && !wb.isEnabled()) {
-				results.remove(wb);
-				break;
-			}
+			
+			temp.add(elmt);
 		}
 		
-		if(results.size() < initialSize) {
-			return removeUnqualified(results, type);
+		if(results.size() != temp.size()) {
+			results.clear();
+			results.addAll(temp);
 		}
-		
-		return results;
 	}
 	
 	/**
@@ -139,7 +140,7 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 		Parameters newparms = new Parameters();
 		if(etype.canNavigate()) {						
 			webElmt.click();
-			newparms.setWebDriverWait(new WebDriverWait(parms.getDriver(), TIMEOUT_SECONDS));
+			newparms.setWebDriverWait(new WebDriverWait(parms.getDriver(), getTimeoutSeconds()));
 		}
 		
 		newparms.setDriver(parms.getDriver());
@@ -147,6 +148,7 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 		newparms.setSearchContext(parentElmt);
 		newparms.setShortcut(getNestedShortcut());
 		ShortcutElementLocator locator = new ShortcutElementLocator(newparms);
+		locator.setTimeoutSeconds(getTimeoutSeconds());
 		locator.elementType = elementType;
 		return locator.customLocate();
 	}
@@ -164,7 +166,18 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 		List<WebElement> webElements = new ArrayList<WebElement>();
 		
 		if(wait) {
-			parms.waitPatiently().until(webElementLocated(clue));
+			try {
+				parms.waitPatiently().until(webElementLocated(clue));
+			} 
+			catch (TimeoutException e) {
+				/**
+				 * TODO: For every section whose header is a clickable item, the full timeout period will be
+				 * reached trying to find an element if that element does not exist. 
+				 * Figure out a way to determine if pending html content has arrived by other means than finding 
+				 * the expected element within that content.
+				 */
+				System.out.println(String.valueOf(getTimeoutSeconds()) + " second timeout reached trying to find \"" + clue + "\"");
+			}
 			
 			for(Element elmt : searchResults) {
 				webElements.add(elmt.getWebElement());
@@ -203,6 +216,7 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 					searchResults.addAll(locator.locateAll(elementType, searchparms));
 				}
 			}
+			
 			for(Element elmt : searchResults) {
 				webElements.add(elmt.getWebElement());
 			}
@@ -238,7 +252,20 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 		ExpectedCondition<Boolean> condition = new ExpectedCondition<Boolean>() {			  
 			public Boolean apply(WebDriver drv) {
 				find(heading, false);
-				return !searchResults.isEmpty();
+				boolean foundInteractive = false;
+				for(Element e : searchResults) {
+					if(e.isInteractive()) {
+						foundInteractive = true;
+					}
+				}
+				
+				/**
+				 * Found a matching element, so end the search, but don't let it get in to the 
+				 * search results if it is not qualified (hidden/disabled).
+				 */
+				removeUnqualified(searchResults);
+				
+				return foundInteractive;
 			}
 		};
 		return condition;
@@ -282,6 +309,14 @@ public class ShortcutElementLocator  extends AbstractElementLocator {
 		public boolean isHeader() {
 			return shortcut.getLabelHierarchyParts().length > 1;
 		}
+	}
+
+	public Integer getTimeoutSeconds() {
+		return timeoutSeconds == null ? DEFAULT_TIMEOUT_SECONDS : timeoutSeconds;
+	}
+
+	public void setTimeoutSeconds(Integer timeoutSeconds) {
+		this.timeoutSeconds = timeoutSeconds;
 	}
 	
 }
