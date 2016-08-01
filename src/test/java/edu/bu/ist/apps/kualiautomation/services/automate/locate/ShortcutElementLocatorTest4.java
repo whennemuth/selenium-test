@@ -11,6 +11,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import edu.bu.ist.apps.kualiautomation.AbstractJettyBasedTest;
+import edu.bu.ist.apps.kualiautomation.ElementsAssertion;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
@@ -23,7 +25,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
  */
 @RunWith(MockitoJUnitRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class ShortcutElementLocatorTest4 extends AbstractLocatorTest {
+public class ShortcutElementLocatorTest4 extends AbstractJettyBasedTest {
 	
 	private ShortcutElementLocator locator;
 
@@ -39,7 +41,7 @@ public class ShortcutElementLocatorTest4 extends AbstractLocatorTest {
 	@Test
 	public void test1() {
 		ConfigShortcut shortcut = null;
-		LocateResultAssertion asserter = null;
+		ElementsAssertion asserter = null;
 		List<Element> results = null;
 		
 		
@@ -50,7 +52,7 @@ public class ShortcutElementLocatorTest4 extends AbstractLocatorTest {
 			"RESEARCHER", "IACUC Protocols", "Lists", "All My Schedules"
 		});		
 		locator = new ShortcutElementLocator(driver, shortcut);
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/welcome-page");
 		asserter.setElementType(ElementType.HYPERLINK);
 		asserter.setNumResults(1);
@@ -65,7 +67,7 @@ public class ShortcutElementLocatorTest4 extends AbstractLocatorTest {
 			"unit", "Pre-submission compliance", "protocols", "animals", "icon-plus"
 		});		
 		locator = new ShortcutElementLocator(driver, shortcut);
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/welcome-page");
 		asserter.setElementType(ElementType.HOTSPOT);
 		asserter.setNumResults(1);
@@ -80,7 +82,7 @@ public class ShortcutElementLocatorTest4 extends AbstractLocatorTest {
 			"central admin", "pre-award", "proposal log", "icon-search"
 		});		
 		locator = new ShortcutElementLocator(driver, shortcut);
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/welcome-page");
 		asserter.setElementType(ElementType.HOTSPOT);
 		asserter.setNumResults(1);
@@ -95,7 +97,7 @@ public class ShortcutElementLocatorTest4 extends AbstractLocatorTest {
 			"User: wrh", "preferences"
 		});		
 		locator = new ShortcutElementLocator(driver, shortcut);
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/welcome-page");
 		asserter.setElementType(ElementType.HYPERLINK);
 		asserter.setNumResults(1);

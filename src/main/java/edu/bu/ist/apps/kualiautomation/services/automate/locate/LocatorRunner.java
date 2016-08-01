@@ -54,20 +54,14 @@ public class LocatorRunner {
 				BasicElementLocator.class // the label in LabelAndValue will be treated as an attribute of the sought element
 			});
 			break;
-		case CHECKBOX:
-			break;
 		case HYPERLINK:
 			elements = runBatch(new Class<?>[]{
 				HyperlinkElementLocator.class,
 				HotspotElementLocator.class
 			});
 			break;
-		case TEXTBOX: case PASSWORD: case TEXTAREA:
+		case TEXTBOX: case PASSWORD: case TEXTAREA: case SELECT: case RADIO: case CHECKBOX:
 			elements.addAll(locateElements(new LabelledElementLocator(driver)));
-			break;
-		case SELECT:
-			break;
-		case RADIO:
 			break;
 		case HOTSPOT:
 			elements.addAll(locateElements(new HotspotElementLocator(driver)));

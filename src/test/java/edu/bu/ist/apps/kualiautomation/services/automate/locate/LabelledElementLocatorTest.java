@@ -4,9 +4,11 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import edu.bu.ist.apps.kualiautomation.AbstractJettyBasedTest;
+import edu.bu.ist.apps.kualiautomation.ElementsAssertion;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
-public class LabelledElementLocatorTest extends AbstractLocatorTest {
+public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 	
 	private LabelledElementLocator locator;
 
@@ -57,14 +59,14 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 	}
 	public void findButtonImageByNearestLabel(String url) {
 		
-		LocateResultAssertion asserter = new LocateResultAssertion(locator);
+		ElementsAssertion asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Proposal Log Status");
 		asserter.setElementType(ElementType.BUTTONIMAGE);
 		asserter.setNumResults(2);
 		asserter.findAndAssertElements();
 
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Proposal Log Status");
 		asserter.addAttributeValue("Search Proposal Log Status");
@@ -81,7 +83,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 	}
 	public void findButtonImageByTitle(String url) {
 
-		LocateResultAssertion asserter = new LocateResultAssertion(locator);
+		ElementsAssertion asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.addAttributeValue("Search Proposal Log Status");
 		asserter.setElementType(ElementType.BUTTONIMAGE);
@@ -92,7 +94,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 	
 	private void findFields(String url) {
 		
-		LocateResultAssertion asserter = new LocateResultAssertion(locator);
+		ElementsAssertion asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Proposal Number");
 		asserter.setElementType(ElementType.TEXTBOX);
@@ -100,7 +102,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("id", "proposalNumber");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Proposal Log Type");
 		asserter.setElementType(ElementType.SELECT);
@@ -109,7 +111,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("name", "proposalLogTypeCode");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Proposal Log Status");
 		asserter.setElementType(ElementType.SELECT);
@@ -118,7 +120,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("name", "logstatus");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Proposal Merged With");
 		asserter.setElementType(ElementType.TEXTBOX);
@@ -127,7 +129,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("name", "mergedwith");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Created Institutional Proposal");
 		asserter.setElementType(ElementType.TEXTBOX);
@@ -135,7 +137,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("id", "instProposalNumber");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Proposal Type");
 		asserter.setElementType(ElementType.SELECT);
@@ -143,7 +145,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("id", "proposalTypeCode");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Title");
 		asserter.setElementType(ElementType.TEXTBOX);
@@ -151,7 +153,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("id", "title");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Principal Investigator (Employee)");
 		asserter.setElementType(ElementType.TEXTBOX);
@@ -159,7 +161,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("id", "person.username");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Principal Investigator (Non-Employee)");
 		asserter.setElementType(ElementType.TEXTBOX);
@@ -167,7 +169,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("id", "rolodexId");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Lead Unit");
 		asserter.setElementType(ElementType.TEXTBOX);
@@ -175,7 +177,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("id", "leadunit");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Sponsor");
 		asserter.setElementType(ElementType.TEXTBOX);
@@ -183,7 +185,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("id", "sponsorcode");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Sponsor Name");
 		asserter.setElementType(ElementType.TEXTBOX);
@@ -191,7 +193,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("id", "sponsorname");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Comments");
 		asserter.setElementType(ElementType.TEXTBOX);
@@ -199,7 +201,7 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("id", "comments");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Deadline Date From");
 		asserter.setElementType(ElementType.TEXTBOX);
@@ -207,12 +209,22 @@ public class LabelledElementLocatorTest extends AbstractLocatorTest {
 		asserter.addAttributeAssertion("id", "rangeLowerBoundKeyPrefix_deadlineDate");
 		asserter.findAndAssertElements();
 		
-		asserter = new LocateResultAssertion(locator);
+		asserter = new ElementsAssertion(locator);
 		asserter.setUrl(url);
 		asserter.setLabel("Deadline Date To");
 		asserter.setElementType(ElementType.TEXTBOX);
 		asserter.setNumResults(1);
 		asserter.addAttributeAssertion("id", "deadlinedate");
 		asserter.findAndAssertElements();
+		
+		asserter = new ElementsAssertion(locator);
+		asserter.setUrl(url);
+		asserter.setLabel("Principal Investigator (Employee)");
+		asserter.setElementType(ElementType.TEXTBOX);
+		asserter.setNumResults(1);
+		asserter.addAttributeAssertion("id", "person.userName");
+		asserter.findAndAssertElements();
+		
+		
 	}
 }

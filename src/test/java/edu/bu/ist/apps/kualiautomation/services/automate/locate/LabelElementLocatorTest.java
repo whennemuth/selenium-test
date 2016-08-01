@@ -8,9 +8,10 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import edu.bu.ist.apps.kualiautomation.AbstractJettyBasedTest;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 
-public class LabelElementLocatorTest extends AbstractLocatorTest {
+public class LabelElementLocatorTest extends AbstractJettyBasedTest {
 
 	static {
 		javascriptEnabled = false;

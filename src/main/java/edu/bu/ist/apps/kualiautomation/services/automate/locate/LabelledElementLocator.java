@@ -13,6 +13,8 @@ import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Attribute;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**
  * With a specified WebElement that serves as a label, traverse up the DOM one element at a time until
@@ -49,9 +51,12 @@ public class LabelledElementLocator extends AbstractElementLocator {
 				attributeValues = parameters.subList(1, parameters.size());
 			}
 			LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext);
-			List<Element> candidates = labelLocator.locateAll(elementType, Arrays.asList(new String[]{label}));
-			for(Element labelElement : candidates) {
-				List<WebElement> flds = getInputField(labelElement.getWebElement(), attributeValues);
+			List<Element> labelElements = labelLocator.locateAll(elementType, Arrays.asList(new String[]{label}));
+			for(Element labelElement : labelElements) {
+				List<WebElement> flds = tryTraditionalLabelSearchMethod(labelElement.getWebElement(), attributeValues);
+				if(flds.isEmpty()) {
+					flds = trySearchingOutwardFromLabel(labelElement.getWebElement(), attributeValues);
+				}
 				located.addAll(flds);
 			}
 		}
@@ -60,39 +65,62 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	}
 
 	/**
-	 * Recurse up the DOM from the provided elements parent until the sought element is found, or the root node is reached.
+	 * The label might be a <label> html element with a for attribute, in which case the search for the element
+	 * should be easy.
 	 * 
-	 * @param element
+	 * @param labelElement
+	 * @param attributeValues
 	 * @return
 	 */
-	private List<WebElement> getInputField(WebElement element, List<String> attributeValues) {
+	private List<WebElement> tryTraditionalLabelSearchMethod(WebElement labelElement, List<String> attributeValues) {
+		List<WebElement> flds = new ArrayList<WebElement>();
+		if("label".equals(labelElement.getTagName())) {
+			String id = labelElement.getAttribute("for");
+			if(!Utils.isEmpty(id)) {
+				List<WebElement> temp = driver.findElements(By.id(id));
+				for(WebElement candidate : temp) {
+					if(ElementType.getInstance(candidate).equals(elementType)) {
+						flds.add(candidate);
+					}
+				}
+			}
+		}
+		return flds;
+	}
+	/**
+	 * Recurse up the DOM from the provided elements parent until the sought element is found, or the root node is reached.
+	 * 
+	 * @param labelElement
+	 * @return
+	 */
+	private List<WebElement> trySearchingOutwardFromLabel(WebElement labelElement, List<String> attributeValues) {
 
-		List<WebElement> flds = elementType.findAll(element);
+		List<WebElement> candidates = elementType.findAll(labelElement);
 
-		if(flds.isEmpty()) {
+		if(candidates.isEmpty()) {
 			// WebElement parent = getParentElement(element);
 			WebElement parent = null;
 			try {
-				parent = element.findElement(By.xpath("./.."));
+				parent = labelElement.findElement(By.xpath("./.."));
 			} 
 			catch (InvalidSelectorException e) {
 				// Runtime exception thrown when you are at the top of the DOM and try to select higher.
 				// An instance of com.gargoylesoftware.htmlunit.html.HtmlPage is returned, which triggers the exception.
-				return flds;
+				return candidates;
 			}
 			if(parent != null) {
-				return getInputField(parent, attributeValues);
+				return trySearchingOutwardFromLabel(parent, attributeValues);
 			}
-			return flds;
+			return candidates;
 		}
 		else {
 			if(attributeValues.isEmpty()) {
-				return flds;
+				return candidates;
 			}
 			else {
 				// If parameters are present beyond the first, they are attribute values, so pick only 
 				// those webElements that have every attributeValue accounted for among their attributes.
-				List<WebElement> filtered = Attribute.findForValues(flds, attributeValues);
+				List<WebElement> filtered = Attribute.findForValues(candidates, attributeValues);
 				return filtered;
 			}
 		}

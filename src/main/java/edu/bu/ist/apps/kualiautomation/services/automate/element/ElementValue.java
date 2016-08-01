@@ -30,15 +30,45 @@ public class ElementValue {
 			element.setValue(lv.getValue());
 		}
 		else {
-			element.click();
-			if(navigate && element.getElementType().canNavigate()) {
-				wait.until(arrivedAtNextPage());	
+			boolean click = false;
+			if(element.getElementType().isCheckable()) {
+				if(shouldCheck()) {
+					click = true;
+				}
+			}
+			else {
+				click = true;
+			}
+
+			if(click) {
+				
+				element.click();
+				
+				if(navigate && element.getElementType().canNavigate()) {
+					wait.until(arrivedAtNextPage());	
+				}
 			}
 		}
 		
 		return true;
 	}
 	
+	private boolean shouldCheck() {
+		if(wantChecked() && !isChecked())
+			return true;
+		if(!wantChecked() && isChecked())
+			return true;
+		return false;
+	}
+	
+	private boolean isChecked() {
+		return "true".equalsIgnoreCase(element.getWebElement().getAttribute("checked"));
+	}
+
+	private boolean wantChecked() {
+		return "true".equalsIgnoreCase(lv.getValue());
+	}
+
 	public boolean isNavigation() {
 		return navigation;
 	}

@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.locate;
+package edu.bu.ist.apps.kualiautomation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,7 +15,14 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.Locator;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
-public class LocateResultAssertion {
+/**
+ * This class performs the typical tests you would want to make against elements gathered using a locator
+ * or any other means.
+ * 
+ * @author wrh
+ *
+ */
+public class ElementsAssertion {
 	private String url;
 	private ElementType elementType;
 	private int numResults;
@@ -25,9 +32,9 @@ public class LocateResultAssertion {
 	private Locator locator;
 	
 	@SuppressWarnings("unused")
-	private LocateResultAssertion() { /* Restrict default constructor */ }
+	private ElementsAssertion() { /* Restrict default constructor */ }
 	
-	public LocateResultAssertion(Locator locator) {
+	public ElementsAssertion(Locator locator) {
 		this.locator = locator;
 	}
 	
@@ -42,6 +49,11 @@ public class LocateResultAssertion {
 		openWebPage();
 		
 		List<Element> elements = locator.locateAll(elementType, attributeValues);
+		
+		return elements;
+	}
+	
+	public void assertElements(List<Element> elements) {
 		assertNotNull(elements);
 		if(numResults <= 0 ) {
 			assertTrue(elements.isEmpty());
@@ -53,8 +65,6 @@ public class LocateResultAssertion {
 				assertElement(element);
 			}
 		}
-		
-		return elements;
 	}
 	
 	public void openWebPage() {

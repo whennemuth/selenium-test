@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.locate;
+package edu.bu.ist.apps.kualiautomation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,6 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -17,7 +16,17 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 
 import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 
-public abstract class AbstractLocatorTest {
+/**
+ * All test classes that extend this class can access a website run by this class and whose web pages 
+ * those test classes define, either by configuring this class with static html or a classpath reference
+ * to a file that contains html and a URL. 
+ * This class will start a Jetty web server upon execution of the first test (and keep it running for
+ * all subsequent tests) and serve up those web pages.
+ * 
+ * @author wrh
+ *
+ */
+public abstract class AbstractJettyBasedTest {
 	
 	private static Map<String, String> handlers = new HashMap<String, String>();	
 	private static EmbeddedJettyStaticServer server;
