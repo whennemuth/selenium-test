@@ -16,8 +16,8 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
 /**
- * This locator works by trying the of one or more other locators and returning their output. 
- * It returns search results for the element by invoking other Locator implementations and returning the aggregate results.
+ * This locator finds web elements by delegating to one or more other locators and returning their output. 
+ * This is done by invoking other Locator implementations and returning the aggregate results (with duplicates removed).
  * The other implementations are indicated by class name and invoked through reflection.
  * 
  * @author wrh
@@ -113,9 +113,9 @@ public class BatchElementLocator implements Locator {
 	}
 	
 	/**
-	 * Run the locator. If a locator is of type AbstractElementLocator, it will always run the default locate method 
+	 * Run the locator. If a locator is of type AbstractElementLocator, it will always run the default locate method for the elementType
 	 * unless flagged not to do so, therefore set the defaultRan boolean field to true after the first locator has run
-	 * so that subsequent locators in the batch do not also run this default location method.
+	 * so that subsequent locators in the batch do not also run this default location method for the same elementType.
 	 *  
 	 * @param locator
 	 * @param elementType

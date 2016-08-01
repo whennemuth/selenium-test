@@ -1,5 +1,6 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,47 +45,52 @@ public class LocatorRunner {
 	 */
 	public List<Element> run(boolean greedy) {
 		
-		List<Element> element = null;
+		List<Element> elements = new ArrayList<Element>();
 		
 		switch(lv.getElementTypeEnum()) {
-		case BUTTON:
-			element = runBatch(new Class<?>[]{
-				BasicElementLocator.class,
-				LabelledElementLocator.class
-			});
-			break;
-		case BUTTONIMAGE:
-			element = runBatch(new Class<?>[]{
-				BasicElementLocator.class,
-				LabelledElementLocator.class
+		case BUTTON: case BUTTONIMAGE:
+			elements = runBatch(new Class<?>[]{
+				LabelledElementLocator.class,
+				BasicElementLocator.class // the label in LabelAndValue will be treated as an attribute of the sought element
 			});
 			break;
 		case CHECKBOX:
 			break;
 		case HYPERLINK:
-			// RESUME NEXT: write code here.
+			elements = runBatch(new Class<?>[]{
+				HyperlinkElementLocator.class,
+				HotspotElementLocator.class
+			});
 			break;
-		case TEXTBOX: case PASSWORD:
-			locator = new LabelledElementLocator(driver);
-			element = locator.locateAll(lv.getElementTypeEnum(), Arrays.asList(new String[]{ lv.getLabel() }));
-			break;
-		case TEXTAREA:
+		case TEXTBOX: case PASSWORD: case TEXTAREA:
+			elements.addAll(locateElements(new LabelledElementLocator(driver)));
 			break;
 		case SELECT:
 			break;
 		case RADIO:
 			break;
-		case OTHER:
-			break;
 		case HOTSPOT:
+			elements.addAll(locateElements(new HotspotElementLocator(driver)));
 			break;
 		case SHORTCUT:
+			elements.addAll(locateElements(new ShortcutElementLocator(driver, lv.getConfigShortcut())));
+			break;
+		case OTHER:
+			elements = runBatch(new Class<?>[]{
+				LabelledElementLocator.class,
+				HotspotElementLocator.class,
+				(lv.getConfigShortcut() == null ? null : ShortcutElementLocator.class)
+			});
 			break;
 		default:
 			break;
 		}
 		
-		return element;
+		return elements;
+	}
+	
+	private List<Element> locateElements(Locator locator) {
+		return locator.locateAll(lv.getElementTypeEnum(), Arrays.asList(new String[]{ lv.getLabel() }));
 	}
 	
 	/**
@@ -99,6 +105,8 @@ public class LocatorRunner {
 		locator = new BatchElementLocator(driver);
 		String[] parameters = new String[classes.length];
 		for(int i=0; i<classes.length; i++) {
+			if(classes[i] == null)
+				continue;
 			StringBuilder s = new StringBuilder(classes[i].getName())
 				.append(BatchElementLocator.PARAMETER_DELIMITER)
 				.append(lv.getLabel());

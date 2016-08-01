@@ -173,7 +173,7 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 				/**
 				 * TODO: For every section whose header is a clickable item, the full timeout period will be
 				 * reached trying to find an element if that element does not exist. 
-				 * Figure out a way to determine if pending html content has arrived by other means than finding 
+				 * Figure out a way to determine if pending html content has fully arrived by other means than finding 
 				 * the expected element within that content.
 				 */
 				System.out.println(String.valueOf(getTimeoutSeconds()) + " second timeout reached trying to find \"" + clue + "\"");
