@@ -1,7 +1,10 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
+import java.util.List;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
@@ -57,6 +60,37 @@ public class BasicElement implements Element {
 	public void setValue(String value) {		
 		ElementValue ev = new ElementValue(driver, value);
 		ev.applyTo(this, false);
+	}
+
+	@Override
+	public String getValue() {
+		if(ElementType.SELECT.equals(elementType)) {
+			Select select = new Select(webElement);
+			List<WebElement> selected = select.getAllSelectedOptions();
+			if(selected.isEmpty()) {
+				return "";
+			}
+			else if(select.isMultiple()) {
+				StringBuilder s = new StringBuilder("");
+				for(WebElement option : selected) {
+					if(s.toString().isEmpty())
+						s.append(":");
+					if(!Utils.isEmpty(option.getAttribute("value"))) {
+						s.append(option.getAttribute("value"));
+					}
+				}
+				return s.toString();
+			}
+			else {
+				return selected.get(0).getAttribute("value");
+			}
+		}
+		else if(elementType.isCheckable()) {
+			return webElement.getAttribute("checked");
+		}
+		else {
+			return webElement.getAttribute("value");
+		}
 	}
 
 	@Override

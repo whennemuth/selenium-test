@@ -16,6 +16,7 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**
  * Find a WebElement instance whose location has been described as part of a "hierarch". That is,
@@ -136,7 +137,11 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 	 */
 	private List<WebElement> findNext(WebElement webElmt) throws Exception {
 		ElementType etype = ElementType.getInstance(webElmt);
-		
+
+		if(ElementType.HOTSPOT.equals(elementType)) {
+			// RESUME NEXT
+		}
+
 		Parameters newparms = new Parameters();
 		if(etype.canNavigate()) {						
 			webElmt.click();
@@ -307,6 +312,13 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 			return getWebDriverWait();
 		}
 		public boolean isHeader() {
+			if(ElementType.HOTSPOT.name().equals((shortcut.getElementType()))) {
+				if(!Utils.isEmpty(shortcut.getIdentifier())) {
+					// The last element in the hierarchy is not the element being sought.
+					// The element being sought will be found by trying to match an element against getIdentifier()
+					return shortcut.getLabelHierarchyParts().length >= 1;
+				}
+			}
 			return shortcut.getLabelHierarchyParts().length > 1;
 		}
 	}

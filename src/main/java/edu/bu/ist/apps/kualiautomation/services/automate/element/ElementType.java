@@ -188,6 +188,11 @@ public enum ElementType {
 				}
 			}
 		}
+		if("select".equalsIgnoreCase(we.getTagName())) {
+			if("select-one".equalsIgnoreCase(type) || "select-multiple".equalsIgnoreCase(type)){
+				return SELECT;
+			}
+		}
 		if("input".equalsIgnoreCase(we.getTagName())) {
 			if("submit".equalsIgnoreCase(type)) {
 				return BUTTON;

@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment.ConfigFieldSerializer;
 import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 
@@ -191,8 +192,10 @@ public class ConfigShortcut extends AbstractEntity implements Serializable, Clon
 		if(Utils.isEmpty(h) || h.trim().isEmpty() || h.trim().equals(LABEL_HIERARCHY_SEPARATOR.trim())) {
 			return new String[]{};
 		}
+		
 		return h.trim().split(LABEL_HIERARCHY_SEPARATOR_REGEX);
 	}
+	
 	/**
 	 * Flatten the labelHierarchyParts array into a string and set the persistable labelHierarchy field with it.
 	 * @param parts

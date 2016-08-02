@@ -30,6 +30,7 @@ public class ElementsAssertion {
 	private List<String> attributeValues = new ArrayList<String>();
 	private Map<String, String> attributeAssertions = new HashMap<String, String>();
 	private Locator locator;
+	private boolean webPageOpen;
 	
 	@SuppressWarnings("unused")
 	private ElementsAssertion() { /* Restrict default constructor */ }
@@ -68,8 +69,11 @@ public class ElementsAssertion {
 	}
 	
 	public void openWebPage() {
-		if(locator.getWebDriver().getCurrentUrl() == null || !locator.getWebDriver().getCurrentUrl().equalsIgnoreCase(url)) {
-			locator.getWebDriver().get(url);
+		if(!webPageOpen) {
+			if(locator.getWebDriver().getCurrentUrl() == null || !locator.getWebDriver().getCurrentUrl().equalsIgnoreCase(url)) {
+				locator.getWebDriver().get(url);
+				webPageOpen = true;
+			}
 		}
 	}
 	

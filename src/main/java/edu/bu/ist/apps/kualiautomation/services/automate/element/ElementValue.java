@@ -1,12 +1,11 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
-import java.util.List;
-
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class ElementValue {
@@ -19,7 +18,8 @@ public class ElementValue {
 	
 	public ElementValue(WebDriver driver, String value) {
 		this.driver = driver;
-		this.value = value;
+		if(value != null)
+			this.value = value.trim();
 		this.wait = new WebDriverWait(driver, 10);
 	}
 
@@ -40,10 +40,32 @@ public class ElementValue {
 			element.click();
 			break;
 		case SELECT:
-			List<WebElement> options = element.getWebElement().findElements(By.tagName("option"));
-			for(WebElement option : options) {
-				// RESUME NEXT:
+			Select select = new Select(element.getWebElement());
+			try {
+				select.selectByVisibleText(value);
+			} 
+			catch (NoSuchElementException e) {
+				try {
+					select.selectByValue(value);
+				} 
+				catch (NoSuchElementException e1) {
+					if(value.matches("\\d+")) {
+						try {
+							// Assume the user is not basing the index on zero, but one (so subtract one from it).
+							int idx = Integer.valueOf(value);
+							if(idx < 0) 
+								idx = 0;
+							if(idx > 0)
+								idx--;
+							select.selectByIndex(idx);
+						} 
+						catch (NoSuchElementException e2) {
+							// Do nothing. No matching option element can be found.
+						}
+					}
+				}
 			}
+			// TODO: Match by partial text?
 			break;
 		case SHORTCUT:
 			break;

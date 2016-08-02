@@ -46,25 +46,28 @@ public class ShortcutElementLocatorTest4 extends AbstractJettyBasedTest {
 		
 		
 		// 1) RESEARCHER menu
-		shortcut = new ConfigShortcut();
-		shortcut.setNavigates(true);
-		shortcut.setLabelHierarchyParts(new String[] {
-			"RESEARCHER", "IACUC Protocols", "Lists", "All My Schedules"
-		});		
-		locator = new ShortcutElementLocator(driver, shortcut);
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl("http://localhost:8080/welcome-page");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		results = asserter.findAndAssertElements();
-		assertEquals("All My Schedules", results.get(0).getWebElement().getText());	
+//		shortcut = new ConfigShortcut();
+//		shortcut.setNavigates(true);
+//		shortcut.setElementType(ElementType.HYPERLINK.name());
+//		shortcut.setLabelHierarchyParts(new String[] {
+//			"RESEARCHER", "IACUC Protocols", "Lists", "All My Schedules"
+//		});		
+//		locator = new ShortcutElementLocator(driver, shortcut);
+//		asserter = new ElementsAssertion(locator);
+//		asserter.setUrl("http://localhost:8080/welcome-page");
+//		asserter.setElementType(ElementType.HYPERLINK);
+//		asserter.setNumResults(1);
+//		results = asserter.findAndAssertElements();
+//		assertEquals("All My Schedules", results.get(0).getWebElement().getText());	
 		
 		
 		// 2) UNIT menu
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
+		shortcut.setIdentifier("icon-plus");
+		shortcut.setElementType(ElementType.HOTSPOT.name());
 		shortcut.setLabelHierarchyParts(new String[] {
-			"unit", "Pre-submission compliance", "protocols", "animals", "icon-plus"
+			"unit", "Pre-submission compliance", "protocols", "animals"
 		});		
 		locator = new ShortcutElementLocator(driver, shortcut);
 		asserter = new ElementsAssertion(locator);
@@ -78,6 +81,7 @@ public class ShortcutElementLocatorTest4 extends AbstractJettyBasedTest {
 		// 3) CENTRAL ADMIN menu
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
+		shortcut.setElementType(ElementType.HOTSPOT.name());
 		shortcut.setLabelHierarchyParts(new String[] {
 			"central admin", "pre-award", "proposal log", "icon-search"
 		});		
@@ -93,6 +97,7 @@ public class ShortcutElementLocatorTest4 extends AbstractJettyBasedTest {
 		// 4) User dropdown menu
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
+		shortcut.setElementType(ElementType.HYPERLINK.name());
 		shortcut.setLabelHierarchyParts(new String[] {
 			"User: wrh", "preferences"
 		});		

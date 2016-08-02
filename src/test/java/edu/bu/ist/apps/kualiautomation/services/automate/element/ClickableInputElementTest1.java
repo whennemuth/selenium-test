@@ -135,12 +135,37 @@ public class ClickableInputElementTest1 extends AbstractJettyBasedTest {
 
 	@Test
 	public void test3ClickSelectElement() {
+		
+		// 1) Test a select element that does not have a top blank value at the top
+		// ------------------------------------------------------------------------
+		// a) Assert the first option is selected in select1 if no action has been taken
 		Element select1 = findAndAssertElement("select-element-page1", 1, ElementType.SELECT);
-		assertEquals("val1", select1.getWebElement().getAttribute("value"));
+		assertEquals("val1", select1.getValue());		
+		// b) Select the second option by text and assert the value of the select element accordingly.
 		configureLabelAndValue(1, "my second value", ElementType.SELECT);
 		ev = new ElementValue(driver, lv.getValue());
 		ev.applyTo(select1, false);		
-		assertEquals("val2", select1.getWebElement().getAttribute("value"));
+		assertEquals("val2", select1.getValue());		
+		// c) Select the third option by text and assert the value of the select element accordingly.
+		configureLabelAndValue(1, "my third value", ElementType.SELECT);
+		ev = new ElementValue(driver, lv.getValue());
+		ev.applyTo(select1, false);		
+		assertEquals("val3", select1.getValue());		
+		// d) Select the second option by value and assert the value of the select element accordingly.
+		configureLabelAndValue(1, "val2", ElementType.SELECT);
+		ev = new ElementValue(driver, lv.getValue());
+		ev.applyTo(select1, false);		
+		assertEquals("val2", select1.getValue());		
+		// e) Select the third option by index and assert the value of the select element accordingly.
+		configureLabelAndValue(1, "3", ElementType.SELECT);
+		ev = new ElementValue(driver, lv.getValue());
+		ev.applyTo(select1, false);		
+		assertEquals("val3", select1.getValue());	
+		// f) Assert the prior value remains after attempt to select non-existing option
+		configureLabelAndValue(1, "bogus value", ElementType.SELECT);
+		ev = new ElementValue(driver, lv.getValue());
+		ev.applyTo(select1, false);		
+		assertEquals("val3", select1.getValue());	
 	}
 	
 }
