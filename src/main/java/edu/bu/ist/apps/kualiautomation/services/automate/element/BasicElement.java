@@ -6,10 +6,7 @@ import org.openqa.selenium.WebElement;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 public class BasicElement implements Element {
-	
-	public static final String CHECKED_REGEX = "(?!)(true)|(yes)|(on)|(checked)";
-	public static final String UNCHECKED_REGEX = "(?!)(false)|(no)|(off)|(unchecked)";
-	
+
 	private WebDriver driver;
 	private WebElement webElement;
 	private WebElement label;
@@ -57,40 +54,9 @@ public class BasicElement implements Element {
 	}
 
 	@Override
-	public void setValue(String value) {
-		switch(elementType) {
-		case TEXTAREA: case TEXTBOX: case PASSWORD:
-			webElement.sendKeys(value);
-			break;
-		case CHECKBOX: case RADIO:
-			String val = value.trim();
-			String checked = webElement.getAttribute("checked");
-			if(checked != null) {
-				if(val.matches(CHECKED_REGEX) && checked.matches(UNCHECKED_REGEX)) {
-					webElement.click();
-				}
-				else if(val.matches(UNCHECKED_REGEX) && checked.matches(CHECKED_REGEX)) {
-					webElement.click();
-				}
-			}
-			break;
-		case SELECT:
-			break;
-		case OTHER:
-			break;
-		case BUTTON:
-			break;
-		case BUTTONIMAGE:
-			break;
-		case HOTSPOT:
-			break;
-		case HYPERLINK:
-			break;
-		case SHORTCUT:
-			break;
-		default:
-			break;
-		}
+	public void setValue(String value) {		
+		ElementValue ev = new ElementValue(driver, value);
+		ev.applyTo(this, false);
 	}
 
 	@Override

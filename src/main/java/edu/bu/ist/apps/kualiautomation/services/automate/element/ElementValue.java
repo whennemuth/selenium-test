@@ -1,24 +1,25 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 
 public class ElementValue {
 
 	private WebDriver driver;
-	private LabelAndValue lv;
+	private String value;
 	private Element element;
 	private WebDriverWait wait;
 	private boolean navigation;
 	
-	public ElementValue(WebDriver driver, LabelAndValue lv) {
+	public ElementValue(WebDriver driver, String value) {
 		this.driver = driver;
-		this.lv = lv;
+		this.value = value;
 		this.wait = new WebDriverWait(driver, 10);
 	}
 
@@ -26,28 +27,32 @@ public class ElementValue {
 
 		this.element = element;
 		
-		if(element.getElementType().acceptsKeystrokes()) {
-			element.setValue(lv.getValue());
-		}
-		else {
-			boolean click = false;
-			if(element.getElementType().isCheckable()) {
-				if(shouldCheck()) {
-					click = true;
-				}
-			}
-			else {
-				click = true;
-			}
-
-			if(click) {
-				
+		switch(element.getElementType()) {
+		case TEXTBOX: case TEXTAREA: case PASSWORD:
+			element.getWebElement().sendKeys(value);
+			break;
+		case CHECKBOX: case RADIO:
+			if(shouldCheck()) {
 				element.click();
-				
-				if(navigate && element.getElementType().canNavigate()) {
-					wait.until(arrivedAtNextPage());	
-				}
 			}
+			break;
+		case BUTTON: case BUTTONIMAGE: case HOTSPOT: case HYPERLINK: case OTHER:
+			element.click();
+			break;
+		case SELECT:
+			List<WebElement> options = element.getWebElement().findElements(By.tagName("option"));
+			for(WebElement option : options) {
+				// RESUME NEXT:
+			}
+			break;
+		case SHORTCUT:
+			break;
+		default:
+			break;
+		}
+		
+		if(navigate && element.getElementType().canNavigate()) {
+			wait.until(arrivedAtNextPage());	
 		}
 		
 		return true;
@@ -66,7 +71,7 @@ public class ElementValue {
 	}
 
 	private boolean wantChecked() {
-		return "true".equalsIgnoreCase(lv.getValue());
+		return "true".equalsIgnoreCase(value);
 	}
 
 	public boolean isNavigation() {

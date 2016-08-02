@@ -93,7 +93,7 @@ public class CycleRunner {
 	 * @param elements
 	 */
 	private boolean applyElementValue(LabelAndValue lv, Element element) {
-		ElementValue val = new ElementValue(driver, lv);
+		ElementValue val = new ElementValue(driver, lv.getValue());
 		runlog.log(element, lv);
 		if(!val.applyTo(element, lv.isNavigates())) {
 			runlog.valueApplicationError(lv, element);
