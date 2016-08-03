@@ -75,15 +75,20 @@ public abstract class AbstractElementLocator implements Locator {
 			
 			if(webElements.isEmpty() && !skipFrameSearch) {
 				// Check for frames and search those as well
-				WebDriverWait wait = new WebDriverWait(driver, 100);
 				List<WebElement> iframes = searchContext.findElements(By.tagName("iframe"));
 				if(!iframes.isEmpty()) {
 					for(WebElement iframe : iframes) {
-						searchContext = wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
+						// (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOf(iframe));
+						(new WebDriverWait(driver, 5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
+// RESUME NEXT: Elements are not being found inside frame - was it "switched to"? (new proposal log page in pre-award)						
+						skipFrameSearch = true;
+						searchContext = driver;
 						List<Element> frameResults = locateAll(elementType, parameters);
 						results.addAll(frameResults);
 						if(frameResults.isEmpty()) {
 							driver.switchTo().defaultContent();
+							searchContext = driver;
+							skipFrameSearch = false;
 						}
 						else {
 							// Don't switch back to the parent window because you will not be able to use the WebElement as it would 

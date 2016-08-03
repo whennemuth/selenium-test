@@ -32,6 +32,7 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 	private static final int DEFAULT_TIMEOUT_SECONDS = 10;
 	private Integer timeoutSeconds;
 	private Parameters parms;
+	private ElementType targetElementType;
 	private final List<Element> searchResults = new ArrayList<Element>();
 	
 	private ShortcutElementLocator() {
@@ -48,11 +49,22 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 		parms.setDriver(driver);
 		parms.setSearchContext(searchContext);
 		parms.setShortcut(shortcut);
+		setTargetElementType();
 	}
 	
 	public ShortcutElementLocator(Parameters parms) {
 		super(parms.getDriver());
 		this.parms = parms;
+		setTargetElementType();
+	}
+	
+	private void setTargetElementType() {
+		if(parms.getShortcut() == null || parms.getShortcut().getElementType() == null) {
+			targetElementType = ElementType.HOTSPOT;
+		}
+		else {
+			targetElementType = ElementType.valueOf(parms.getShortcut().getElementType());
+		}
 	}
 
 	@Override
@@ -119,7 +131,7 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 		newparms.setShortcut(getNestedShortcut());
 		ShortcutElementLocator locator = new ShortcutElementLocator(newparms);
 		locator.setTimeoutSeconds(getTimeoutSeconds());
-		locator.elementType = elementType;
+		locator.elementType = targetElementType;
 		return locator.customLocate();
 	}
 
@@ -160,30 +172,30 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 				
 				// 1) Assume clue is the text or attribute value for a hotspot
 				Locator locator = new HotspotElementLocator(parms.getDriver(), parms.getSearchContext());
-				searchResults.addAll(locator.locateAll(elementType, searchparms));
+				searchResults.addAll(locator.locateAll(targetElementType, searchparms));
 				
 				// 2) Assume that clue can refer to the name of a class (CSS) or a member of a multi-valued class
 				if(searchResults.isEmpty()) {
 					locator = new ClassBasedElementLocator(parms.getDriver(), parms.getSearchContext());
-					searchResults.addAll(locator.locateAll(elementType, searchparms));
+					searchResults.addAll(locator.locateAll(targetElementType, searchparms));
 				}
 				
 				// 3) Assume that we are looking for any other kind of element.
 				if(searchResults.isEmpty()) {
 					locator = new BasicElementLocator(parms.getDriver(), parms.getSearchContext());
-					searchResults.addAll(locator.locateAll(elementType, searchparms));
+					searchResults.addAll(locator.locateAll(targetElementType, searchparms));
 				}
 			}
 			else {
 				
 				// 1) Assume clue is a heading label value and search accordingly
 				Locator locator = new LabelElementLocator(parms.getDriver(), parms.getSearchContext());
-				searchResults.addAll(locator.locateAll(elementType, searchparms));
+				searchResults.addAll(locator.locateAll(targetElementType, searchparms));
 				
 				// 2) Assume clue indicates an attribute value of a heading hotspot element and search accordingly
 				if(searchResults.isEmpty()) {
 					locator = new HotspotElementLocator(parms.getDriver(), parms.getSearchContext());
-					searchResults.addAll(locator.locateAll(elementType, searchparms));
+					searchResults.addAll(locator.locateAll(targetElementType, searchparms));
 				}
 			}
 			
@@ -260,7 +272,7 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 	}
 	
 	private boolean isHotspot() {
-		return ElementType.HOTSPOT.equals(elementType);
+		return ElementType.HOTSPOT.name().equals(parms.getShortcut().getElementType());
 	}
 	
 	/**

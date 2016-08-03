@@ -44,6 +44,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		// 1)
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
+		shortcut.setElementType(ElementType.HYPERLINK.name());
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingA 1", "headingA 2", "headingA 3", "target 1"
 		});		
@@ -58,6 +59,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		// 2)
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
+		shortcut.setElementType(ElementType.HOTSPOT.name());
 		shortcut.setIdentifier("icon-plus");
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingA 1", "headingA 2", "headingA 3"
@@ -73,6 +75,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		// 3)
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
+		shortcut.setElementType(ElementType.HOTSPOT.name());
 		shortcut.setIdentifier("icon-search");
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingA 1", "headingA 2", "headingA 3"
@@ -88,6 +91,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		// 4)
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
+		shortcut.setElementType(ElementType.HOTSPOT.name());
 		shortcut.setIdentifier("uif-actionLink");
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingA 1", "headingA 2", "headingA 3"
@@ -111,6 +115,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
 		shortcut.setIdentifier(null);
+		shortcut.setElementType(ElementType.BUTTON.name());
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingB 1", "headingB 2", "headingB 3", "target 2"
 		});		
@@ -126,6 +131,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
 		shortcut.setIdentifier(null);
+		shortcut.setElementType(ElementType.BUTTON.name());
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingB 1", "headingB 2", "headingB 3", "icon-plus"
 		});		
@@ -141,6 +147,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
 		shortcut.setIdentifier(null);
+		shortcut.setElementType(ElementType.BUTTON.name());
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingB 1", "headingB 2", "headingB 3", "u10mjulv"
 		});		
@@ -163,6 +170,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
 		shortcut.setIdentifier(null);
+		shortcut.setElementType(ElementType.HYPERLINK.name());
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingC 1", "headingC 2", "headingC 3", "target 3"
 		});		
@@ -176,6 +184,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		// 2)
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
+		shortcut.setElementType(ElementType.HOTSPOT.name());
 		shortcut.setIdentifier("icon-plus");
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingC 1", "headingC 2", "headingC 3"
@@ -198,6 +207,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
 		shortcut.setIdentifier(null);
+		shortcut.setElementType(ElementType.BUTTON.name());
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingD 1", "headingD 2", "headingD 3", "target 4"
 		});	
@@ -211,6 +221,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		// 2)
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
+		shortcut.setElementType(ElementType.HOTSPOT.name());
 		shortcut.setIdentifier("icon-plus");
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingD 1", "headingD 2", "headingD 3"
