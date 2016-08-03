@@ -16,7 +16,6 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
-import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**
  * Find a WebElement instance whose location has been described as part of a "hierarch". That is,
@@ -68,12 +67,12 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 			
 			if(!results.isEmpty()) {
 				if(results.size() == 1) {
-					if(parms.isHeader()) {
+					if(!parms.isEndOfHierarchy()) {
 						return findNext(results.get(0));
 					}
 					return results;
 				}
-				else if(parms.isHeader()) {
+				else if(!parms.isEndOfHierarchy()) {
 					/**
 					 * There is more than one matching heading, but it may still be possible that only one
 					 * is part of a hierarchy that terminates at the sought WebElement. Explore down each
@@ -96,36 +95,6 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 	}
 	
 	/**
-	 * Hidden or disabled WebElements can be removed from the search results if necessary.
-	 *  
-	 * @param results
-	 * @param type
-	 * @return
-	 */
-	private <T> void removeUnqualified(List<T> results) {
-		List<T> temp = new ArrayList<T>();
-		
-		for(T elmt : results) {
-			Element tempElmt = null;
-			if(elmt instanceof Element) 
-				tempElmt = (Element) elmt;
-			else if(elmt instanceof WebElement) 
-				tempElmt = new BasicElement(driver, ((WebElement) elmt));
-
-			if(!tempElmt.isInteractive()) {
-				continue;
-			}
-			
-			temp.add(elmt);
-		}
-		
-		if(results.size() != temp.size()) {
-			results.clear();
-			results.addAll(temp);
-		}
-	}
-	
-	/**
 	 * This function performs another call to customLocate(), but with the top level of 
 	 * getShortcut.getLabelHierarchyParts() popped off the start. Effectively, this repeats
 	 * the search for the target element incrementally restarted one level deeper into the html element 
@@ -137,12 +106,8 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 	 */
 	private List<WebElement> findNext(WebElement webElmt) throws Exception {
 		ElementType etype = ElementType.getInstance(webElmt);
-
-		if(ElementType.HOTSPOT.equals(elementType)) {
-			// RESUME NEXT
-		}
-
 		Parameters newparms = new Parameters();
+		
 		if(etype.canNavigate()) {						
 			webElmt.click();
 			newparms.setWebDriverWait(new WebDriverWait(parms.getDriver(), getTimeoutSeconds()));
@@ -191,19 +156,7 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 		}
 		else {
 			List<String> searchparms = Arrays.asList(new String[]{ clue });
-			if(parms.isHeader()) {
-				
-				// 1) Assume clue is a heading label value and search accordingly
-				Locator locator = new LabelElementLocator(parms.getDriver(), parms.getSearchContext());
-				searchResults.addAll(locator.locateAll(elementType, searchparms));
-				
-				// 2) Assume clue indicates an attribute value of a heading hotspot element and search accordingly
-				if(searchResults.isEmpty()) {
-					locator = new HotspotElementLocator(parms.getDriver(), parms.getSearchContext());
-					searchResults.addAll(locator.locateAll(elementType, searchparms));
-				}
-			}
-			else {
+			if(parms.isEndOfHierarchy()) {
 				
 				// 1) Assume clue is the text or attribute value for a hotspot
 				Locator locator = new HotspotElementLocator(parms.getDriver(), parms.getSearchContext());
@@ -221,6 +174,18 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 					searchResults.addAll(locator.locateAll(elementType, searchparms));
 				}
 			}
+			else {
+				
+				// 1) Assume clue is a heading label value and search accordingly
+				Locator locator = new LabelElementLocator(parms.getDriver(), parms.getSearchContext());
+				searchResults.addAll(locator.locateAll(elementType, searchparms));
+				
+				// 2) Assume clue indicates an attribute value of a heading hotspot element and search accordingly
+				if(searchResults.isEmpty()) {
+					locator = new HotspotElementLocator(parms.getDriver(), parms.getSearchContext());
+					searchResults.addAll(locator.locateAll(elementType, searchparms));
+				}
+			}
 			
 			for(Element elmt : searchResults) {
 				webElements.add(elmt.getWebElement());
@@ -231,19 +196,71 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 	}
 
 	/**
+	 * Get a hierarchy array from the current shortcut with the first element removed and 
+	 * base a new, smaller shortcut on it. If a shortcut is thought of as a route, going inward
+	 * consecutively past labeling markers toward the center of an html hierarchy where the
+	 * target element exists, then a nested shortcut is what you get when you peel off that 
+	 * part of the route it took to get its own deeper starting point.
 	 * 
 	 * @return
 	 * @throws Exception
 	 */
 	private ConfigShortcut getNestedShortcut() throws Exception {
-		// Get a hierarchy array from the current shortcut with the first element removed.
-		String[] hierarchy = Arrays.copyOfRange(
-				parms.getShortcut().getLabelHierarchyParts(), 
-				1, 
-				parms.getShortcut().getLabelHierarchyParts().length);
+		String[] oldHierarchy = parms.getShortcut().getLabelHierarchyParts();
+		String[] newHierarchy = null;
+		String identifier = parms.getShortcut().getIdentifier();
+		
+		// 1) Get a new hierarchy based on the original hierarchy array.
+		if(isHotspot() && !oldHierarchy[oldHierarchy.length-1].equals(identifier)) {
+			newHierarchy = Arrays.copyOf(oldHierarchy, oldHierarchy.length+1);
+			newHierarchy[newHierarchy.length-1] = identifier;
+		}
+		else {
+			newHierarchy = oldHierarchy;
+		}
+		
+		// 2) Remove the first element of the new hierarchy.
+		newHierarchy = Arrays.copyOfRange(newHierarchy, 1, newHierarchy.length);
+		
+		// 3) Create the new ConfigShortcut based on the shortened hierarchy
 		ConfigShortcut subshortcut = (ConfigShortcut) parms.getShortcut().clone();
-		subshortcut.setLabelHierarchyParts(hierarchy);
+		subshortcut.setLabelHierarchyParts(newHierarchy);
+		
 		return subshortcut;
+	}
+	
+	/**
+	 * Hidden or disabled WebElements can be removed from the search results if necessary.
+	 *  
+	 * @param results
+	 * @param type
+	 * @return
+	 */
+	private <T> void removeUnqualified(List<T> results) {
+		List<T> temp = new ArrayList<T>();
+		
+		for(T elmt : results) {
+			Element tempElmt = null;
+			if(elmt instanceof Element) 
+				tempElmt = (Element) elmt;
+			else if(elmt instanceof WebElement) 
+				tempElmt = new BasicElement(driver, ((WebElement) elmt));
+
+			if(!tempElmt.isInteractive()) {
+				continue;
+			}
+			
+			temp.add(elmt);
+		}
+		
+		if(results.size() != temp.size()) {
+			results.clear();
+			results.addAll(temp);
+		}
+	}
+	
+	private boolean isHotspot() {
+		return ElementType.HOTSPOT.equals(elementType);
 	}
 	
 	/**
@@ -311,15 +328,8 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 		public WebDriverWait waitPatiently() {
 			return getWebDriverWait();
 		}
-		public boolean isHeader() {
-			if(ElementType.HOTSPOT.name().equals((shortcut.getElementType()))) {
-				if(!Utils.isEmpty(shortcut.getIdentifier())) {
-					// The last element in the hierarchy is not the element being sought.
-					// The element being sought will be found by trying to match an element against getIdentifier()
-					return shortcut.getLabelHierarchyParts().length >= 1;
-				}
-			}
-			return shortcut.getLabelHierarchyParts().length > 1;
+		public boolean isEndOfHierarchy() {
+			return shortcut.getLabelHierarchyParts().length == 1;
 		}
 	}
 

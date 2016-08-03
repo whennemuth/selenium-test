@@ -58,8 +58,9 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		// 2)
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
+		shortcut.setIdentifier("icon-plus");
 		shortcut.setLabelHierarchyParts(new String[] {
-			"headingA 1", "headingA 2", "headingA 3", "icon-plus"
+			"headingA 1", "headingA 2", "headingA 3"
 		});		
 		locator = new ShortcutElementLocator(driver, shortcut);
 		asserter = new ElementsAssertion(locator);
@@ -72,8 +73,9 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		// 3)
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
+		shortcut.setIdentifier("icon-search");
 		shortcut.setLabelHierarchyParts(new String[] {
-			"headingA 1", "headingA 2", "headingA 3", "icon-search"
+			"headingA 1", "headingA 2", "headingA 3"
 		});		
 		locator = new ShortcutElementLocator(driver, shortcut);
 		asserter = new ElementsAssertion(locator);
@@ -86,8 +88,9 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		// 4)
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
+		shortcut.setIdentifier("uif-actionLink");
 		shortcut.setLabelHierarchyParts(new String[] {
-			"headingA 1", "headingA 2", "headingA 3", "uif-actionLink"
+			"headingA 1", "headingA 2", "headingA 3"
 		});		
 		locator = new ShortcutElementLocator(driver, shortcut);
 		asserter = new ElementsAssertion(locator);
@@ -173,9 +176,9 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		// 2)
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
-		shortcut.setIdentifier(null);
+		shortcut.setIdentifier("icon-plus");
 		shortcut.setLabelHierarchyParts(new String[] {
-			"headingC 1", "headingC 2", "headingC 3", "icon-plus"
+			"headingC 1", "headingC 2", "headingC 3"
 		});		
 		locator = new ShortcutElementLocator(driver, shortcut);
 		asserter = new ElementsAssertion(locator);
@@ -208,9 +211,9 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		// 2)
 		shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
-		shortcut.setIdentifier(null);
+		shortcut.setIdentifier("icon-plus");
 		shortcut.setLabelHierarchyParts(new String[] {
-			"headingD 1", "headingD 2", "headingD 3", "icon-plus"
+			"headingD 1", "headingD 2", "headingD 3"
 		});	
 		locator = new ShortcutElementLocator(driver, shortcut);
 		asserter = new ElementsAssertion(locator);
