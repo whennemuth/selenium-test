@@ -78,6 +78,16 @@ public class LocatorRunner {
 			break;
 		}
 		
+		if(elements.isEmpty()) {
+			System.out.println("Could not locate " + String.valueOf(lv.getLabel() + ": " + lv.getElementType()));
+		}
+		else if(elements.size() > 1){
+			System.out.println("Located multiple for " + String.valueOf(lv.getLabel() + ": " + lv.getElementType()));
+		}
+		else {
+			System.out.println("Located " + String.valueOf(lv.getLabel() + ": " + lv.getElementType()));
+		}
+		
 		return elements;
 	}
 	

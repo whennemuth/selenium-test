@@ -193,6 +193,11 @@ public enum ElementType {
 				return SELECT;
 			}
 		}
+		if("textarea".equalsIgnoreCase(we.getTagName())) {
+			if("textarea".equalsIgnoreCase(type)) {
+				return TEXTAREA;
+			}
+		}
 		if("input".equalsIgnoreCase(we.getTagName())) {
 			if("submit".equalsIgnoreCase(type)) {
 				return BUTTON;
