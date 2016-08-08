@@ -13,6 +13,20 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 
 public class LabelElementLocator extends AbstractElementLocator {
 	
+	private static final String[] SEARCH_METHODS = new String[] { 			
+			"//*[normalize-space(translate(text(), "
+			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
+			+ "'abcdefghijklmnopqrstuvwxyz'))=\"[INSERT-LABEL]\"]",	
+	
+			"//*[starts-with(normalize-space(translate(text(), "
+			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
+			+ "'abcdefghijklmnopqrstuvwxyz')), \"[INSERT-LABEL]\")]",	
+	
+			"//*[starts-with(normalize-space(translate(text(), "
+			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
+			+ "'abcdefghijklmnopqrstuvwxyz')), \"[INSERT-LABEL]\")]"
+	};
+	
 	private LabelElementLocator() {
 		super(null); // Restrict the default constructor
 	}
@@ -32,10 +46,15 @@ public class LabelElementLocator extends AbstractElementLocator {
 		
 		List<WebElement> located = new ArrayList<WebElement>();
 		String label = new String(parameters.get(0));
-		String cleanedLabel = getCleanedValue(label);
+		String cleanedLabel = ComparableLabel.getCleanedValue(label);
 		String scope = "";	// global
 		if(searchContext instanceof WebElement) {
 			scope = ".";	// current scope within element.
+		}
+		
+		for(int i=0; i<SEARCH_METHODS.length; i++) {
+// RESUME NEXT:			
+			//String xpath = scope + SEARCH_METHODS[i].replace(, newChar)
 		}
 		
 		// If there is no element type specified, then we assume that label indicates the innerText of the element being sought.
@@ -43,7 +62,10 @@ public class LabelElementLocator extends AbstractElementLocator {
 			//driver.findElements(By.xpath(scope + "//*[text()[normalize-space(lower-case(.))=\"" + cleanedLabel.toLowerCase() + "\"]]"));
 			//driver.findElements(By.xpath(scope + "//*[normalize-space(lower-case(text()))=\"" + label.trim().toLowerCase() + "\"]"));
 			// lower-case if for xpath v2.0, but firefox uses v1.0, so have to use the translate function.
-			searchContext.findElements(By.xpath(scope + "//*[normalize-space(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'))=\"" + label.trim().toLowerCase() + "\"]"));
+			searchContext.findElements(By.xpath(scope + 
+					"//*[normalize-space(translate(text(), "
+					+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
+					+ "'abcdefghijklmnopqrstuvwxyz'))=\"" + label.trim().toLowerCase() + "\"]"));
 		
 		if(elements.isEmpty()) {
 			// Find a match that starts with the specified label. This is for long labels that can be uniquely identified by the way they start.
@@ -51,36 +73,46 @@ public class LabelElementLocator extends AbstractElementLocator {
 				//driver.findElements(By.xpath(scope + "//*[text()[contains(lower-case(.), \"" + cleanedLabel.toLowerCase() + "\")]]"));
 				//driver.findElements(By.xpath(scope + "//*[starts-with(normalize-space(lower-case(text())), \"" + cleanedLabel.toLowerCase() + "\")]"));
 				// lower-case if for xpath v2.0, but firefox uses v1.0, so have to use the translate function.
-				searchContext.findElements(By.xpath(scope + "//*[starts-with(normalize-space(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')), \"" + cleanedLabel.toLowerCase() + "\")]"));
+				searchContext.findElements(By.xpath(scope + 
+						"//*[starts-with(normalize-space(translate(text(), "
+						+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
+						+ "'abcdefghijklmnopqrstuvwxyz')), \"" + cleanedLabel.toLowerCase() + "\")]"));
+		}
+		
+		if(elements.isEmpty()) {
+			searchContext.findElements(By.xpath(scope + 
+					"//*[starts-with(normalize-space(translate(text(), "
+					+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
+					+ "'abcdefghijklmnopqrstuvwxyz')), \"" + cleanedLabel.toLowerCase() + "\")]"));
 		}
 		
 		// Double check the startswith/normalization filtering 
-		List<WebElement> filtered = new ArrayList<WebElement>();
-		Integer shortest = null;
-		for(WebElement we : elements) {
-			String cleanedElementText = getCleanedValue(getText(driver, we));
-			
-			if(cleanedElementText.toLowerCase().startsWith(cleanedLabel.toLowerCase())) {
-				if(shortest == null) {
-					shortest = cleanedElementText.length();
-				}
-				else{
-					int len = cleanedElementText.length();
-					if(shortest > len)
-						shortest = len;
-				}
-				filtered.add(we);
-			}
-		}
-		
-		// Of the filtered matches, keep the shortest match(s).
-		for(WebElement we : filtered) {
-			String cleanedElementText = getCleanedValue(getText(driver, we));
-			int len = cleanedElementText.length();
-			if(shortest.equals(len)) {
-				located.add(we);
-			}
-		}
+//		List<WebElement> filtered = new ArrayList<WebElement>();
+//		Integer shortest = null;
+//		for(WebElement we : elements) {
+//			String cleanedElementText = getCleanedValue(getText(driver, we));
+//			
+//			if(cleanedElementText.toLowerCase().startsWith(cleanedLabel.toLowerCase())) {
+//				if(shortest == null) {
+//					shortest = cleanedElementText.length();
+//				}
+//				else{
+//					int len = cleanedElementText.length();
+//					if(shortest > len)
+//						shortest = len;
+//				}
+//				filtered.add(we);
+//			}
+//		}
+//		
+//		// Of the filtered matches, keep the shortest match(s).
+//		for(WebElement we : filtered) {
+//			String cleanedElementText = getCleanedValue(getText(driver, we));
+//			int len = cleanedElementText.length();
+//			if(shortest.equals(len)) {
+//				located.add(we);
+//			}
+//		}
 
 		// We are only searching for labels, but if the search fails then the upcoming default search
 		// will try to find fields. Prevent this by indicating the default search has already run.
@@ -96,12 +128,12 @@ public class LabelElementLocator extends AbstractElementLocator {
 	 * @param s
 	 * @return
 	 */
-	public static String getCleanedValue(String s) {
-		// Normalize the spaces (trim from edges, and replace multiple contiguous whitespace with single space character)
-		String cleaned = s.trim().replaceAll("\\s+", " ");
-		// Trim off any sequence of colons and whitespace from the end of the text.
-		cleaned = cleaned.replaceAll("(\\s*:\\s*)*$", "");
-		return cleaned;
-	}
+//	public static String getCleanedValue(String s) {
+//		// Normalize the spaces (trim from edges, and replace multiple contiguous whitespace with single space character)
+//		String cleaned = s.trim().replaceAll("\\s+", " ");
+//		// Trim off any sequence of colons and whitespace from the end of the text.
+//		cleaned = cleaned.replaceAll("(\\s*:\\s*)*$", "");
+//		return cleaned;
+//	}
 
 }
