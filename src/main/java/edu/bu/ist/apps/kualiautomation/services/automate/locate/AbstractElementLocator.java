@@ -80,7 +80,6 @@ public abstract class AbstractElementLocator implements Locator {
 					for(WebElement iframe : iframes) {
 						// (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOf(iframe));
 						(new WebDriverWait(driver, 5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
-// RESUME NEXT: Elements are not being found inside frame - was it "switched to"? (new proposal log page in pre-award)						
 						skipFrameSearch = true;
 						searchContext = driver;
 						List<Element> frameResults = locateAll(elementType, parameters);

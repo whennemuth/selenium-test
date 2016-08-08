@@ -32,8 +32,9 @@ public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 		handlers.put("colon1", "<html><body><span> label: </span></body></html>");
 		handlers.put("colon2", "<html><body><span> :label </span></body></html>");
 		handlers.put("colon3", "<html><body><span> label : : </span></body></html>");
-		handlers.put("prop-log-lookup-frame", "ProposalLogLookupFrame.htm");
+		handlers.put("prop-log-lookup-frame", "ProposalLogLookup_files/ProposalLogLookupFrame.htm");
 		handlers.put("prop-log-lookup", "ProposalLogLookup.htm");
+		handlers.put("ProposalLogLookup_files", "ProposalLogLookup_files");
 	}
 	
 	/**

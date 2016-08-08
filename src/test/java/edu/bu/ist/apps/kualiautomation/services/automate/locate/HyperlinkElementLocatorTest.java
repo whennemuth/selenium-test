@@ -23,8 +23,9 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 	@Override
 	public void loadHandlers(Map<String, String> handlers) {
 		handlers.put("hyperlink-page", "HyperlinkPage.htm");
+		handlers.put("prop-log-lookup-frame", "ProposalLogLookup_files/ProposalLogLookupFrame.htm");
 		handlers.put("prop-log-lookup", "ProposalLogLookup.htm");
-		handlers.put("prop-log-lookup-frame", "ProposalLogLookupFrame.htm");
+		handlers.put("ProposalLogLookup_files", "ProposalLogLookup_files");
 	}
 
 	@Test

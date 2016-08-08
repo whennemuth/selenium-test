@@ -35,8 +35,14 @@ public class LabelElementLocatorTest extends AbstractJettyBasedTest {
 		handlers.put("colon1", "<html><body><span> label: </span></body></html>");
 		handlers.put("colon2", "<html><body><span> :label </span></body></html>");
 		handlers.put("colon3", "<html><body><span> label : : </span></body></html>");
-		handlers.put("prop-log-lookup-frame", "ProposalLogLookupFrame.htm");
+		handlers.put("mixture", "<html><body><label><font color=\"red\">*&nbsp;</font>  Description:  </label></body></html>");
+		
+		handlers.put("prop-log-lookup-frame", "ProposalLogLookup_files/ProposalLogLookupFrame.htm");
 		handlers.put("prop-log-lookup", "ProposalLogLookup.htm");
+		handlers.put("ProposalLogLookup_files", "ProposalLogLookup_files");
+		
+		handlers.put("prop-log-add", "ProposalLogAdd.htm");
+		handlers.put("ProposalLogAdd_files", "ProposalLogAdd_files");
 	}
 	
 	@Test
@@ -97,6 +103,15 @@ public class LabelElementLocatorTest extends AbstractJettyBasedTest {
 		assertEquals("span", element.getWebElement().getTagName().toLowerCase());
 	}
 	
+	@Test
+	public void testFindInnerTextWithHtmlBlock() {
+		// RESUME NEXT: Make this test work (Address LabelElementLocator.getCleanedValue())
+		locator.getWebDriver().get("http://localhost:8080/mixture");
+		Element element = locator.locate("description");
+		assertNotNull(element);
+		assertEquals("label", element.getWebElement().getTagName().toLowerCase());
+	}
+	
 	@Test 
 	public void findProposalLogLabel() {
 		locator.getWebDriver().get("http://localhost:8080/prop-log-lookup");
@@ -104,6 +119,12 @@ public class LabelElementLocatorTest extends AbstractJettyBasedTest {
 		assertNotNull(element);
 		assertEquals("label", element.getWebElement().getTagName().toLowerCase());
 		assertEquals("Proposal Number:", element.getWebElement().getText());
+		
+		locator.getWebDriver().get("http://localhost:8080/prop-log-add");
+		Element element2 = locator.locate("description");
+		assertNotNull(element2);
+		assertEquals("label", element2.getWebElement().getTagName().toLowerCase());
+		assertEquals("Description:", element2.getWebElement().getText());		
 	}
 	
 	@Test 
