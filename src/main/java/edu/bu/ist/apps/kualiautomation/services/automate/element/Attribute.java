@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.openqa.selenium.WebElement;
 
-import edu.bu.ist.apps.kualiautomation.services.automate.locate.LabelElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.ComparableLabel;
 
 /**
  * Check attributes of the webElement for the specified attributeValue(s) in the order found in attributesToCheck.
@@ -55,8 +55,8 @@ public class Attribute {
 		}
 
 		if("a".equalsIgnoreCase(webElement.getTagName())) {
-			String cleanedVal = LabelElementLocator.getCleanedValue(attributeValue);
-			String cleanedText = LabelElementLocator.getCleanedValue(webElement.getText());
+			String cleanedVal = ComparableLabel.getCleanedValue(attributeValue);
+			String cleanedText = ComparableLabel.getCleanedValue(webElement.getText());
 			if(cleanedVal.equalsIgnoreCase(cleanedText)) {
 				return true;
 			}

@@ -35,6 +35,7 @@ public class LabelElementLocatorTest extends AbstractJettyBasedTest {
 		handlers.put("colon1", "<html><body><span> label: </span></body></html>");
 		handlers.put("colon2", "<html><body><span> :label </span></body></html>");
 		handlers.put("colon3", "<html><body><span> label : : </span></body></html>");
+		handlers.put("colon4", "<html><body><span> abc :label </span></body></html>");
 		handlers.put("mixture", "<html><body><label><font color=\"red\">*&nbsp;</font>  Description:  </label></body></html>");
 		
 		handlers.put("prop-log-lookup-frame", "ProposalLogLookup_files/ProposalLogLookupFrame.htm");
@@ -95,17 +96,22 @@ public class LabelElementLocatorTest extends AbstractJettyBasedTest {
 		
 		locator.getWebDriver().get("http://localhost:8080/colon2");
 		element = locator.locate("label");
-		assertNull(element);
+		assertNotNull(element);
+		assertEquals("span", element.getWebElement().getTagName().toLowerCase());
 		
 		locator.getWebDriver().get("http://localhost:8080/colon3");
 		element = locator.locate("label");
 		assertNotNull(element);
 		assertEquals("span", element.getWebElement().getTagName().toLowerCase());
+		
+// RESUME NEXT: Fix this (Problem is in ComparableLabel).		
+		locator.getWebDriver().get("http://localhost:8080/colon4");
+		element = locator.locate("label");
+		assertNull(element);
 	}
 	
 	@Test
 	public void testFindInnerTextWithHtmlBlock() {
-		// RESUME NEXT: Make this test work (Address LabelElementLocator.getCleanedValue())
 		locator.getWebDriver().get("http://localhost:8080/mixture");
 		Element element = locator.locate("description");
 		assertNotNull(element);

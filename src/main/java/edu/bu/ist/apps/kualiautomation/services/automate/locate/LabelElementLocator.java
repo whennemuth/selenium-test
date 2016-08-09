@@ -2,6 +2,7 @@ package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -13,19 +14,32 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 
 public class LabelElementLocator extends AbstractElementLocator {
 	
-	private static final String[] SEARCH_METHODS = new String[] { 			
+	/**
+	 * 1) First priority (NOTE: lower-case if for xpath v2.0, but firefox uses v1.0, so have to use the translate function).
+	 * Matches an element with a text value that matches the provided value, both values normalized for whitespace.
+	 */
+	private static final String XPATH_EQUALS = 
 			"//*[normalize-space(translate(text(), "
 			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
-			+ "'abcdefghijklmnopqrstuvwxyz'))=\"[INSERT-LABEL]\"]",	
+			+ "'abcdefghijklmnopqrstuvwxyz'))=\"[INSERT-LABEL]\"]";
 	
+	/**
+	 * 2) Second priority
+	 * Matches for an element with a text value that starts with the provided value, both values normalized for whitespace.
+	 */
+	private static final String XPATH_STARTS_WITH = 
 			"//*[starts-with(normalize-space(translate(text(), "
 			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
-			+ "'abcdefghijklmnopqrstuvwxyz')), \"[INSERT-LABEL]\")]",	
+			+ "'abcdefghijklmnopqrstuvwxyz')), \"[INSERT-LABEL]\")]";
 	
-			"//*[starts-with(normalize-space(translate(text(), "
+	/**
+	 * 3) Third priority
+	 * Matches for an element with a text value that contains the provided value, both values normalized for whitespace.
+	 */
+	private static final String XPATH_CONTAINS = 
+			"//*[contains(normalize-space(translate(text(), "
 			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
-			+ "'abcdefghijklmnopqrstuvwxyz')), \"[INSERT-LABEL]\")]"
-	};
+			+ "'abcdefghijklmnopqrstuvwxyz')), \"[INSERT-LABEL]\")]";
 	
 	private LabelElementLocator() {
 		super(null); // Restrict the default constructor
@@ -45,46 +59,66 @@ public class LabelElementLocator extends AbstractElementLocator {
 	protected List<WebElement> customLocate() {
 		
 		List<WebElement> located = new ArrayList<WebElement>();
-		String label = new String(parameters.get(0));
-		String cleanedLabel = ComparableLabel.getCleanedValue(label);
+		String label = new String(parameters.get(0)).trim().toLowerCase();
+		String cleanedLabel = ComparableLabel.getCleanedValue(label).toLowerCase();
 		String scope = "";	// global
 		if(searchContext instanceof WebElement) {
 			scope = ".";	// current scope within element.
 		}
 		
-		for(int i=0; i<SEARCH_METHODS.length; i++) {
-// RESUME NEXT:			
-			//String xpath = scope + SEARCH_METHODS[i].replace(, newChar)
+		// Search for an element that matches the provided value with xpath expressions in order of their priority.
+		// Only proceed to the next search of no results have yet been found with the prior search(es).
+		String xpath = scope + XPATH_EQUALS.replace("[INSERT-LABEL]", label);
+		List<WebElement> elements = searchContext.findElements(By.xpath(xpath));
+		
+		if(elements.isEmpty()) {
+			xpath = scope + XPATH_STARTS_WITH.replace("[INSERT-LABEL]", cleanedLabel);
+			elements = searchContext.findElements(By.xpath(xpath));
 		}
+		
+		if(elements.isEmpty()) {
+			xpath = scope + XPATH_CONTAINS.replace("[INSERT-LABEL]", cleanedLabel);
+			elements = searchContext.findElements(By.xpath(xpath));
+		}
+		
+		// Wrap the web elements in ComparableLabel instances for sorting so higher ranked results are on top.
+		List<ComparableLabel> labels = new ArrayList<ComparableLabel>();
+		for(WebElement elmt : elements) {
+			String text = getText(driver, elmt);
+			labels.add(new BasicComparableLabel(elmt, label, text));
+		}
+		
+		// Unwrap the highest ranked result(s) back into a WebElement collection.
+		located.addAll(ComparableLabel.getHighestRanked(labels));
 		
 		// If there is no element type specified, then we assume that label indicates the innerText of the element being sought.
-		List<WebElement> elements = 
-			//driver.findElements(By.xpath(scope + "//*[text()[normalize-space(lower-case(.))=\"" + cleanedLabel.toLowerCase() + "\"]]"));
-			//driver.findElements(By.xpath(scope + "//*[normalize-space(lower-case(text()))=\"" + label.trim().toLowerCase() + "\"]"));
-			// lower-case if for xpath v2.0, but firefox uses v1.0, so have to use the translate function.
-			searchContext.findElements(By.xpath(scope + 
-					"//*[normalize-space(translate(text(), "
-					+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
-					+ "'abcdefghijklmnopqrstuvwxyz'))=\"" + label.trim().toLowerCase() + "\"]"));
-		
-		if(elements.isEmpty()) {
-			// Find a match that starts with the specified label. This is for long labels that can be uniquely identified by the way they start.
-			elements = 
-				//driver.findElements(By.xpath(scope + "//*[text()[contains(lower-case(.), \"" + cleanedLabel.toLowerCase() + "\")]]"));
-				//driver.findElements(By.xpath(scope + "//*[starts-with(normalize-space(lower-case(text())), \"" + cleanedLabel.toLowerCase() + "\")]"));
-				// lower-case if for xpath v2.0, but firefox uses v1.0, so have to use the translate function.
-				searchContext.findElements(By.xpath(scope + 
-						"//*[starts-with(normalize-space(translate(text(), "
-						+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
-						+ "'abcdefghijklmnopqrstuvwxyz')), \"" + cleanedLabel.toLowerCase() + "\")]"));
-		}
-		
-		if(elements.isEmpty()) {
-			searchContext.findElements(By.xpath(scope + 
-					"//*[starts-with(normalize-space(translate(text(), "
-					+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
-					+ "'abcdefghijklmnopqrstuvwxyz')), \"" + cleanedLabel.toLowerCase() + "\")]"));
-		}
+//		List<WebElement> elements = 
+//			//driver.findElements(By.xpath(scope + "//*[text()[normalize-space(lower-case(.))=\"" + cleanedLabel.toLowerCase() + "\"]]"));
+//			//driver.findElements(By.xpath(scope + "//*[normalize-space(lower-case(text()))=\"" + label.trim().toLowerCase() + "\"]"));
+//			// lower-case if for xpath v2.0, but firefox uses v1.0, so have to use the translate function.
+//			searchContext.findElements(By.xpath(scope + 
+//					"//*[normalize-space(translate(text(), "
+//					+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
+//					+ "'abcdefghijklmnopqrstuvwxyz'))=\"" + label + "\"]"));
+//		
+//		if(elements.isEmpty()) {
+//			// Find a match that starts with the specified label. This is for long labels that can be uniquely identified by the way they start.
+//			elements = 
+//				//driver.findElements(By.xpath(scope + "//*[text()[contains(lower-case(.), \"" + cleanedLabel.toLowerCase() + "\")]]"));
+//				//driver.findElements(By.xpath(scope + "//*[starts-with(normalize-space(lower-case(text())), \"" + cleanedLabel.toLowerCase() + "\")]"));
+//				// lower-case if for xpath v2.0, but firefox uses v1.0, so have to use the translate function.
+//				searchContext.findElements(By.xpath(scope + 
+//						"//*[starts-with(normalize-space(translate(text(), "
+//						+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
+//						+ "'abcdefghijklmnopqrstuvwxyz')), \"" + cleanedLabel + "\")]"));
+//		}
+//		
+//		if(elements.isEmpty()) {
+//			searchContext.findElements(By.xpath(scope + 
+//					"//*[starts-with(normalize-space(translate(text(), "
+//					+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
+//					+ "'abcdefghijklmnopqrstuvwxyz')), \"" + cleanedLabel + "\")]"));
+//		}
 		
 		// Double check the startswith/normalization filtering 
 //		List<WebElement> filtered = new ArrayList<WebElement>();
