@@ -107,11 +107,17 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 						return 0;
 					}
 				};
+				newThis.demoted = this.demoted;
+				newThis.disqualified = this.disqualified;
+				
 				ComparableLabel newOther = new ComparableLabel(otherlabel, trimmedOthertext, true) {
 					@Override protected int customCompareTo(ComparableLabel lbl) {
 						return 0;
 					}
 				};
+				newOther.demoted = lbl.demoted;
+				newOther.disqualified = lbl.disqualified;
+				
 				retval = newThis.compareTo(newOther);
 			}
 			else if(thistext.contains(thislabel)) {
@@ -132,6 +138,14 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 	@Override
 	public int compareTo(ComparableLabel o) {
 		int compared = requiredCompareTo(o);
+		
+		if(this.disqualified && o.disqualified)
+			return 0;
+		else if(o.disqualified)
+			return THIS_LABEL_IS_BETTER;
+		else if(this.disqualified)
+			return OTHER_LABEL_IS_BETTER;
+		
 		if(compared == 0) {
 			compared = customCompareTo(o);
 			if(compared == 0 && useDefaultMethodIfIndeterminate) {
@@ -214,16 +228,27 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 	public static String trimLeftNonAlphaNumeric(String trimmable, String contained) {
 		String s = new String(trimmable);
 		int idx = s.indexOf(contained);
+// RESUME NEXT: Not working for "* Description:"		
 		String start = s.substring(0, idx);
-		if(start.matches("[^a-zA-Z\\d\\s]*")) {
+		if(start.matches("[^a-zA-Z\\d]*")) {
 			s = s.substring(idx);
 		}
 		return s;
 	}
 
 	public static List<WebElement> getHighestRanked(List<ComparableLabel> labels) {
-		Collections.sort(labels);
 		List<WebElement> highest = new ArrayList<WebElement>();
+		if(labels == null || labels.isEmpty())
+			return highest;
+		
+		if(labels.size() > 1) {
+			Collections.sort(labels);
+		}
+		else {
+			// Compare the one label to itself to run it through the disqualification logic
+			labels.get(0).compareTo(labels.get(0));
+		}
+		
 		for(ComparableLabel lbl : labels) {
 			if(!lbl.isDemoted() && !lbl.isDisqualified()) {
 				highest.add(lbl.getWebElement());

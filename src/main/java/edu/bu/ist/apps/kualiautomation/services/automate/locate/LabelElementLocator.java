@@ -2,7 +2,7 @@ package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -11,6 +11,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 public class LabelElementLocator extends AbstractElementLocator {
 	
@@ -74,6 +75,21 @@ public class LabelElementLocator extends AbstractElementLocator {
 		if(elements.isEmpty()) {
 			xpath = scope + XPATH_STARTS_WITH.replace("[INSERT-LABEL]", cleanedLabel);
 			elements = searchContext.findElements(By.xpath(xpath));
+			
+			if(!elements.isEmpty()) {
+				/**
+				 * The above xpath will not include text wrapped in an html block as part of the innerText
+				 * being evaluated. For this reason, results could be returned that do not appear to the
+				 * user to start with the specified value. Trim these edge cases off the list. 
+				 */
+				for (Iterator<WebElement> iterator = elements.iterator(); iterator.hasNext();) {
+					WebElement we = iterator.next();
+					String text = getText(driver, we);
+					if(!text.toLowerCase().trim().startsWith(label.toLowerCase())) {
+						iterator.remove();
+					}
+				}
+			}
 		}
 		
 		if(elements.isEmpty()) {
