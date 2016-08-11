@@ -228,7 +228,6 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 	public static String trimLeftNonAlphaNumeric(String trimmable, String contained) {
 		String s = new String(trimmable);
 		int idx = s.indexOf(contained);
-// RESUME NEXT: Not working for "* Description:"		
 		String start = s.substring(0, idx);
 		if(start.matches("[^a-zA-Z\\d]*")) {
 			s = s.substring(idx);

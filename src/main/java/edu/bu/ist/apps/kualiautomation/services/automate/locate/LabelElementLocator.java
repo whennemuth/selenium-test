@@ -11,7 +11,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
-import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 public class LabelElementLocator extends AbstractElementLocator {
 	
@@ -19,6 +18,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 	 * 1) First priority (NOTE: lower-case if for xpath v2.0, but firefox uses v1.0, so have to use the translate function).
 	 * Matches an element with a text value that matches the provided value, both values normalized for whitespace.
 	 */
+// RESUME NEXT: change to //*[text()[...]] and add more text/non-text node mixture test cases.
 	private static final String XPATH_EQUALS = 
 			"//*[normalize-space(translate(text(), "
 			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
@@ -28,6 +28,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 	 * 2) Second priority
 	 * Matches for an element with a text value that starts with the provided value, both values normalized for whitespace.
 	 */
+// RESUME NEXT: change to //*[text()[...]] and add more text/non-text node mixture test cases.
 	private static final String XPATH_STARTS_WITH = 
 			"//*[starts-with(normalize-space(translate(text(), "
 			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
@@ -38,9 +39,9 @@ public class LabelElementLocator extends AbstractElementLocator {
 	 * Matches for an element with a text value that contains the provided value, both values normalized for whitespace.
 	 */
 	private static final String XPATH_CONTAINS = 
-			"//*[contains(normalize-space(translate(text(), "
+			"//*[text()[contains(normalize-space(translate(., "
 			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
-			+ "'abcdefghijklmnopqrstuvwxyz')), \"[INSERT-LABEL]\")]";
+			+ "'abcdefghijklmnopqrstuvwxyz')), \"[INSERT-LABEL]\")]]";
 	
 	private LabelElementLocator() {
 		super(null); // Restrict the default constructor
@@ -67,11 +68,16 @@ public class LabelElementLocator extends AbstractElementLocator {
 			scope = ".";	// current scope within element.
 		}
 		
-		// Search for an element that matches the provided value with xpath expressions in order of their priority.
-		// Only proceed to the next search of no results have yet been found with the prior search(es).
+		/**
+		 * Search for an element that matches the provided value with xpath expressions in order of their priority.
+		 * Only proceed to the next search of no results have yet been found with the prior search(es).
+		 */
+		
+		/** 1) Search for full length match */
 		String xpath = scope + XPATH_EQUALS.replace("[INSERT-LABEL]", label);
 		List<WebElement> elements = searchContext.findElements(By.xpath(xpath));
 		
+		/** 2) Search for match that starts with the provided value */
 		if(elements.isEmpty()) {
 			xpath = scope + XPATH_STARTS_WITH.replace("[INSERT-LABEL]", cleanedLabel);
 			elements = searchContext.findElements(By.xpath(xpath));
@@ -92,11 +98,14 @@ public class LabelElementLocator extends AbstractElementLocator {
 			}
 		}
 		
+		/** 3a) Search for a match that would start with the provided value if garbage characters 
+		 * are trimmed from the start.
+		 */
 		if(elements.isEmpty()) {
 			xpath = scope + XPATH_CONTAINS.replace("[INSERT-LABEL]", cleanedLabel);
 			elements = searchContext.findElements(By.xpath(xpath));
 		}
-		
+
 		// Wrap the web elements in ComparableLabel instances for sorting so higher ranked results are on top.
 		List<ComparableLabel> labels = new ArrayList<ComparableLabel>();
 		for(WebElement elmt : elements) {

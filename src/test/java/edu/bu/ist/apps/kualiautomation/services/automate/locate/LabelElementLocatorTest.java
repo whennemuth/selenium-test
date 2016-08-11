@@ -36,7 +36,6 @@ public class LabelElementLocatorTest extends AbstractJettyBasedTest {
 		handlers.put("colon2", "<html><body><span> :label </span></body></html>");
 		handlers.put("colon3", "<html><body><span> label : : </span></body></html>");
 		handlers.put("colon4", "<html><body><span> abc :label </span></body></html>");
-//		handlers.put("mixture", "<html><body><label><font color=\"red\">*&nbsp;</font>  Description:  </label></body></html>");
 		handlers.put("mixture", "<html><body><label> <font color=\"red\">*&nbsp;</font>  Description:  </label></body></html>");
 		
 		handlers.put("prop-log-lookup-frame", "ProposalLogLookup_files/ProposalLogLookupFrame.htm");
@@ -118,21 +117,22 @@ public class LabelElementLocatorTest extends AbstractJettyBasedTest {
 		Element element = locator.locate("description");
 		assertNotNull(element);
 		assertEquals("label", element.getWebElement().getTagName().toLowerCase());
+		assertEquals("*  Description:", element.getWebElement().getText());		
 	}
 	
 	@Test 
 	public void findProposalLogLabel() {
-//		locator.getWebDriver().get("http://localhost:8080/prop-log-lookup");
-//		Element element = locator.locate("Proposal Number");
-//		assertNotNull(element);
-//		assertEquals("label", element.getWebElement().getTagName().toLowerCase());
-//		assertEquals("Proposal Number:", element.getWebElement().getText());
+		locator.getWebDriver().get("http://localhost:8080/prop-log-lookup");
+		Element element = locator.locate("Proposal Number");
+		assertNotNull(element);
+		assertEquals("label", element.getWebElement().getTagName().toLowerCase());
+		assertEquals("Proposal Number:", element.getWebElement().getText());
 		
 		locator.getWebDriver().get("http://localhost:8080/prop-log-add");
 		Element element2 = locator.locate("description");
 		assertNotNull(element2);
 		assertEquals("label", element2.getWebElement().getTagName().toLowerCase());
-		assertEquals("Description:", element2.getWebElement().getText());		
+		assertEquals("*  Description:", element2.getWebElement().getText());		
 	}
 	
 	@Test 

@@ -82,17 +82,21 @@ public abstract class AbstractElementLocator implements Locator {
 						(new WebDriverWait(driver, 5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
 						skipFrameSearch = true;
 						searchContext = driver;
-						List<Element> frameResults = locateAll(elementType, parameters);
-						results.addAll(frameResults);
-						if(frameResults.isEmpty()) {
-							driver.switchTo().defaultContent();
-							searchContext = driver;
-							skipFrameSearch = false;
+						try {
+							List<Element> frameResults = locateAll(elementType, parameters);
+							results.addAll(frameResults);
+							if(frameResults.isEmpty()) {
+								driver.switchTo().defaultContent();
+								searchContext = driver;
+							}
+							else {
+								// Don't switch back to the parent window because you will not be able to use the WebElement as it would 
+								// then belong to a frame that the WebDriver is longer focused on ( you will get a StaleElementReferenceException ).
+								// driver.switchTo().defaultContent();
+							}
 						}
-						else {
-							// Don't switch back to the parent window because you will not be able to use the WebElement as it would 
-							// then belong to a frame that the WebDriver is longer focused on ( you will get a StaleElementReferenceException ).
-							// driver.switchTo().defaultContent();
+						finally {
+							skipFrameSearch = false;
 						}
 					}
 				}
