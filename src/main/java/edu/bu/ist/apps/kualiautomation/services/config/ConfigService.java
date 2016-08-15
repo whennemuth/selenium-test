@@ -103,6 +103,7 @@ public class ConfigService {
         EntityManagerFactory factory = null;
         EntityManager em = null;
         EntityTransaction trans = null;
+        boolean ignoreEmpties = false;
         try {
     		boolean persist = cfg.getUser() == null || cfg.getUser().getId() == null;
             factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
@@ -120,8 +121,8 @@ public class ConfigService {
 		    }
 		    else {
 		    	cfgEntity = em.find(Config.class, cfg.getId());
-		    	EntityPopulator ep = new EntityPopulator(em, true);
-		    	BeanPopulator populator = new BeanPopulator(ep, true);
+		    	EntityPopulator ep = new EntityPopulator(em, ignoreEmpties);
+		    	BeanPopulator populator = new BeanPopulator(ep, ignoreEmpties);
 		    	populator.populate(cfgEntity, cfg);
 		    	em.merge(cfgEntity);
 		    }

@@ -65,6 +65,7 @@ public class ScriptService {
         EntityManagerFactory factory = null;
         EntityManager em = null;
         EntityTransaction trans = null;
+        boolean ignoreEmpties = false;
         try {
         	boolean persist = Utils.isEmpty(cycle.getId()) || cycle.getId() == 0;
             factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
@@ -83,8 +84,8 @@ public class ScriptService {
 		    }
 		    else {
 		    	cycleEntity = em.find(Cycle.class, cycle.getId());
-		    	EntityPopulator ep = new EntityPopulator(em, true);
-		    	BeanPopulator populator = new BeanPopulator(ep, true);
+		    	EntityPopulator ep = new EntityPopulator(em, ignoreEmpties);
+		    	BeanPopulator populator = new BeanPopulator(ep, ignoreEmpties);
 		    	populator.populate(cycleEntity, cycle);
 		    	em.merge(cycleEntity);
 		    }

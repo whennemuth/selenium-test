@@ -37,6 +37,11 @@ public class LabelElementLocatorTest extends AbstractJettyBasedTest {
 		handlers.put("colon3", "<html><body><span> label : : </span></body></html>");
 		handlers.put("colon4", "<html><body><span> abc :label </span></body></html>");
 		handlers.put("mixture", "<html><body><label> <font color=\"red\">*&nbsp;</font>  Description:  </label></body></html>");
+		handlers.put("mixture2", "<html><body>"
+				+ "<label> "
+				+ "<font color=\"red\">*&nbsp;</font>  Description:  "
+				+ "<font color=\"red\">*&nbsp;</font>  Description2:  "
+				+ "</label></body></html>");
 		
 		handlers.put("prop-log-lookup-frame", "ProposalLogLookup_files/ProposalLogLookupFrame.htm");
 		handlers.put("prop-log-lookup", "ProposalLogLookup.htm");
@@ -114,10 +119,14 @@ public class LabelElementLocatorTest extends AbstractJettyBasedTest {
 	@Test
 	public void testFindInnerTextWithHtmlBlock() {
 		locator.getWebDriver().get("http://localhost:8080/mixture");
-		Element element = locator.locate("description");
-		assertNotNull(element);
-		assertEquals("label", element.getWebElement().getTagName().toLowerCase());
-		assertEquals("*  Description:", element.getWebElement().getText());		
+		Element element1 = locator.locate("description");
+		assertNotNull(element1);
+		assertEquals("label", element1.getWebElement().getTagName().toLowerCase());
+		assertEquals("*  Description:", element1.getWebElement().getText());	
+		
+		locator.getWebDriver().get("http://localhost:8080/mixture2");
+		Element element2 = locator.locate("description2");
+		assertNull(element2);
 	}
 	
 	@Test 
