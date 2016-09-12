@@ -283,6 +283,9 @@ var cycleCtrlFactory = function() {
 					if((i+1) < parts.length) {
 						s += '   >   ';
 					}
+					else if(shortcut.identifier != null && shortcut.identifier != '') {
+						s += ' : ["' + shortcut.identifier + '"]';
+					}
 				}
 				return s;
 			};

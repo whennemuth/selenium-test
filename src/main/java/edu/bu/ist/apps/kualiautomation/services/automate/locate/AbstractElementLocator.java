@@ -17,7 +17,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
 public abstract class AbstractElementLocator implements Locator {
-
+// RESUME NEXT: resume testing add proposal log in test drive.
 	protected SearchContext searchContext;
 	protected WebDriver driver;
 	protected ElementType elementType;

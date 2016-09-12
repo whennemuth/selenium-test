@@ -138,6 +138,7 @@
 			</div>
 			<div class="basicfont" style="display:inline;" ng-repeat="p in sc.labelHierarchyParts">
 				{{p}}<span ng-if="!$last">&nbsp;&nbsp;&nbsp;>&nbsp;&nbsp;&nbsp;</span>
+				     <span ng-if="$last && sc.identifier != null && sc.identifier != ''"> : <span style="color:green">["{{sc.identifier}}"]</span></span>
 			</div>
 			<div 
 				style="padding-left:50px; padding-top:5px;" 
@@ -154,7 +155,6 @@
 						<td>
 							<div>
 								<select ng-model="sc.elementType">
-<!-- RESUME NEXT: Extend the display of et so it includes non-empty identifier values at the end. Then resume testing add proposal log in test drive. -->								
 									<option value="{{et}}" title="{{desc}}" ng-repeat="(et, desc) in getShortcutElementTypes()">{{et}}</option>
 								</select>
 							</div>
