@@ -1,7 +1,8 @@
 
 var GET_EMPTY_CYCLE_URL = '/rest/cycle/empty';
-var GET_CYCLE_BY_ID_URL = '/rest/cycle/lookup';	// tack id on to the end as a path variable
+var GET_CYCLE_BY_ID_URL = '/rest/cycle';	// tack id on to the end as a path variable
 var GET_CYCLES_BY_USER_ID = '/rest/cycles';
+var DELETE_CYCLE_URL = '/rest/cycle/delete';
 var SAVE_CYCLE_URL = '/rest/cycle/save';
 var GET_ELEMENT_TYPES_URL = '/rest/cycle/element/types';
 var GET_SHORTCUTS_URL = '/rest/cycle/shortcut/types';
@@ -83,6 +84,21 @@ var cycleSvcFactory = function($http, $q) {
 				method: 'POST',
 				url: SAVE_CYCLE_URL,
 				data: cycle
+			})
+				.success(function(response) {
+					cyclesCache = response.data;
+					deferred.resolve(response);
+					
+				}).error(function(response){
+					deferred.reject(response);
+				});
+			return deferred.promise;
+		},
+		removeCycle : function(cycle) {
+			var deferred = $q.defer();
+			$http({
+				method: 'DELETE',
+				url: DELETE_CYCLE_URL + "/" + cycle.id
 			})
 				.success(function(response) {
 					cyclesCache = response.data;

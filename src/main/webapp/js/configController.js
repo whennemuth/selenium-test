@@ -58,6 +58,7 @@ var configCtrlFactory = function(cycleCtrl) {
 			scope.setConfig = function(action) {
 				scope.action = action;
 				scope.config.currentEnvironment.current = true;
+				scope.cycle.kerberosLoginParms.configEnvironmentId = scope.config.currentEnvironment.id;
 				for(var env in scope.config.configEnvironments) {
 					if(env.name == scope.config.currentEnvironment.name) {
 						env.current = true;

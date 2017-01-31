@@ -62,7 +62,10 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 	private byte navigate;
 	
 	// uni-directional one-to-one association to ConfigShortcut (ConfigShortcut cannot "see" LabelAndValue). 
-	@OneToOne(cascade={CascadeType.MERGE, CascadeType.REMOVE}, fetch=FetchType.EAGER)
+	// NOTE: Don't use CascadeType.REMOVE as removals of this entity will try to cascade the removal of the ConfigShortcut
+	//       entity from the database, which we don't want because it's a configuration setting and we want it available
+	//       for other suites to use, which if they were, you'd get a ConstraintViolationException when commiting the transaction. 
+	@OneToOne(cascade={CascadeType.MERGE}, fetch=FetchType.EAGER)
 	@JoinColumn(name="shortcut_id", nullable=true)
 	private ConfigShortcut configShortcut;
 	

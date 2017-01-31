@@ -13,3 +13,5 @@
 /target/
 /eclipse_build.xml
 /README.txt
+/.metadata
+/RemoteSystemsTempFiles

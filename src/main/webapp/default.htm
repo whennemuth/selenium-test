@@ -6,6 +6,27 @@
 			<div><input type='text' ng-model="cycle.kerberosLoginParms.username" ng-disabled="!cycle"></div>
 			<div class=fieldlabel>Weblogin password</div>
 			<div><input type='password' ng-model="cycle.kerberosLoginParms.password" ng-disabled="!cycle"></div>
+			<div style="font-size:8px; font-family:verdana;">
+				login to 
+				<span>{{config.currentEnvironment.name}}</span> 
+				(id: 
+				<span ng-model="cycle.kerberosLoginParms.configEnvironmentId">{{config.currentEnvironment.id}}</span>)
+			</div>
+		</div>
+		
+		<div class=sectionLabel>Environment to run in</div>
+		<div class=sectionarea>
+			<select 
+				required
+				name="server" 
+				style="width:180px;"
+				ng-change="setConfig();"
+				ng-model="config.currentEnvironment"
+				ng-options="environment as environment.name 
+							for environment in config.configEnvironments 
+							track by environment.url">
+			</select>
+		
 		</div>
 		<div class=sectionlabel>Cycles</div>
 		<div class=sectionarea>
@@ -25,7 +46,13 @@
 					value=" New " 
 					style='padding:5px;' 
 					ng-click="newCycle();" 
-					ng-disabled="cycle || !isInitialized()">
+					ng-disabled="!isInitialized()">
+				<input 
+					type='button' 
+					value=" Remove " 
+					style='padding:5px;' 
+					ng-click="removeCycle();" 
+					ng-show="cycle || !isInitialized()">
 			</div>
 		</div>
 	</div>

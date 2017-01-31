@@ -3,6 +3,7 @@ package edu.bu.ist.apps.kualiautomation.rest.resource;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -77,6 +78,20 @@ public class ScriptResource {
 			e.printStackTrace();
 			return ServiceResponse.getExceptionResponse(e);
 		}		
+	}
+	
+	@DELETE
+	@Path("/cycle/delete/{cycleId}")
+	public Response deleteCycle(@PathParam("cycleId") Integer cycleId) throws Exception {
+		try {
+			ScriptService svc = new ScriptService();
+			List<Cycle> cycles = svc.deleteCycle(cycleId);
+			return ServiceResponse.getSuccessResponse(cycles);
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+			return ServiceResponse.getExceptionResponse(e);
+		}
 	}
 	
 	@POST

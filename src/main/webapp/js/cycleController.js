@@ -140,6 +140,7 @@ var cycleCtrlFactory = function() {
 			};
 			
 			scope.backupCycle = function() {
+				scope.cycle.kerberosLoginParms.configEnvironmentId = scope.config.currentEnvironment.id;
 				scope.cycleBackup = angular.copy(scope.cycle);
 			};
 				
@@ -183,6 +184,24 @@ var cycleCtrlFactory = function() {
 			
 			scope.cloneCycle = function() {
 				
+			};
+			
+			scope.removeCycle = function() {
+				cycleSvc.removeCycle(scope.cycle).then(
+						function(serviceResponse) {
+							scope.cycles = serviceResponse.data;					
+							scope.cycle = '';
+							scope.$apply;
+						},
+						function(serviceResponse) {
+							if(serviceResponse != undefined && serviceResponse.message) {
+								alert(serviceResponse.message);
+							}
+							else {
+								alert('Cycle deletion error:\n' + serviceResponse);
+							}
+						}
+					);
 			};
 			
 			scope.launch = function(itemId, itemType) {

@@ -103,7 +103,7 @@ public class ScriptService {
         catch(Exception e) {
         	e.printStackTrace(System.out);
         	if(trans.isActive()) {
-        		System.out.println("Config Service rolling back!!!");
+        		System.out.println("Script Service rolling back cycle save!!!");
         		trans.rollback();
         	}
         	throw e;
@@ -114,6 +114,47 @@ public class ScriptService {
 	    	if(factory != null && factory.isOpen())
 	    		factory.close();
 		}			
+	}
+
+	public List<Cycle> deleteCycle(Integer cycleId) {
+        EntityManagerFactory factory = null;
+        EntityManager em = null;
+        EntityTransaction trans = null;
+        try {
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            em = factory.createEntityManager();
+            Cycle cycle = em.find(Cycle.class, cycleId);
+            Integer userId = cycle.getUser().getId();
+            User user = em.find(User.class, userId);
+            
+		    trans = em.getTransaction();
+		    trans.begin();
+		    
+            user.removeCycle(cycle);
+		    em.remove(cycle);
+            
+		    if(trans.isActive()) {
+			    System.out.println("Committing...");
+			    trans.commit();
+		    }
+		    
+            List<Cycle> cycles = getCycles(userId);
+    		return cycles;
+		} 
+        catch(Exception e) {
+        	e.printStackTrace(System.out);
+        	if(trans != null && trans.isActive()) {
+        		System.out.println("Script Service rolling back cycle deletion!!!");
+        		trans.rollback();
+        	}
+        	throw e;
+        }
+	    finally {
+	    	if(em != null && em.isOpen())
+	    		em.close();
+	    	if(factory != null && factory.isOpen())
+	    		factory.close();
+		}
 	}
 
 	public String launchCycle(Integer configId, Integer cycleId, boolean terminate) {

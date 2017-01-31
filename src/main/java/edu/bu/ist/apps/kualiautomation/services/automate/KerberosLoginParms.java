@@ -9,6 +9,7 @@ public class KerberosLoginParms {
 	private String usernameOtherIdentifier;
 	private String passwordOtherIdentifier;
 	private String submitButtonLabel;
+	private Integer configEnvironmentId = -1;
 	
 	public String getUsername() {
 		return username;
@@ -55,6 +56,12 @@ public class KerberosLoginParms {
 	}
 	public void setSubmitButtonLabel(String submitButtonLabel) {
 		this.submitButtonLabel = submitButtonLabel;
+	}
+	public Integer getConfigEnvironmentId() {
+		return configEnvironmentId;
+	}
+	public void setConfigEnvironmentId(Integer configEnvironmentId) {
+		this.configEnvironmentId = configEnvironmentId;
 	}
 	
 }
