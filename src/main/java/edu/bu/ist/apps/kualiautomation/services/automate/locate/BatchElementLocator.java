@@ -1,6 +1,7 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -31,6 +32,8 @@ public class BatchElementLocator implements Locator {
 	private SearchContext searchContext;
 	private boolean defaultRan;
 	private boolean busy;
+	private boolean ignoreHidden;
+	private boolean ignoreDisabled;
 	
 	
 	public BatchElementLocator(SearchContext searchContext) {
@@ -74,6 +77,16 @@ public class BatchElementLocator implements Locator {
 					Constructor<?> ctr = clazz.getConstructor(WebDriver.class, SearchContext.class);
 					List<String> attributes = parms.get(clazz);
 					Locator locator = (Locator) ctr.newInstance(driver, searchContext);
+					
+					Method setter = clazz.getMethod("setIgnoreHidden", boolean.class);
+					if(setter != null) {
+						setter.invoke(locator, this.ignoreHidden);
+					}
+					
+					setter = clazz.getMethod("setIgnoreDisabled", boolean.class);
+					if(setter != null) {
+						setter.invoke(locator, this.ignoreDisabled);
+					}
 					
 					Element result = runLocator(locator, elementType, attributes);
 					
@@ -184,6 +197,25 @@ public class BatchElementLocator implements Locator {
 
 	private static String getDelimiterRegex() {
 		return "\\" + StringUtils.join(PARAMETER_DELIMITER.split(""), "\\");
+	}
+
+
+	@Override
+	public boolean ignoreHidden() {
+		return ignoreHidden;
+	}
+
+	@Override
+	public boolean ignoreDisabled() {
+		return ignoreDisabled;
+	}
+	
+	public void setIgnoreHidden(boolean ignoreHidden) {
+		this.ignoreHidden = ignoreHidden;
+	}
+	
+	public void setIgnoreDisabled(boolean ignoreDisabled) {
+		this.ignoreDisabled = ignoreDisabled;
 	}
 
 	public static void main(String[] args) {

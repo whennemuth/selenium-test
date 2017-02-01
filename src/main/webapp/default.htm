@@ -86,7 +86,7 @@
 							ng-show="cycle.suites.length > 1"
 							ng-click="removeSuite(cycle, $index);">
 						<div style="display:inline; padding-left:50px; width:200px;" ng-show="cycle && cycle.suites[$index].id">
-							<input type='button' value=' Launch '>
+							<input type='button' value=' Launch ' onclick="alert('Not implemented yet');">
 							<select 
 								ng-model="suite.repeat" 
 								ng-options="idx as idx for idx in [1,2,3,4,5,6,7,8,9,10]">

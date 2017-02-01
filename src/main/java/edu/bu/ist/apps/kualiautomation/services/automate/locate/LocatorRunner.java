@@ -2,7 +2,10 @@ package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.openqa.selenium.WebDriver;
 
@@ -21,62 +24,92 @@ import edu.bu.ist.apps.kualiautomation.util.Utils;
 public class LocatorRunner {
 
 	private WebDriver driver;
-	private LabelAndValue lv;
-	private Locator locator;
+	private BatchElementLocator locator;
+	private boolean ignoreHidden;
+	private boolean ignoreDisabled;
+	private boolean busy;
+	private Set<Class<?>> additionalLocators = new HashSet<Class<?>>();
 	
 	@SuppressWarnings("unused")
 	private LocatorRunner() { /* Restrict the default constructor */ }
 	
-	public LocatorRunner(WebDriver driver, LabelAndValue lv) {
+	public LocatorRunner(WebDriver driver) {
 		this.driver = driver;
-		this.lv = lv;
 	}
 	
-	public List<Element> run() {
-		return run(false);
+	public Element run(LabelAndValue lv) {
+		return run(new LabelAndValue[]{ lv });
+	}
+	
+	public Element run(LabelAndValue[] lvs) {
+		List<Element> elements = runGreedy(lvs);
+		if(elements.isEmpty())
+			return null;
+		return elements.get(0);
 	}
 
+	public List<Element> runGreedy(LabelAndValue lv) {
+		return runGreedy(new LabelAndValue[]{ lv });
+	}
+
+	public List<Element> runGreedy(LabelAndValue[] lvs) {
+		try {
+			busy = true;
+			List<Element> elements = new ArrayList<Element>();
+			for(LabelAndValue lv : lvs) {
+				elements.addAll(doRun(lv));
+			}
+			return elements;
+		} 
+		finally {
+			busy = false;
+		}
+	}
+	
 	/**
 	 * Find an element on a web page, returning it or multiple elements if the search criteria yielded more than one match.
-	 * @param greedy Stop searching for elements that match the criteria after the first successful locate attempt.
 	 * @return
 	 */
-	public List<Element> run(boolean greedy) {
+	private List<Element> doRun(LabelAndValue lv) {
 		
 		List<Element> elements = new ArrayList<Element>();
+		Set<Class<?>> locators = new HashSet<Class<?>>();
+		boolean labelCanAlsoBeAnAttribute = true;
 		
 		switch(lv.getElementTypeEnum()) {
 		case BUTTON: case BUTTONIMAGE:
-			elements = runBatch(new Class<?>[]{
-				LabelledElementLocator.class,
-				BasicElementLocator.class // the label in LabelAndValue will be treated as an attribute of the sought element
-			});
+			locators.add(LabelledElementLocator.class);
+			locators.add(BasicElementLocator.class); // the label in LabelAndValue will be treated as an attribute of the sought element
+			elements.addAll(runBatch(lv, locators, labelCanAlsoBeAnAttribute));
 			break;
 		case HYPERLINK:
-			elements = runBatch(new Class<?>[]{
-				HyperlinkElementLocator.class,
-				HotspotElementLocator.class
-			});
+			locators.add(HyperlinkElementLocator.class);
+			locators.add(HotspotElementLocator.class);
+			elements.addAll(runBatch(lv, locators, labelCanAlsoBeAnAttribute));
 			break;
 		case TEXTBOX: case PASSWORD: case TEXTAREA: case SELECT: case RADIO: case CHECKBOX:
-			elements.addAll(locateElements(new LabelledElementLocator(driver)));
+			elements.addAll(locateElements(lv, new LabelledElementLocator(driver)));
+			labelCanAlsoBeAnAttribute = false;
 			break;
 		case HOTSPOT:
-			elements.addAll(locateElements(new HotspotElementLocator(driver)));
+			elements.addAll(locateElements(lv, new HotspotElementLocator(driver)));
 			break;
 		case SHORTCUT:
-			elements.addAll(locateElements(new ShortcutElementLocator(driver, lv.getConfigShortcut())));
+			elements.addAll(locateElements(lv, new ShortcutElementLocator(driver, lv.getConfigShortcut())));
 			break;
 		case OTHER:
-			elements = runBatch(new Class<?>[]{
-				LabelledElementLocator.class,
-				HotspotElementLocator.class,
-				(lv.getConfigShortcut() == null ? null : ShortcutElementLocator.class)
-			});
+			locators.add(LabelledElementLocator.class);
+			locators.add(HotspotElementLocator.class);
+			if(lv.getConfigShortcut() != null) {
+				locators.add(ShortcutElementLocator.class);
+			}
+			elements.addAll(runBatch(lv, locators, labelCanAlsoBeAnAttribute));
 			break;
 		default:
 			break;
 		}
+		
+		elements.addAll(runBatch(lv, additionalLocators, labelCanAlsoBeAnAttribute));
 		
 		if(elements.isEmpty()) {
 			System.out.println("Could not locate " + String.valueOf(lv.getLabel() + ": " + lv.getElementType()));
@@ -91,7 +124,7 @@ public class LocatorRunner {
 		return elements;
 	}
 	
-	private List<Element> locateElements(Locator locator) {
+	private List<Element> locateElements(LabelAndValue lv, Locator locator) {
 		return locator.locateAll(lv.getElementTypeEnum(), Arrays.asList(new String[]{ lv.getLabel() }));
 	}
 	
@@ -103,22 +136,66 @@ public class LocatorRunner {
 	 * @param classes
 	 * @return
 	 */
-	private List<Element> runBatch(Class<?>[] classes) {
+	private List<Element> runBatch(LabelAndValue lv, Set<Class<?>> classes, boolean labelAsAttribute) {
+		
+		if(classes.isEmpty())
+			return new ArrayList<Element>();
+		
 		locator = new BatchElementLocator(driver);
-		String[] parameters = new String[classes.length];
-		for(int i=0; i<classes.length; i++) {
-			if(classes[i] == null)
-				continue;
-			StringBuilder s = new StringBuilder(classes[i].getName())
-				.append(BatchElementLocator.PARAMETER_DELIMITER)
-				.append(lv.getLabel());
+		locator.setIgnoreDisabled(ignoreDisabled);
+		locator.setIgnoreHidden(ignoreHidden);
+		
+		String[] parameters = new String[classes.size()];
+		
+		int i = 0;
+		for (Iterator<Class<?>> iterator = classes.iterator(); iterator.hasNext();) {
+			Class<?> clazz = iterator.next();
+			StringBuilder s = new StringBuilder(clazz.getName());
+			if(!BasicElementLocator.class.equals(clazz) || labelAsAttribute) {
+				s.append(BatchElementLocator.PARAMETER_DELIMITER).append(lv.getLabel());
+			}
 			if(!Utils.isEmpty(lv.getIdentifier())) {
 				s.append(BatchElementLocator.PARAMETER_DELIMITER).append(lv.getIdentifier());
 			}
 			parameters[i] = s.toString();
+			i++;
 		}
 		List<Element> elements = locator.locateAll(lv.getElementTypeEnum(), Arrays.asList(parameters));
 		
 		return elements;
+	}
+
+	public boolean ignoreHidden() {
+		return ignoreHidden;
+	}
+
+	public boolean ignoreDisabled() {
+		return ignoreDisabled;
+	}
+	
+	public void setIgnoreHidden(boolean ignoreHidden) {
+		this.ignoreHidden = ignoreHidden;
+	}
+	
+	public void setIgnoreDisabled(boolean ignoreDisabled) {
+		this.ignoreDisabled = ignoreDisabled;
+	}
+
+	public boolean isBusy() {
+		return busy;
+	}
+
+	/**
+	 * Add a supplimentary locator by class name. This locator will run after the default
+	 * locators associated with the ElementType have run.
+	 * 
+	 * @param locator
+	 */
+	public void addLocator(Class<?> locator) {
+		additionalLocators.add(locator);
+	}
+	
+	public void removeLocator(Class<?> locator) {
+		additionalLocators.remove(locator);
 	}
 }

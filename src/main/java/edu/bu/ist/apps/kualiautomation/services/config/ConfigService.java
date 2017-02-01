@@ -82,6 +82,23 @@ public class ConfigService {
 	    		factory.close();
 		}
 	}
+	
+	public ConfigEnvironment getConfigEnvironmentById(Integer cfgEnvId) {
+        EntityManagerFactory factory = null;
+        EntityManager em = null;
+        try {
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            em = factory.createEntityManager();
+            ConfigEnvironment env = em.find(ConfigEnvironment.class, cfgEnvId);
+        	return env;
+		} 
+	    finally {
+	    	if(em != null && em.isOpen())
+	    		em.close();
+	    	if(factory != null && factory.isOpen())
+	    		factory.close();
+		}
+	}
 
 	private Config getEmptyConfig(boolean defaultEnvironments) {
 		Config cfg = new Config();

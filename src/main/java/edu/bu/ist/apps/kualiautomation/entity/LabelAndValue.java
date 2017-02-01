@@ -35,7 +35,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 @Entity
 @Table(name="label_and_value")
 @NamedQuery(name="LabelAndValue.findAll", query="SELECT l FROM LabelAndValue l")
-public class LabelAndValue extends AbstractEntity implements Serializable {
+public class LabelAndValue extends AbstractEntity implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -211,6 +211,19 @@ public class LabelAndValue extends AbstractEntity implements Serializable {
 			
 			(new CustomJsonSerializer<Suite>()).serialize(suite, generator, provider);
 		}
+	}
+
+	/**
+ * 
+	 * @return A clone of everything except the id (leave null). Would be a detached instance that
+	 * wouldn't seem to have been persisted yet as far as JPA is concerned.
+	 * @throws CloneNotSupportedException
+	 */
+	public LabelAndValue copy() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		LabelAndValue lv = (LabelAndValue) super.clone();
+		lv.setId(null);
+		return lv;
 	}
 	
 //	public static class ShortcutFieldSerializer extends JsonSerializer<ConfigShortcut> {

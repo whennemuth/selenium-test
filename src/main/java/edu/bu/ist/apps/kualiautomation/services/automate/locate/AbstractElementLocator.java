@@ -31,6 +31,8 @@ public abstract class AbstractElementLocator implements Locator {
 	 */
 	protected boolean busy; 
 	protected boolean skipFrameSearch;
+	protected boolean ignoreHidden;
+	protected boolean ignoreDisabled;
 	
 	public AbstractElementLocator(WebDriver driver) {
 		this.driver = driver;
@@ -65,8 +67,13 @@ public abstract class AbstractElementLocator implements Locator {
 			results = new ArrayList<Element>();
 			
 			List<WebElement> custom = customLocate();
-			
-			webElements.addAll(custom);
+			for(WebElement found : custom) {
+				if(ignoreHidden && !found.isDisplayed())
+					continue;
+				if(ignoreDisabled && !found.isEnabled())
+					continue;
+				webElements.add(found);
+			}
 			
 			if(webElements.isEmpty()) {
 				List<WebElement> defaults = defaultLocate();
@@ -205,6 +212,22 @@ public abstract class AbstractElementLocator implements Locator {
 	public void setSkipParameterMatching(boolean skipParameterMatching) {
 		this.skipParameterMatching = skipParameterMatching;
 	}
+
+	@Override
+	public boolean ignoreHidden() {
+		return ignoreHidden;
+	}
+
+	@Override
+	public boolean ignoreDisabled() {
+		return ignoreDisabled;
+	}
 	
+	public void setIgnoreHidden(boolean ignoreHidden) {
+		this.ignoreHidden = ignoreHidden;
+	}
 	
+	public void setIgnoreDisabled(boolean ignoreDisabled) {
+		this.ignoreDisabled = ignoreDisabled;
+	}
 }

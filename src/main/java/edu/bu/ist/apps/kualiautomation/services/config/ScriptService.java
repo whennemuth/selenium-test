@@ -17,6 +17,7 @@ import edu.bu.ist.apps.kualiautomation.entity.User;
 import edu.bu.ist.apps.kualiautomation.entity.util.BeanPopulator;
 import edu.bu.ist.apps.kualiautomation.entity.util.EntityPersister;
 import edu.bu.ist.apps.kualiautomation.entity.util.EntityPopulator;
+import edu.bu.ist.apps.kualiautomation.services.automate.KerberosLoginParms;
 import edu.bu.ist.apps.kualiautomation.services.automate.Session;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
@@ -157,7 +158,7 @@ public class ScriptService {
 		}
 	}
 
-	public String launchCycle(Integer configId, Integer cycleId, boolean terminate) {
+	public String launchCycle(Integer configId, KerberosLoginParms kerberosParms, Integer cycleId, boolean terminate) {
         EntityManagerFactory factory = null;
         EntityManager em = null;
         try {
@@ -180,6 +181,7 @@ public class ScriptService {
         		return s.toString();
         	}
         	
+        	cycle.setKerberosLoginParms(kerberosParms);
         	Session session = new Session(config, cycle, terminate);
     		Thread thread = new Thread(session);
     		thread.start();

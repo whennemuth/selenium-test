@@ -51,6 +51,8 @@ public class LabelledElementLocator extends AbstractElementLocator {
 				attributeValues = parameters.subList(1, parameters.size());
 			}
 			LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext);
+			labelLocator.setIgnoreHidden(super.ignoreHidden);
+			labelLocator.setIgnoreDisabled(super.ignoreDisabled);
 			List<Element> labelElements = labelLocator.locateAll(elementType, Arrays.asList(new String[]{label}));
 			for(Element labelElement : labelElements) {
 				List<WebElement> flds = tryTraditionalLabelSearchMethod(labelElement.getWebElement(), attributeValues);

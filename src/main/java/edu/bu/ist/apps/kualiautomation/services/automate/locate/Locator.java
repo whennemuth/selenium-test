@@ -19,4 +19,16 @@ public interface Locator {
 	public WebDriver getWebDriver();
 	
 	public boolean busy();
+	
+	/**
+	 * Don't include any hidden elements in search results that have been otherwise found to match.
+	 * @return
+	 */
+	public boolean ignoreHidden();
+	
+	/**
+	 * Don't include any disabled elements in search results that have been otherwise found to match.
+	 * @return
+	 */
+	public boolean ignoreDisabled();
 }

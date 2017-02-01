@@ -37,7 +37,7 @@ public class KerberosLoginParms {
 	}
 	public String getUsernameOtherIdentifier() {
 		if(usernameLabel == null)
-			return usernameOtherIdentifier == null ? "login_user" : usernameOtherIdentifier;
+			return usernameOtherIdentifier == null ? "j_username" : usernameOtherIdentifier;
 		return usernameOtherIdentifier;
 	}
 	public void setUsernameOtherIdentifier(String usernameOtherIdentifier) {
@@ -45,14 +45,14 @@ public class KerberosLoginParms {
 	}
 	public String getPasswordOtherIdentifier() {
 		if(passwordLabel == null)
-			return passwordOtherIdentifier == null ? "login_pw" : passwordOtherIdentifier;
+			return passwordOtherIdentifier == null ? "j_password" : passwordOtherIdentifier;
 		return passwordOtherIdentifier;
 	}
 	public void setPasswordOtherIdentifier(String passwordOtherIdentifier) {
 		this.passwordOtherIdentifier = passwordOtherIdentifier;
 	}
 	public String getSubmitButtonLabel() {
-		return submitButtonLabel == null ? "login" : submitButtonLabel;
+		return submitButtonLabel == null ? "continue" : submitButtonLabel;
 	}
 	public void setSubmitButtonLabel(String submitButtonLabel) {
 		this.submitButtonLabel = submitButtonLabel;

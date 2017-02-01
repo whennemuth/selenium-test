@@ -96,10 +96,14 @@ public class ScriptResource {
 	
 	@POST
 	@Path("/cycle/launch/cycle")
-	public Response launchCycle(KerberosLoginParms parms, @QueryParam("cycleId") Integer cycleId, @QueryParam("cfgId") Integer configId, @QueryParam("terminate") boolean terminate) {
+	public Response launchCycle(
+			KerberosLoginParms parms, 
+			@QueryParam("cycleId") Integer cycleId, 
+			@QueryParam("cfgId") Integer configId, 
+			@QueryParam("terminate") boolean terminate) {
 		try {
 			ScriptService svc = new ScriptService();
-			String message = svc.launchCycle(configId, cycleId, terminate);
+			String message = svc.launchCycle(configId, parms, cycleId, terminate);
 			return ServiceResponse.getSuccessResponse(null, message);
 		} 
 		catch (Exception e) {

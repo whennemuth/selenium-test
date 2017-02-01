@@ -49,8 +49,8 @@ public class CycleRunner {
 		for(Suite suite : cycle.getSuites()) {
 			System.out.println("Processing Suite: " + suite.getName());
 			for(LabelAndValue lv : suite.getLabelAndValues()) {
-				LocatorRunner locator = new LocatorRunner(driver, lv);
-				List<Element> elements = locator.run(true);
+				LocatorRunner locator = new LocatorRunner(driver);
+				List<Element> elements = locator.runGreedy(lv);
 				if(elementLocated(lv, elements)) {
 					if(!applyElementValue(lv, elements.get(0))) {
 						driver.switchTo().defaultContent();

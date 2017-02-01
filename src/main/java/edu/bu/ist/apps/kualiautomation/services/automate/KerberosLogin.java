@@ -1,45 +1,51 @@
 package edu.bu.ist.apps.kualiautomation.services.automate;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
+import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
-import edu.bu.ist.apps.kualiautomation.services.automate.locate.LabelledElementLocator;
-import edu.bu.ist.apps.kualiautomation.services.automate.locate.Locator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.BasicElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.LocatorRunner;
+import edu.bu.ist.apps.kualiautomation.services.config.ConfigService;
 import edu.bu.ist.apps.kualiautomation.services.config.ConfigTestingDefaults;
 
 public class KerberosLogin {
 	
-	private Session session;
 	private KerberosLoginParms loginParms;
 	private String loginUrl;
 	private WebDriver driver;
 	private long submittedAt;
-	private final Locator locator;
+	
+	private final LocatorRunner locatorRunner;
 	private WebDriverWait wait;
 	private int timeout;
 	private Element username;
 	private String failureMessage;
 	
+	private static final String TEST_DRIVE_USERNAME_OTHER_IDENTIFIER = "login_user";
+	private static final String TEST_DRIVE_PASSWORD_OTHER_IDENTIFIER = "login_pw";
+	private static final String TEST_DRIVE_SUBMIT_BUTTON_LABEL = "login";
+	
 	public KerberosLogin(Session session, int timeout) {
-		this.session = session;
 		this.loginParms = session.getCycle().getKerberosLoginParms();
-		this.loginUrl = session.getConfig().getCurrentEnvironment().getUrl();
+		if(loginParms.getConfigEnvironmentId() == null || loginParms.getConfigEnvironmentId() < 1) {
+			this.loginUrl = session.getConfig().getCurrentEnvironment().getUrl();
+		}
+		else {
+			this.loginUrl = (new ConfigService()).getConfigEnvironmentById(
+					loginParms.getConfigEnvironmentId()).getUrl();
+		}
 		this.driver = session.getDriver();
-		this.locator = new LabelledElementLocator(driver);
+		this.locatorRunner = new LocatorRunner(driver);
 		this.timeout = timeout;
 		this.wait = new WebDriverWait(driver, timeout);
 	}
@@ -70,13 +76,26 @@ public class KerberosLogin {
 
 	private void typeAndSubmit() throws Exception {
 		System.out.println("Going to login page...");
-		Element password = locator.locateFirst(ElementType.TEXTBOX, Arrays.asList(new String[]{
-			loginParms.getPasswordLabel(),
-			loginParms.getPasswordOtherIdentifier()
-		}));
-		Element submit = locator.locateFirst(ElementType.BUTTON, Arrays.asList(new String[]{
-			loginParms.getSubmitButtonLabel()
-		}));
+		this.locatorRunner.setIgnoreHidden(true);
+		// Also use BasicElementLocator so that the label in LabelAndValue will also be treated as an attribute of the sought element
+		this.locatorRunner.addLocator(BasicElementLocator.class);
+		
+		// 1) Get the password field
+		LabelAndValue lv = new LabelAndValue();
+		lv.setElementType(ElementType.PASSWORD.name());
+		lv.setLabel(loginParms.getPasswordLabel());
+		lv.setIdentifier(loginParms.getPasswordOtherIdentifier());		
+		LabelAndValue lvTstDrv = (LabelAndValue) lv.copy();
+		lvTstDrv.setIdentifier(TEST_DRIVE_PASSWORD_OTHER_IDENTIFIER);		
+		Element password = locatorRunner.run(new LabelAndValue[]{ lv, lvTstDrv });
+		
+		// 2) Get the submit button
+		lv = new LabelAndValue();
+		lv.setElementType(ElementType.BUTTON.name());
+		lv.setLabel(loginParms.getSubmitButtonLabel());
+		lvTstDrv = (LabelAndValue) lv.copy();
+		lvTstDrv.setLabel(TEST_DRIVE_SUBMIT_BUTTON_LABEL);		
+		Element submit = locatorRunner.run(new LabelAndValue[]{ lv, lvTstDrv });
 		
 		username.setValue(loginParms.getUsername());
 		if(password != null && password.isInteractive()) {
@@ -90,17 +109,25 @@ public class KerberosLogin {
 	private ExpectedCondition<Boolean> loginPageLoaded() {
 		ExpectedCondition<Boolean> condition = new ExpectedCondition<Boolean>() {			  
 			public Boolean apply(WebDriver drv) {
-				if(locator.busy()) {
+				if(locatorRunner.isBusy()) {
 					System.out.println("busy finding " + loginParms.getUsernameLabel());
 					return false;
 				}
 				
 				try {
 					System.out.println("Start search for " + loginParms.getUsernameLabel());
-					username = locator.locateFirst(ElementType.TEXTBOX, Arrays.asList(new String[]{
-							loginParms.getUsernameLabel(),
-							loginParms.getUsernameOtherIdentifier()
-						}));
+					
+					locatorRunner.setIgnoreHidden(true);
+					// Also use BasicElementLocator so that the label in LabelAndValue will also be treated as an attribute of the sought element
+					locatorRunner.addLocator(BasicElementLocator.class);
+
+					LabelAndValue lv = new LabelAndValue();
+					lv.setElementType(ElementType.TEXTBOX.name());
+					lv.setLabel(loginParms.getUsernameLabel());
+					lv.setIdentifier(loginParms.getUsernameOtherIdentifier());		
+					LabelAndValue lvTstDrv = (LabelAndValue) lv.copy();
+					lvTstDrv.setIdentifier(TEST_DRIVE_USERNAME_OTHER_IDENTIFIER);		
+					username = locatorRunner.run(new LabelAndValue[]{ lv, lvTstDrv });
 					
 					return usernameLocated();
 				} 
