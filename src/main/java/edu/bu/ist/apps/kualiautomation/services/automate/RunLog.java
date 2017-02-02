@@ -90,16 +90,14 @@ public class RunLog {
 			.append(element.getWebElement().getAttribute("value"))
 			.append("\" ");
 		
-		s.append("(criteria: label=\"")
-		.append(lv.getLabel())
-		.append("\"");
-		
-		if(!Utils.isEmpty(lv.getIdentifier())) {
-			s.append(", identifier=\"")
-				.append(lv.getIdentifier())
-				.append("\"");
-		}	
-		s.append(")");
+		String value = lv.getElementTypeEnum().useClickEvent() ? 
+				"click()" : 
+				("value=\"" + (Utils.isEmpty(lv.getValue()) ? "" : lv.getValue()) + "\"");
+		s.append("(criteria: type=\"").append(Utils.isEmpty(lv.getElementType()) ? "" : lv.getElementType())
+		.append("\", label=\"").append(Utils.isEmpty(lv.getLabel()) ? "" : lv.getLabel())
+		.append("\", identifier=\"").append(Utils.isEmpty(lv.getIdentifier()) ? "" : lv.getIdentifier())
+		.append("\", ").append(value)
+		.append(")");
 	}
 	
 	private long getDuration() {

@@ -141,8 +141,15 @@ public class BatchElementLocator implements Locator {
 				((AbstractElementLocator) locator).setDefaultRan(true);
 			}
 		}
+		
 		Element result = locator.locateFirst(elementType, parameters);
-		defaultRan = true;
+		
+		if(locator instanceof AbstractElementLocator) {
+			if(((AbstractElementLocator) locator).isDefaultRan()) {
+				defaultRan = true;
+			}
+		}
+		
 		return result;
 	}
 	

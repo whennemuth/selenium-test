@@ -19,6 +19,7 @@ public enum ElementType {
 		"//input[@type='text'] | //input[not(@type)]",
 		true,
 		false,
+		false,
 		false),
 	PASSWORD(
 		"Password text box",
@@ -26,6 +27,7 @@ public enum ElementType {
 		"password",
 		"//input[@type='password']",
 		true,
+		false,
 		false,
 		false),
 	TEXTAREA(
@@ -35,6 +37,7 @@ public enum ElementType {
 		"//textarea",
 		true,
 		false,
+		false,
 		false),
 	BUTTON(
 		"Something to click that looks like a button",
@@ -43,7 +46,8 @@ public enum ElementType {
 		"//input[@type='button'] | //input[@type='submit'] | //button",
 		false,
 		true,
-		false),
+		false,
+		true),
 	BUTTONIMAGE(
 		"Something to click that looks like an image",
 		"input",
@@ -51,7 +55,8 @@ public enum ElementType {
 		"//input[@type='image']",
 		false,
 		true,
-		false),	
+		false,
+		true),	
 	HYPERLINK(
 		"Clickable text that changes the cursor when hovered over to indicate a hyperlink.",
 		"a",
@@ -59,7 +64,8 @@ public enum ElementType {
 		"//a[text()]",
 		false,
 		true,
-		false), 
+		false,
+		true), 
 	HOTSPOT(
 		"Clickable graphic that changes the cursor when hovered over to indicate a hotspot for navigation or function trigger.",
 		"a",
@@ -67,12 +73,14 @@ public enum ElementType {
 		"//a[not(text())] | //a[text() and not(text())]",
 		false,
 		true,
-		false), 
+		false,
+		true), 
 	SELECT(
 		"A dropdown box or listbox",
 		"select",
 		null,
 		"//select",
+		false,
 		false,
 		false,
 		false),
@@ -83,7 +91,8 @@ public enum ElementType {
 		"//input[@type='checkbox']",
 		false,
 		false,
-		true),
+		true,
+		false),
 	RADIO(
 		"Radio Button",
 		"input",
@@ -91,7 +100,8 @@ public enum ElementType {
 		"//input[@type='radio']",
 		false,
 		false,
-		true),
+		true,
+		false),
 	SHORTCUT(
 		"A hyperlink or hotspot that is located by more than one label heading" ,
 		null,
@@ -99,7 +109,8 @@ public enum ElementType {
 		null,
 		false,
 		true,
-		false
+		false,
+		true
 	),
 	OTHER(
 		"None of the above, but clickable",
@@ -108,7 +119,8 @@ public enum ElementType {
 		"//*",
 		false,
 		false,
-		false);
+		false,
+		true);
 	
 	private String description;
 	private String xpathSelector;
@@ -117,8 +129,9 @@ public enum ElementType {
 	private boolean acceptsKeystrokes;
 	private boolean canNavigate;
 	private boolean checkable;
+	private boolean useClickEvent;
 	
-	private ElementType(String description, String tagname, String typeAttribute, String xpathSelector, boolean acceptsKeystrokes, boolean canNavigate, boolean checkable) {
+	private ElementType(String description, String tagname, String typeAttribute, String xpathSelector, boolean acceptsKeystrokes, boolean canNavigate, boolean checkable, boolean useClickEvent) {
 		this.description = description;
 		this.xpathSelector = xpathSelector;
 		this.tagname = tagname;
@@ -126,6 +139,7 @@ public enum ElementType {
 		this.acceptsKeystrokes = acceptsKeystrokes;
 		this.canNavigate = canNavigate;
 		this.checkable = checkable;
+		this.useClickEvent = useClickEvent;
 	}
 
 	public String getDescription() {
@@ -154,6 +168,10 @@ public enum ElementType {
 
 	public boolean isCheckable() {
 		return checkable;
+	}
+
+	public boolean useClickEvent() {
+		return useClickEvent;
 	}
 
 	public List<WebElement> findAll(SearchContext ctx) {

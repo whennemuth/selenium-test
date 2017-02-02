@@ -2,8 +2,8 @@ package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +11,7 @@ import org.openqa.selenium.WebDriver;
 
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**
@@ -28,7 +29,7 @@ public class LocatorRunner {
 	private boolean ignoreHidden;
 	private boolean ignoreDisabled;
 	private boolean busy;
-	private Set<Class<?>> additionalLocators = new HashSet<Class<?>>();
+	private Set<Class<?>> additionalLocators = new LinkedHashSet<Class<?>>();
 	
 	@SuppressWarnings("unused")
 	private LocatorRunner() { /* Restrict the default constructor */ }
@@ -73,7 +74,7 @@ public class LocatorRunner {
 	private List<Element> doRun(LabelAndValue lv) {
 		
 		List<Element> elements = new ArrayList<Element>();
-		Set<Class<?>> locators = new HashSet<Class<?>>();
+		Set<Class<?>> locators = new LinkedHashSet<Class<?>>();
 		boolean labelCanAlsoBeAnAttribute = true;
 		
 		switch(lv.getElementTypeEnum()) {
@@ -81,6 +82,12 @@ public class LocatorRunner {
 			locators.add(LabelledElementLocator.class);
 			locators.add(BasicElementLocator.class); // the label in LabelAndValue will be treated as an attribute of the sought element
 			elements.addAll(runBatch(lv, locators, labelCanAlsoBeAnAttribute));
+			if(elements.isEmpty() && ElementType.BUTTON.equals(lv.getElementTypeEnum())) {
+				// Search for a button did not work - perhaps the user is dealing with a BUTTONIMAGE?
+				LabelAndValue imgLv = lv.copy();
+				imgLv.setElementType(ElementType.BUTTONIMAGE.name());
+				elements.addAll(runBatch(imgLv, locators, labelCanAlsoBeAnAttribute));
+			}
 			break;
 		case HYPERLINK:
 			locators.add(HyperlinkElementLocator.class);

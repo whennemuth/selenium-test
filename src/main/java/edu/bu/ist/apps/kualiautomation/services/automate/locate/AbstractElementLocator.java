@@ -125,6 +125,9 @@ public abstract class AbstractElementLocator implements Locator {
 		this.defaultRan = defaultRan;
 	}
 	
+	public boolean isDefaultRan() {
+		return defaultRan;
+	}
 	
 	@Override
 	public boolean busy() {

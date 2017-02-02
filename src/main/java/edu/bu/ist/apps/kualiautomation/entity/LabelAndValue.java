@@ -219,9 +219,14 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 	 * wouldn't seem to have been persisted yet as far as JPA is concerned.
 	 * @throws CloneNotSupportedException
 	 */
-	public LabelAndValue copy() throws CloneNotSupportedException {
+	public LabelAndValue copy() {
 		// TODO Auto-generated method stub
-		LabelAndValue lv = (LabelAndValue) super.clone();
+		LabelAndValue lv = null;
+		try {
+			lv = (LabelAndValue) super.clone();
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
 		lv.setId(null);
 		return lv;
 	}

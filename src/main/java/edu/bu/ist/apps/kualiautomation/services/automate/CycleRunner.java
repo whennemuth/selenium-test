@@ -50,6 +50,7 @@ public class CycleRunner {
 			System.out.println("Processing Suite: " + suite.getName());
 			for(LabelAndValue lv : suite.getLabelAndValues()) {
 				LocatorRunner locator = new LocatorRunner(driver);
+				locator.setIgnoreHidden(true);
 				List<Element> elements = locator.runGreedy(lv);
 				if(elementLocated(lv, elements)) {
 					if(!applyElementValue(lv, elements.get(0))) {

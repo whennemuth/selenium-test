@@ -96,35 +96,32 @@ public class BasicElement implements Element {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("webElement=[");
+		builder.append("webElement=[ ");
 		if(webElement == null) {
 			builder.append("null");
 		}
 		else {
-			builder.append(webElement.getTagName());
-			if(!Utils.isEmpty(webElement.getText())) {
-				builder.append(" (text='").append(webElement.getText()).append("', ")
+			builder
+				.append("label=").append(label).append(", ")
+				.append("elementType=").append(elementType.name()).append(", ")
 				.append("enabled=").append(Boolean.valueOf(webElement.isEnabled())).append(", ")
-				.append("disabled=").append(Boolean.valueOf(webElement.isDisplayed()));
-				for (int i = 0; i < Attribute.DEFAULT_ATTRIBUTES_TO_CHECK.length; i++) {
-					if(i == 0) {
-						builder.append(", ");
-					}
-					String attribute = Attribute.DEFAULT_ATTRIBUTES_TO_CHECK[i];
-					builder.append(attribute).append("='").append(String.valueOf(webElement.getAttribute(attribute)));
-					builder.append("'");
-					if((i+1) == Attribute.DEFAULT_ATTRIBUTES_TO_CHECK.length)
-						break;
-					builder.append(", ");
-				}
-				builder.append(")");
+				.append("displayed=").append(Boolean.valueOf(webElement.isDisplayed())).append(", ")
+				.append("selected=").append(Boolean.valueOf(webElement.isSelected())).append(", ")
+				.append("html=<").append(webElement.getTagName()).append(" ");
+			for (int i = 0; i < Attribute.DEFAULT_ATTRIBUTES_TO_CHECK.length; i++) {
+				String attribute = Attribute.DEFAULT_ATTRIBUTES_TO_CHECK[i];
+				builder.append(attribute).append("='").append(String.valueOf(webElement.getAttribute(attribute)));
+				builder.append("'");
+				if((i+1) == Attribute.DEFAULT_ATTRIBUTES_TO_CHECK.length)
+					break;
+				builder.append(" ");
 			}
+			builder.append(">");
 		}
-		builder.append(", label=");
-		builder.append(label);
-		builder.append(", elementType=");
-		builder.append(elementType.name());
-		builder.append("]");
+		if(!Utils.isEmpty(webElement.getText())) {
+			builder.append(webElement.getText());
+		}
+		builder.append("</").append(webElement.getTagName()).append("> ]");
 		return builder.toString();
 	}
 
