@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.locate;
+package edu.bu.ist.apps.kualiautomation.services.automate.locate.label;
 
 import java.util.Map;
 
@@ -7,6 +7,7 @@ import org.junit.Test;
 import edu.bu.ist.apps.kualiautomation.AbstractJettyBasedTest;
 import edu.bu.ist.apps.kualiautomation.ElementsAssertion;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledElementLocator;
 
 public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 	

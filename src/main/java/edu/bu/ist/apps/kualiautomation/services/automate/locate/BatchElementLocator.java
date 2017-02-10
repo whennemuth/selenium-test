@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class BatchElementLocator implements Locator {
 	private boolean busy;
 	private boolean ignoreHidden;
 	private boolean ignoreDisabled;
-	
+	private List<String> messages;
 	
 	public BatchElementLocator(SearchContext searchContext) {
 		if(searchContext instanceof WebDriver) {
@@ -143,6 +144,9 @@ public class BatchElementLocator implements Locator {
 		}
 		
 		Element result = locator.locateFirst(elementType, parameters);
+		if(locator.getMessage() != null) {
+			messages.add(locator.getMessage());
+		}
 		
 		if(locator instanceof AbstractElementLocator) {
 			if(((AbstractElementLocator) locator).isDefaultRan()) {
@@ -223,6 +227,21 @@ public class BatchElementLocator implements Locator {
 	
 	public void setIgnoreDisabled(boolean ignoreDisabled) {
 		this.ignoreDisabled = ignoreDisabled;
+	}
+
+	@Override
+	public String getMessage() {
+		if(messages.isEmpty())
+			return null;
+		StringBuilder message = new StringBuilder();
+		for (Iterator iterator = messages.iterator(); iterator.hasNext();) {
+			String msg = (String) iterator.next();
+			message.append(msg);
+			if(iterator.hasNext()) {
+				message.append("\r\n");
+			}
+		}
+		return message.toString();
 	}
 
 	public static void main(String[] args) {

@@ -90,13 +90,9 @@ public class RunLog {
 			.append(element.getWebElement().getAttribute("value"))
 			.append("\" ");
 		
-		String value = lv.getElementTypeEnum().useClickEvent() ? 
-				"click()" : 
-				("value=\"" + (Utils.isEmpty(lv.getValue()) ? "" : lv.getValue()) + "\"");
 		s.append("(criteria: type=\"").append(Utils.isEmpty(lv.getElementType()) ? "" : lv.getElementType())
 		.append("\", label=\"").append(Utils.isEmpty(lv.getLabel()) ? "" : lv.getLabel())
 		.append("\", identifier=\"").append(Utils.isEmpty(lv.getIdentifier()) ? "" : lv.getIdentifier())
-		.append("\", ").append(value)
 		.append(")");
 	}
 	

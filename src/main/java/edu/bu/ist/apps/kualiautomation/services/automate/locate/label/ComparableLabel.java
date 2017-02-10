@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.locate;
+package edu.bu.ist.apps.kualiautomation.services.automate.locate.label;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,19 +19,19 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 
 	private String label;
 	private String text;
-	private WebElement webElement;
+	protected WebElement webElement;
 	protected boolean demoted;
 	protected boolean disqualified;
-	private boolean useDefaultMethodIfIndeterminate;
-	private static final int THIS_LABEL_IS_BETTER = -1;
-	private static final int OTHER_LABEL_IS_BETTER = 1;
+	protected boolean useDefaultMethodIfIndeterminate;
+	protected static final int THIS_LABEL_IS_BETTER = -1;
+	protected static final int OTHER_LABEL_IS_BETTER = 1;
+	protected static final int ITS_A_DRAW = 0;
 	
 	/**
 	 * Constructor for Comparable Label
 	 * 
 	 * @param label The value the web element this label is based on was located by.
 	 * @param text The actual text of the web element this label is based on.
-	 * @param basis The value labels are "competing" to be most like when they are compare with one another.
 	 * @param useDefaultMethodIfIndeterminate Invoke the default comparison method if implementors of this class 
 	 * find two unequal labels to compare as zero using their custom compare method.
 	 */
@@ -41,6 +41,15 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 		this.useDefaultMethodIfIndeterminate = useDefaultMethodIfIndeterminate;
 	}
 	
+	/**
+	 * Constructor for Comparable Label
+	 * 
+	 * @param webElement of the label
+	 * @param label The value the web element this label is based on was located by.
+	 * @param text The actual text of the web element this label is based on.
+	 * @param useDefaultMethodIfIndeterminate Invoke the default comparison method if implementors of this class 
+	 * find two unequal labels to compare as zero using their custom compare method.
+	 */
 	public ComparableLabel(WebElement webElement, String label, String text, boolean useDefaultMethodIfIndeterminate) {
 		this(label, text, useDefaultMethodIfIndeterminate);
 		this.webElement = webElement;
@@ -50,7 +59,7 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 	
 	protected int requiredCompareTo(ComparableLabel lbl) {
 		if (this == lbl)
-			return 0;		
+			return ITS_A_DRAW;		
 		if (lbl == null)
 			return THIS_LABEL_IS_BETTER;
 		if (!(lbl instanceof ComparableLabel))
@@ -64,7 +73,7 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 			return THIS_LABEL_IS_BETTER;
 		}
 		
-		return 0;
+		return ITS_A_DRAW;
 	}
 	
 	protected int defaultCompareTo(ComparableLabel lbl) {
@@ -72,7 +81,7 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 		String thistext = getText();
 		String otherlabel = getCleanedValue(lbl.label).toLowerCase();
 		String othertext = getCleanedValue(lbl.text).toLowerCase();
-		int retval = 0;
+		int retval = ITS_A_DRAW;
 		
 		if(thistext.startsWith(thislabel) && othertext.startsWith(otherlabel)) {			
 			if(thistext.length() < othertext.length()) {
@@ -104,7 +113,7 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 
 				ComparableLabel newThis = new ComparableLabel(thislabel, trimmedThistext, true) {
 					@Override protected int customCompareTo(ComparableLabel lbl) {
-						return 0;
+						return ITS_A_DRAW;
 					}
 				};
 				newThis.demoted = this.demoted;
@@ -112,7 +121,7 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 				
 				ComparableLabel newOther = new ComparableLabel(otherlabel, trimmedOthertext, true) {
 					@Override protected int customCompareTo(ComparableLabel lbl) {
-						return 0;
+						return ITS_A_DRAW;
 					}
 				};
 				newOther.demoted = lbl.demoted;
@@ -146,9 +155,9 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 		else if(this.disqualified)
 			return OTHER_LABEL_IS_BETTER;
 		
-		if(compared == 0) {
+		if(compared == ITS_A_DRAW) {
 			compared = customCompareTo(o);
-			if(compared == 0 && useDefaultMethodIfIndeterminate) {
+			if(compared == ITS_A_DRAW && useDefaultMethodIfIndeterminate) {
 				compared = defaultCompareTo(o);
 			}
 		}

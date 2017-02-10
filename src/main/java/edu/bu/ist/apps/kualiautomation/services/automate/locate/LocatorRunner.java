@@ -12,6 +12,8 @@ import org.openqa.selenium.WebDriver;
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.screenscrape.ScreenScrapeElementLocator;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**
@@ -103,6 +105,9 @@ public class LocatorRunner {
 			break;
 		case SHORTCUT:
 			elements.addAll(locateElements(lv, new ShortcutElementLocator(driver, lv.getConfigShortcut())));
+			break;
+		case SCREENSCRAPE:
+			elements.addAll(locateElements(lv, new ScreenScrapeElementLocator(driver)));
 			break;
 		case OTHER:
 			locators.add(LabelledElementLocator.class);

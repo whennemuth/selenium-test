@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.locate;
+package edu.bu.ist.apps.kualiautomation.services.automate.locate.label;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import edu.bu.ist.apps.kualiautomation.AbstractJettyBasedTest;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelElementLocator;
 
 public class LabelElementLocatorTest extends AbstractJettyBasedTest {
 

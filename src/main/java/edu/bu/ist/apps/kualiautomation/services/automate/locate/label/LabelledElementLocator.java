@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.locate;
+package edu.bu.ist.apps.kualiautomation.services.automate.locate.label;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +14,7 @@ import org.openqa.selenium.WebElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Attribute;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**

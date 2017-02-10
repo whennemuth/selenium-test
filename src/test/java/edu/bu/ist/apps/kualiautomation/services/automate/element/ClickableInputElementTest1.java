@@ -16,7 +16,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import edu.bu.ist.apps.kualiautomation.AbstractJettyBasedTest;
 import edu.bu.ist.apps.kualiautomation.ElementsAssertion;
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
-import edu.bu.ist.apps.kualiautomation.services.automate.locate.LabelledElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledElementLocator;
 
 @RunWith(MockitoJUnitRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

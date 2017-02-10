@@ -17,7 +17,6 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
 public abstract class AbstractElementLocator implements Locator {
-// RESUME NEXT: resume testing add proposal log in test drive.
 	protected SearchContext searchContext;
 	protected WebDriver driver;
 	protected ElementType elementType;
@@ -33,6 +32,7 @@ public abstract class AbstractElementLocator implements Locator {
 	protected boolean skipFrameSearch;
 	protected boolean ignoreHidden;
 	protected boolean ignoreDisabled;
+	protected String message;
 	
 	public AbstractElementLocator(WebDriver driver) {
 		this.driver = driver;
@@ -67,6 +67,7 @@ public abstract class AbstractElementLocator implements Locator {
 			results = new ArrayList<Element>();
 			
 			List<WebElement> custom = customLocate();
+			
 			for(WebElement found : custom) {
 				if(ignoreHidden && !found.isDisplayed())
 					continue;
@@ -170,7 +171,7 @@ public abstract class AbstractElementLocator implements Locator {
 				results.addAll(Attribute.findForValues(candidates, parameters));
 			}
 			break;
-		case SHORTCUT:
+		case SHORTCUT: case SCREENSCRAPE:
 			break;
 		default:
 			break;
@@ -233,4 +234,13 @@ public abstract class AbstractElementLocator implements Locator {
 	public void setIgnoreDisabled(boolean ignoreDisabled) {
 		this.ignoreDisabled = ignoreDisabled;
 	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+	
 }

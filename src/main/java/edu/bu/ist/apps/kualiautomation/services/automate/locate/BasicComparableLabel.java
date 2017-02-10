@@ -2,6 +2,8 @@ package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import org.openqa.selenium.WebElement;
 
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.ComparableLabel;
+
 /**
  * This is a basic implementation of ComparableLabel. It triggers the default comparing method by
  * equating all objects in its custom implementation and triggering the default logic in ComparableLabel

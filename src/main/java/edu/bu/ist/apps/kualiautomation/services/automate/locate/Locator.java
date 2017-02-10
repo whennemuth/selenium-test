@@ -31,4 +31,6 @@ public interface Locator {
 	 * @return
 	 */
 	public boolean ignoreDisabled();
+	
+	public String getMessage();
 }

@@ -57,15 +57,18 @@ public class RunLogTest {
 		when(button1.isEnabled()).thenReturn(true);
 		
 		when(lvTextbox1.getElementType()).thenReturn(ElementType.TEXTBOX.name());
+		when(lvTextbox1.getElementTypeEnum()).thenReturn(ElementType.TEXTBOX);
 		when(lvTextbox1.getLabel()).thenReturn("label for textbox 1");
 		when(lvTextbox1.getIdentifier()).thenReturn("text");
 		when(lvTextbox1.getValue()).thenReturn("Apples");
 		
 		when(lvTextbox2.getElementType()).thenReturn(ElementType.TEXTBOX.name());
+		when(lvTextbox2.getElementTypeEnum()).thenReturn(ElementType.TEXTBOX);
 		when(lvTextbox2.getLabel()).thenReturn("label for textbox 2");
 		when(lvTextbox2.getIdentifier()).thenReturn("text");
 		when(lvTextbox2.getValue()).thenReturn("Oranges");
 		
+		when(lvButton1.getElementTypeEnum()).thenReturn(ElementType.BUTTON);
 		when(lvButton1.getElementType()).thenReturn(ElementType.BUTTON.name());
 		when(lvButton1.getLabel()).thenReturn("submit");
 		when(lvButton1.getIdentifier()).thenReturn("");
@@ -127,16 +130,16 @@ public class RunLogTest {
 		String[] assertArray = new String[] {
 			"Cycle Log Results:",
 			"---------------------------------",
-			"Started: 14:29:19",
-			"Ended: 14:29:19 (0 seconds)",
+			"Started: 00:39:58",
+			"Ended: 00:39:58 (0 seconds)",
 			"Applying to element ",
-			"   [input type=\"text\", text=\"\", value=\"null\" (criteria: label=\"label for textbox 1\", identifier=\"text\")] ",
+			"   [input type=\"text\", text=\"\", value=\"null\" (criteria: type=\"TEXTBOX\", label=\"label for textbox 1\", identifier=\"text)] ",
 			"   value: \"Apples\"",
 			"Applying to element ",
-			"   [input type=\"text\", text=\"\", value=\"null\" (criteria: label=\"label for textbox 2\", identifier=\"text\")] ",
+			"   [input type=\"text\", text=\"\", value=\"null\" (criteria: type=\"TEXTBOX\", label=\"label for textbox 2\", identifier=\"text)] ",
 			"   value: \"Oranges\"",
 			"Clicking element ",
-			"   [input type=\"button\", text=\"\", value=\"submit\" (criteria: label=\"submit\")]"
+			"   [input type=\"button\", text=\"\", value=\"submit\" (criteria: type=\"BUTTON\", label=\"submit\", identifier=\")]"
 		};
 		
 		assertRetvalParts(assertArray, retval);
@@ -152,14 +155,14 @@ public class RunLogTest {
 		String[] assertArray = new String[] {
 			"Cycle Log Results:",
 			"---------------------------------",
-			"Started: 14:58:19",
-			"Ended: 14:58:19 (0 seconds)",
+			"Started: 00:42:28",
+			"Ended: 00:42:28 (0 seconds)",
 			"Cannot find element ",
-			"   (criteria: label=\"label for textbox 1\", identifier=\"text\")",
+			"   (criteria: type=\"TEXTBOX\", label=\"label for textbox 1\", identifier=\"text)",
 			"Cannot find element ",
-			"   (criteria: label=\"label for textbox 2\", identifier=\"text\")",
+			"   (criteria: type=\"TEXTBOX\", label=\"label for textbox 2\", identifier=\"text)",
 			"Cannot find element ",
-			"   (criteria: label=\"submit\")"
+			"   (criteria: type=\"BUTTON\", label=\"submit\", identifier=\")"
 		};
 		
 		assertRetvalParts(assertArray, retval);
@@ -174,12 +177,12 @@ public class RunLogTest {
 		String[] assertArray = new String[] {
 			"Cycle Log Results:",
 			"---------------------------------",
-			"Started: 15:08:54",
-			"Ended: 15:08:54 (0 seconds)",
+			"Started: 01:02:08",
+			"Ended: 01:02:08 (0 seconds)",
 			"More than one element was found for the specified search criteria ",
-			"   [input type=\"text\", text=\"\", value=\"null\" (criteria: label=\"label for textbox 1\", identifier=\"text\")], ",
-			"   [input type=\"text\", text=\"\", value=\"null\" (criteria: label=\"label for textbox 1\", identifier=\"text\")], ",
-			"   [input type=\"button\", text=\"\", value=\"submit\" (criteria: label=\"label for textbox 1\", identifier=\"text\")]"			
+			"   [input type=\"text\", text=\"\", value=\"null\" (criteria: type=\"TEXTBOX\", label=\"label for textbox 1\", identifier=\"text)], ",
+			"   [input type=\"text\", text=\"\", value=\"null\" (criteria: type=\"TEXTBOX\", label=\"label for textbox 1\", identifier=\"text)], ",
+			"   [input type=\"button\", text=\"\", value=\"submit\" (criteria: type=\"TEXTBOX\", label=\"label for textbox 1\", identifier=\"text)]"			
 		};
 		
 		assertRetvalParts(assertArray, retval);
@@ -195,16 +198,15 @@ public class RunLogTest {
 		String[] assertArray = new String[] {
 			"Cycle Log Results:",
 			"---------------------------------",
-			"Started: 16:35:56",
-			"Ended: 16:35:56 (0 seconds)",
+			"Started: 01:03:55",
+			"Ended: 01:03:55 (0 seconds)",
 			"Applying to element ",
-			"   [input type=\"text\", text=\"\", value=\"null\" (criteria: label=\"label for textbox 1\", identifier=\"text\")] ",
+			"   [input type=\"text\", text=\"\", value=\"null\" (criteria: type=\"TEXTBOX\", label=\"label for textbox 1\", identifier=\"text)] ",
 			"   value: \"Apples\"",
 			"Error encountered for element ",
-			"   (criteria: label=\"label for textbox 2\", identifier=\"text\")]",
+			"   (criteria: type=\"TEXTBOX\", label=\"label for textbox 2\", identifier=\"text)]",
 			"Cannot find element ",
-			"   (criteria: label=\"submit\")"
-	
+			"   (criteria: type=\"BUTTON\", label=\"submit\", identifier=\")"	
 		};
 		
 		assertRetvalParts(assertArray, retval);

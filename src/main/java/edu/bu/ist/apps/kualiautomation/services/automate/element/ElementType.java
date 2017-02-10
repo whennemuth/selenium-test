@@ -14,7 +14,7 @@ public enum ElementType {
 
 	TEXTBOX(
 		"Simple text box",
-		"input",
+		new String[]{"input"},
 		"text",
 		"//input[@type='text'] | //input[not(@type)]",
 		true,
@@ -23,7 +23,7 @@ public enum ElementType {
 		false),
 	PASSWORD(
 		"Password text box",
-		"input",
+		new String[]{"input"},
 		"password",
 		"//input[@type='password']",
 		true,
@@ -32,7 +32,7 @@ public enum ElementType {
 		false),
 	TEXTAREA(
 		"Area in which multi-line text can be input",
-		"textarea",
+		new String[]{"textarea"},
 		null,
 		"//textarea",
 		true,
@@ -41,7 +41,7 @@ public enum ElementType {
 		false),
 	BUTTON(
 		"Something to click that looks like a button",
-		"input",
+		new String[]{"input"},
 		"button",
 		"//input[@type='button'] | //input[@type='submit'] | //button",
 		false,
@@ -50,7 +50,7 @@ public enum ElementType {
 		true),
 	BUTTONIMAGE(
 		"Something to click that looks like an image",
-		"input",
+		new String[]{"input"},
 		"image",
 		"//input[@type='image']",
 		false,
@@ -59,7 +59,7 @@ public enum ElementType {
 		true),	
 	HYPERLINK(
 		"Clickable text that changes the cursor when hovered over to indicate a hyperlink.",
-		"a",
+		new String[]{"a"},
 		null,
 		"//a[text()]",
 		false,
@@ -68,7 +68,7 @@ public enum ElementType {
 		true), 
 	HOTSPOT(
 		"Clickable graphic that changes the cursor when hovered over to indicate a hotspot for navigation or function trigger.",
-		"a",
+		new String[]{"a"},
 		null,
 		"//a[not(text())] | //a[text() and not(text())]",
 		false,
@@ -77,7 +77,7 @@ public enum ElementType {
 		true), 
 	SELECT(
 		"A dropdown box or listbox",
-		"select",
+		new String[]{"select"},
 		null,
 		"//select",
 		false,
@@ -86,7 +86,7 @@ public enum ElementType {
 		false),
 	CHECKBOX(
 		"Checkable box",
-		"input",
+		new String[]{"input"},
 		"checkbox",
 		"//input[@type='checkbox']",
 		false,
@@ -95,7 +95,7 @@ public enum ElementType {
 		false),
 	RADIO(
 		"Radio Button",
-		"input",
+		new String[]{"input"},
 		"radio",
 		"//input[@type='radio']",
 		false,
@@ -112,6 +112,15 @@ public enum ElementType {
 		false,
 		true
 	),
+	SCREENSCRAPE(
+		"Any html element, like a div or span, that is not a field",
+		null,
+		null,
+		null,
+		false, 
+		false, 
+		false,
+		false),
 	OTHER(
 		"None of the above, but clickable",
 		null,
@@ -124,17 +133,17 @@ public enum ElementType {
 	
 	private String description;
 	private String xpathSelector;
-	private String tagname;
+	private String[] tagnames;
 	private String typeAttribute;
 	private boolean acceptsKeystrokes;
 	private boolean canNavigate;
 	private boolean checkable;
 	private boolean useClickEvent;
 	
-	private ElementType(String description, String tagname, String typeAttribute, String xpathSelector, boolean acceptsKeystrokes, boolean canNavigate, boolean checkable, boolean useClickEvent) {
+	private ElementType(String description, String[] tagnames, String typeAttribute, String xpathSelector, boolean acceptsKeystrokes, boolean canNavigate, boolean checkable, boolean useClickEvent) {
 		this.description = description;
 		this.xpathSelector = xpathSelector;
-		this.tagname = tagname;
+		this.tagnames = tagnames;
 		this.typeAttribute = typeAttribute;
 		this.acceptsKeystrokes = acceptsKeystrokes;
 		this.canNavigate = canNavigate;
@@ -151,9 +160,13 @@ public enum ElementType {
 	}
 
 	public String getTagname() {
-		return tagname;
+		return tagnames == null || tagnames.length == 0 ? null : tagnames[0];
 	}
 
+	public String[] getTagnames() {
+		return tagnames;
+	}
+	
 	public String getTypeAttribute() {
 		return typeAttribute;
 	}

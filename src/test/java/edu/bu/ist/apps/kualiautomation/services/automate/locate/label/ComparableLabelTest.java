@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.locate;
+package edu.bu.ist.apps.kualiautomation.services.automate.locate.label;
 
 import static org.junit.Assert.*;
 
@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
+
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.ComparableLabel;
 
 public class ComparableLabelTest {
 

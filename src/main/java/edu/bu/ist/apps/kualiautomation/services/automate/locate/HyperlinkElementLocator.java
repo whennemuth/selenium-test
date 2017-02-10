@@ -11,6 +11,8 @@ import org.openqa.selenium.WebElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Attribute;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledElementLocator;
 
 public class HyperlinkElementLocator extends AbstractElementLocator {
 

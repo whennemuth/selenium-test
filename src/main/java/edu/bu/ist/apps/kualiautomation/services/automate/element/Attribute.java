@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.openqa.selenium.WebElement;
 
-import edu.bu.ist.apps.kualiautomation.services.automate.locate.ComparableLabel;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.ComparableLabel;
 
 /**
  * Check attributes of the webElement for the specified attributeValue(s) in the order found in attributesToCheck.

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +30,8 @@ public class ElementsAssertion {
 	private String label;
 	private List<String> attributeValues = new ArrayList<String>();
 	private Map<String, String> attributeAssertions = new HashMap<String, String>();
+	private String tagName;
+	private String text;
 	private Locator locator;
 	private boolean webPageOpen;
 	
@@ -84,6 +87,15 @@ public class ElementsAssertion {
 	private void assertElement(Element element) {
 		assertEquals(elementType.getTagname(), element.getWebElement().getTagName().toLowerCase());
 		assertTrue(areEmptyOrEqual(elementType.getTypeAttribute(), element.getWebElement().getAttribute("type")));
+		if(tagName != null) {
+			assertTrue(tagName.equalsIgnoreCase(element.getWebElement().getTagName()));
+		}
+		if(text != null) {
+			if(element.getWebElement().getText() == null) {
+				fail("Expected text = \"" + text + "\", but was null");
+			}
+			assertEquals(text.trim(), element.getWebElement().getText().trim());
+		}
 		for(String attributeName: attributeAssertions.keySet()) {
 			String assertValue = attributeAssertions.get(attributeName);
 			String actualValue = element.getWebElement().getAttribute(attributeName);
@@ -150,6 +162,18 @@ public class ElementsAssertion {
 	}
 	public void addAttributeAssertion(String attributeName, String assertValue) {
 		attributeAssertions.put(attributeName, assertValue);
+	}
+	public String getTagName() {
+		return tagName;
+	}
+	public void setTagName(String tagName) {
+		this.tagName = tagName;
+	}
+	public String getText() {
+		return text;
+	}
+	public void setText(String text) {
+		this.text = text;
 	}
 	
 }

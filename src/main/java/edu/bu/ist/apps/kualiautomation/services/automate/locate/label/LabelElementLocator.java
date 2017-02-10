@@ -1,4 +1,4 @@
-package edu.bu.ist.apps.kualiautomation.services.automate.locate;
+package edu.bu.ist.apps.kualiautomation.services.automate.locate.label;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +11,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.BasicComparableLabel;
 
 public class LabelElementLocator extends AbstractElementLocator {
 	
@@ -68,7 +70,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 		
 		/**
 		 * Search for an element that matches the provided value with xpath expressions in order of their priority.
-		 * Only proceed to the next search of no results have yet been found with the prior search(es).
+		 * Only proceed to the next search if no results have yet been found with the prior search(es).
 		 */
 		
 		/** 1) Search for full length match */
