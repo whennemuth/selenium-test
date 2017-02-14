@@ -17,12 +17,15 @@ import org.openqa.selenium.WebElement;
  */
 public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 
-	private String label;
+	protected String label;
 	private String text;
 	protected WebElement webElement;
 	protected boolean demoted;
 	protected boolean disqualified;
 	protected boolean useDefaultMethodIfIndeterminate;
+	// Defaults to true. Implementers must override this value.
+	protected boolean ignorecase = true;
+	
 	protected static final int THIS_LABEL_IS_BETTER = -1;
 	protected static final int OTHER_LABEL_IS_BETTER = 1;
 	protected static final int ITS_A_DRAW = 0;
@@ -79,8 +82,12 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 	protected int defaultCompareTo(ComparableLabel lbl) {
 		String thislabel = getLabel();
 		String thistext = getText();
-		String otherlabel = getCleanedValue(lbl.label).toLowerCase();
-		String othertext = getCleanedValue(lbl.text).toLowerCase();
+		String otherlabel = getCleanedValue(lbl.label);
+		String othertext = getCleanedValue(lbl.text);
+		if(ignorecase) {
+			otherlabel = otherlabel.toLowerCase();
+			othertext = othertext.toLowerCase();
+		}
 		int retval = ITS_A_DRAW;
 		
 		if(thistext.startsWith(thislabel) && othertext.startsWith(otherlabel)) {			
@@ -175,7 +182,10 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 	}
 	
 	public String getLabel() {
-		return getCleanedValue(label).toLowerCase();
+		if(ignorecase)
+			return getCleanedValue(label).toLowerCase();
+		else
+			return getCleanedValue(label);
 	}
 	
 	public String getRawText() {
@@ -183,7 +193,10 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 	}
 	
 	public String getText() {
-		return getCleanedValue(text).toLowerCase();
+		if(ignorecase)
+			return getCleanedValue(text).toLowerCase();
+		else
+			return getCleanedValue(text);
 	}
 	
 	public WebElement getWebElement() {
@@ -272,10 +285,4 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 				.append(getRawText()).append("]");
 		return builder.toString();
 	}
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

@@ -43,10 +43,11 @@ import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.Comparable
 public class ComparableScreenScrape extends ComparableLabel {
 
 	private ScreenScrapeComparePattern pattern;
-	private String value;
 	private String cleanlabel;
 	private String cleantext;
-	private List<String> matches = new ArrayList<String>();
+	private List<String> matches;
+	private List<String> scrapedValues;
+	private boolean caseMatch;
 	
 	/** Temporary local variable for another instance being comparedTo (remains null outside of customCompareTo()) */
 	private ComparableScreenScrape other;
@@ -85,7 +86,8 @@ public class ComparableScreenScrape extends ComparableLabel {
 	protected int customCompareTo(ComparableLabel otherComparable) {
 		
 		try {
-			other = (ComparableScreenScrape) otherComparable;
+			other = (ComparableScreenScrape) otherComparable;			
+			other.other = this;
 					
 			qualify();
 			
@@ -101,8 +103,27 @@ public class ComparableScreenScrape extends ComparableLabel {
 			if(cleantext.equals(other.cleantext))
 				return ITS_A_DRAW;
 			
-			if(matches.size() == other.matches.size()) {				
-				return ITS_A_DRAW;
+			if(matches.size() == other.matches.size()) {
+				String regex = pattern.getRegex(cleanlabel, true);
+				String thisChaff = cleanLines(cleantext.replaceAll(regex, ""));
+				String otherChaff = cleanLines(other.cleantext.replaceAll(regex, ""));
+				if(thisChaff.length() == otherChaff.length()) {
+					if(!ignorecase) {
+						if(this.caseMatch && !other.caseMatch)
+							return THIS_LABEL_IS_BETTER;
+						if(other.caseMatch && !this.caseMatch)
+							return OTHER_LABEL_IS_BETTER;
+					}
+					return ITS_A_DRAW;
+				}
+				else {
+					// The following comparison is somewhat arbitrary - we are "separating the wheat from the chaff".
+					// The content in which the matches were found has the matching content removed 
+					// and whoever has the least remaining "chaff" characters left is the "winner".
+					return thisChaff.length() < otherChaff.length() ?
+							THIS_LABEL_IS_BETTER : 
+							OTHER_LABEL_IS_BETTER; 
+				}
 			}
 			else {
 				return matches.size() < other.matches.size() ? 
@@ -111,8 +132,51 @@ public class ComparableScreenScrape extends ComparableLabel {
 			}
 		} 
 		finally {
+			other.other = null;
 			other = null;
 		}
+	}
+	
+	/**
+	 * Determine if the label match qualifies with the a sufficiently matching value string immediately to its right. 
+	 */
+	private void qualify() {
+		
+		if(matches != null || disqualified) {
+			if(other.matches == null && !other.disqualified) {
+				other.qualify();
+			}
+			return; // Has already run once.
+		}
+		
+		if(!cleanlabel.equals(other.cleanlabel)) {
+			// If this error is thrown, then it means a programming error has been made.
+			throw new IllegalStateException("compareTo() method called against two ComparableScreenScrapeLabel "
+					+ "instances with unequal labels");
+		}
+		
+		if(!cleantext.toLowerCase().contains(cleanlabel.toLowerCase())) {
+			// Should never happen as a regex found the label, so it must be contained.
+			disqualified = true;
+			return;
+		}
+		
+		// Up to now we know the screenScrape was a match because the label was found by xpath.
+		// However if the characters that immediately follow it do not match what is expected, then disqualify.
+		matches = pattern.getMatches(cleantext, cleanlabel, false);
+		
+		if(matches.isEmpty()) {
+			// Exact case match for label failed, so try ignorecase
+			matches = pattern.getMatches(cleantext, cleanlabel, true);
+			if(matches.isEmpty()) {
+				disqualified = true;
+			}
+		}
+		else {
+			caseMatch = true;
+		}		
+		
+		other.qualify();
 	}
 
 	/**
@@ -126,35 +190,6 @@ public class ComparableScreenScrape extends ComparableLabel {
 	}
 	
 	/**
-	 * Determine if the label match qualifies with the a correctly matching value string immediately to its right. 
-	 */
-	private void qualify() {
-		if(cleanlabel != null)
-			return; // Has already run once.
-		
-		if(!cleanlabel.equals(other.cleanlabel)) {
-			// If this error is thrown, then it means a programming error has been made.
-			throw new IllegalStateException("compareTo() method called against two ComparableScreenScrapeLabel "
-					+ "instances with unequal labels");
-		}
-		
-		if(!cleantext.contains(cleanlabel)) {
-			// Should never happen as a regex found the label, so it must be contained.
-			disqualified = true;
-			return;
-		}
-		
-		// Up to now we know the screenScrape was a match because the label was found by xpath.
-		// However if the characters that immediately follow it do not match what is expected, then disqualify.
-		matches = pattern.getMatches(cleantext, cleanlabel);
-		if(matches.isEmpty()) {
-			disqualified = true;
-		}
-		
-		other.qualify();
-	}
-	
-	/**
 	 * Get a "clone", but with a different text value set.
 	 * @param newText
 	 * @return
@@ -162,19 +197,51 @@ public class ComparableScreenScrape extends ComparableLabel {
 	public ComparableScreenScrape changeText(String newText) {
 		return new ComparableScreenScrape(
 			new ComparableParameters()
-				.setLabel(getLabel())
+				.setLabel(getRawLabel())
 				.setPattern(pattern)
 				.setText(newText)
 				.setUseDefaultMethodIfIndeterminate(useDefaultMethodIfIndeterminate)
 				.setWebElement(webElement)
+				.setIgnorecase(ignorecase)
 		);
 	}
 
-	public String getValue() {
-		return value;
+	public List<String> getMatches() {
+		return matches;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+	/**
+	 * Return an adapted version of the webElement that returns the "scraped" value from instead of the whole getText() value.
+	 */
+	@Override
+	public WebElement getWebElement() {
+		if(scrapedValues == null && matches != null && !matches.isEmpty())
+			getScrapedValues();
+		
+		if(scrapedValues == null)
+			return webElement;
+		else
+			return new ScreenScrapeWebElement(webElement, this);
+	}
+
+	/**
+	 * The "scraped" value we are trying to screen scrape for is found in this list. 
+	 * The list should have only one entry, though there may be more if the criteria for finding it within the 
+	 * html page was not sufficiently specific or the most specific criteria possible yet produces multiple results.
+	 * 
+	 * @return
+	 */
+	public List<String> getScrapedValues() {
+		if(scrapedValues != null)
+			return scrapedValues;
+		
+		scrapedValues = new ArrayList<String>(matches.size());
+		for(String match : matches) {
+			int idx = match.indexOf(getRawLabel()) + getRawLabel().length();
+			String value = match.substring(idx);
+			value = value.replaceAll("[\\:\\-\\x20\\t]", ""); 
+			scrapedValues.add(value);
+		}
+		return scrapedValues;
 	}
 }

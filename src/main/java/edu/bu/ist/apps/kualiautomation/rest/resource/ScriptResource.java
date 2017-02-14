@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response.Status;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.services.automate.KerberosLoginParms;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.screenscrape.ScreenScrapeComparePattern;
 import edu.bu.ist.apps.kualiautomation.services.config.ScriptService;
 
 @Path("/")
@@ -35,6 +36,13 @@ public class ScriptResource {
 	@Path("/cycle/element/types")
 	public Response getElementTypes(@PathParam("userId") Integer userId) throws Exception {		
 		Response response = ServiceResponse.getResponse(ElementType.toJson(), Status.OK);
+		return response;		
+	}
+
+	@GET
+	@Path("/cycle/element/types/screenscrape")
+	public Response getScreenScrapeTypes(@PathParam("userId") Integer userId) throws Exception {		
+		Response response = ServiceResponse.getResponse(ScreenScrapeComparePattern.toJson(), Status.OK);
 		return response;		
 	}
 	

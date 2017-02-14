@@ -14,6 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -26,6 +28,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.screenscrape.ScreenScrapeComparePattern;
 
 
 /**
@@ -61,6 +64,9 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 	@Column(nullable=false)
 	private byte navigate;
 	
+	@Transient
+	private String screenScrapeType;
+	
 	// uni-directional one-to-one association to ConfigShortcut (ConfigShortcut cannot "see" LabelAndValue). 
 	// NOTE: Don't use CascadeType.REMOVE as removals of this entity will try to cascade the removal of the ConfigShortcut
 	//       entity from the database, which we don't want because it's a configuration setting and we want it available
@@ -68,6 +74,17 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 	@OneToOne(cascade={CascadeType.MERGE}, fetch=FetchType.EAGER)
 	@JoinColumn(name="shortcut_id", nullable=true)
 	private ConfigShortcut configShortcut;
+	
+	/**
+	 * The value field does the double-duty of holding the screenscrape type value.
+	 */
+	@PrePersist
+	@PreUpdate
+	private void checkScreenScrape() {
+		if(ElementType.SCREENSCRAPE.equals(elementType) && value == null) {
+			this.value = screenScrapeType;
+		}		
+	}
 	
 	/**
 	 * This is a hack. I'm adding this property to be included into the json object created
@@ -131,6 +148,9 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 	}
 
 	public String getValue() {
+		if(ElementType.SCREENSCRAPE.equals(elementType) && value == null) {
+			this.value = screenScrapeType;
+		}
 		return this.value;
 	}
 
@@ -156,6 +176,19 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 		this.elementType = elementType;
 	}
 
+	@Transient
+	public String getScreenScrapeType() {
+		if(ElementType.SCREENSCRAPE.equals(elementType) && screenScrapeType == null) {
+			this.screenScrapeType = value;
+		}
+		return screenScrapeType;
+	}
+	
+	@Transient
+	public void setScreenScrapeType(String screenScrapeType) {
+		this.screenScrapeType = screenScrapeType;
+	}
+	
 	public String getIdentifier() {
 		return identifier;
 	}

@@ -23,6 +23,8 @@ public class ComparableParameters {
 	 * find two unequal labels to compare as zero using their custom compare method
 	 */
 	private boolean useDefaultMethodIfIndeterminate;
+	/** Ignore case when comparing */
+	private boolean ignorecase = false;
 	
 	public WebElement getWebElement() {
 		return webElement;
@@ -57,6 +59,13 @@ public class ComparableParameters {
 	}
 	public ComparableParameters setUseDefaultMethodIfIndeterminate(boolean useDefaultMethodIfIndeterminate) {
 		this.useDefaultMethodIfIndeterminate = useDefaultMethodIfIndeterminate;
+		return this;
+	}
+	public boolean isIgnorecase() {
+		return ignorecase;
+	}
+	public ComparableParameters setIgnorecase(boolean ignorecase) {
+		this.ignorecase = ignorecase;
 		return this;
 	}
 }

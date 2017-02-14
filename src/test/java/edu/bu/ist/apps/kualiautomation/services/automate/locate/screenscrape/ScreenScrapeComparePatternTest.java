@@ -19,9 +19,9 @@ public class ScreenScrapeComparePatternTest {
 	public void testWholeStringMatch() {
 		
 		// 1) No characters to escape
-		Matcher m = ScreenScrapeComparePattern.LABELLED_NUMBER.getMatcher("mylabel: 12345", "mylabel");
+		Matcher m = ScreenScrapeComparePattern.LABELLED_NUMBER.getMatcher("mylabel: 12345", "mylabel", true);
 		String regex = m.pattern().toString();
-		assertEquals("mylabel[\\x20\\t]*[:\\-]?[\\x20\\t]*\\d+", regex);
+		assertEquals("(?i)(?<!\\w)mylabel\\s*[:\\-]?\\s*\\d+(?!\\w)", regex);
 		List<String> found = getMatches(m);
 		assertEquals(1, found.size());
 		assertEquals("mylabel: 12345", found.get(0));
@@ -29,12 +29,15 @@ public class ScreenScrapeComparePatternTest {
 		// 2) All characters to escape
 		String label = "[].$^()*\\{}-?";
 		String text = label + "   myvalue";
-		m = ScreenScrapeComparePattern.LABELLED_WORD.getMatcher(text, label);
+		m = ScreenScrapeComparePattern.LABELLED_WORD.getMatcher(text, label, true);
 		regex = m.pattern().toString();
 		String expectedRegex = 
-				  "\\[\\]\\.\\$\\^\\(\\)\\*\\\\\\{\\}\\-\\?"
-				+ "[\\x20\\t]*[:\\-]?[\\x20\\t]*"
-				+ "[A-Za-z]+";		
+				  "(?i)"
+				+ "(?<!\\w)"
+				+ "\\[\\]\\.\\$\\^\\(\\)\\*\\\\\\{\\}\\-\\?"
+				+ "\\s*[:\\-]?\\s*"
+				+ "[A-Za-z]+"
+				+ "(?!\\w)";		
 		assertEquals(expectedRegex, regex);
 		found = getMatches(m);
 		assertEquals(1, found.size());
@@ -43,16 +46,26 @@ public class ScreenScrapeComparePatternTest {
 		// 3) Some characters to escape
 		label = "[ ] . $ mylabel ^ ( ) * \\ { } - ?";
 		text = label + "A1B2C3";
-		m = ScreenScrapeComparePattern.LABELLED_BLOCK.getMatcher(text, label);
+		m = ScreenScrapeComparePattern.LABELLED_BLOCK.getMatcher(text, label, true);
 		regex = m.pattern().toString();
 		expectedRegex = 
-				  "\\[ \\] \\. \\$ mylabel \\^ \\( \\) \\* \\\\ \\{ \\} \\- \\?"
-				+ "[\\x20\\t]*[:\\-]?[\\x20\\t]*"
-				+ "[\\dA-Za-z]+";
+				  "(?i)"
+				+ "(?<!\\w)"
+				+ "\\[ \\] \\. \\$ mylabel \\^ \\( \\) \\* \\\\ \\{ \\} \\- \\?"
+				+ "\\s*[:\\-]?\\s*"
+				+ "[\\dA-Za-z]+"
+				+ "(?!\\w)";
 		assertEquals(expectedRegex, regex);
 		found = getMatches(m);
 		assertEquals(1, found.size());
 		assertEquals(text, found.get(0));
+		
+		// 4) Not ignoring case
+		m = ScreenScrapeComparePattern.LABELLED_NUMBER.getMatcher("mylabel: 12345", "MYLABEL", false);
+		regex = m.pattern().toString();
+		assertEquals("(?<!\\w)MYLABEL\\s*[:\\-]?\\s*\\d+(?!\\w)", regex);
+		found = getMatches(m);
+		assertTrue(found.isEmpty());
 	}
 	
 	/**
@@ -71,6 +84,7 @@ public class ScreenScrapeComparePatternTest {
 				"[mylabel]   -   345",
 				"[mylabel] 678",
 				"[mylabel]  	901",
+				"[MYLABEL]   : 3434"
 		};
 		
 		// 2) Create the main String
@@ -90,9 +104,9 @@ public class ScreenScrapeComparePatternTest {
 				+ occurrences[6];
 		
 		// 3) Get the matches
-		Matcher m = ScreenScrapeComparePattern.LABELLED_NUMBER.getMatcher(text, label);
+		Matcher m = ScreenScrapeComparePattern.LABELLED_NUMBER.getMatcher(text, label, false);
 		String regex = m.pattern().toString();
-		assertEquals("\\[mylabel\\][\\x20\\t]*[:\\-]?[\\x20\\t]*\\d+", regex);
+		assertEquals("(?<!\\w)\\[mylabel\\]\\s*[:\\-]?\\s*\\d+(?!\\w)", regex);
 		List<String> found = getMatches(m);
 		
 		// 4) Assert expected results

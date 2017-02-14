@@ -27,6 +27,24 @@
 <body>
 
 <div id="div1">
+	<div>The innerText of the parent of two adjacent divs seems to always have the text of 
+	those divs on separate lines despite the display style and float settings</div>
+	
+	<br>
+	<div style="display:inline; float:none; margin:5px;">pears: </div>
+	<div style="display:inline; float:none; margin:5px"> bannanas </div>
+	<br><br>
+	
+	<div>apples</div>
+	<div style="clear:none;">oranges</div>
+	
+	<div>mangos</div>
+	<div>&nbsp;</div>
+	<div style="clear:none;">pineapples</div>
+	
+</div>
+
+<div id="div1">
 	mylabel1<div>myvalue1</div>
 </div>
 
@@ -40,31 +58,13 @@
 	<div>myvalue2</div>
 </div>
 
-<div id="div3">
-	<div>my multi-word label 1</div>
-	<div>my 
-		multi-word 
-		label 
-		2
-	</div>
-	<div>my multi-word value 1</div>
-	<div>my
-		multi-word
-		value
-		2
-	</div>
-</div>
-
 <table id="table1" cellpadding=0 cellspacing=0>
+<tr><td colspan=4>The inner text of a row has spaces between the content of each cell</td></tr>
 <tr>
-	<th>mylabel3a</th>
-	<th>mylabel3b: extra content</th>
-	<th>mylabel3c: <div>myvalue3c</div></th>
-</tr>
-<tr>
-	<td>myvalue3a</td>
-	<td>myvalue3b</td>
-	<td>myvalue3c</td>
+<td>mylabel3a</td>
+<td>myvalue3a</td>
+<td>mylabel3b</td>
+<td>myvalue3b</td>
 </tr>
 </table>
 

@@ -1,10 +1,8 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.locate.screenscrape;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.MatchResult;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -13,7 +11,6 @@ import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.ComparableLabel;
-import edu.bu.ist.apps.kualiautomation.services.automate.locate.screenscrape.ScreenScrapeComparePattern;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**
@@ -39,16 +36,26 @@ import edu.bu.ist.apps.kualiautomation.util.Utils;
  */
 public class ScreenScrapeElementLocator extends AbstractElementLocator {
 
-	private static final String XPATH_CONTAINS = 
+	private static final String XPATH_CONTAINS_IGNORECASE = 
 			"//*[contains(string(normalize-space(translate(., "
 			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
 			+ "'abcdefghijklmnopqrstuvwxyz'))), \"[INSERT-LABEL]\")]";
+
+	private static final String XPATH_CONTAINS = 
+			"//*[contains(string(normalize-space()), \"[INSERT-LABEL]\")]";
+	
+	private boolean ignorecase = true;
 	
 	public ScreenScrapeElementLocator(WebDriver driver) {
 		super(driver);
 	}
-	public ScreenScrapeElementLocator(WebDriver driver, SearchContext searchContext){
+	public ScreenScrapeElementLocator(WebDriver driver, boolean ignorecase) {
+		super(driver);
+		this.ignorecase = ignorecase;
+	}
+	public ScreenScrapeElementLocator(WebDriver driver, SearchContext searchContext, boolean ignorecase){
 		super(driver, searchContext);
+		this.ignorecase = ignorecase;
 	}
 
 	@Override
@@ -62,8 +69,13 @@ public class ScreenScrapeElementLocator extends AbstractElementLocator {
 			}
 			
 			String label = new String(parameters.get(0)).trim().replaceAll("\\s+", " ");
-			String sPattern = parameters.get(1);					
-			String xpath = scope + XPATH_CONTAINS.replace("[INSERT-LABEL]", label);
+			String sPattern = parameters.get(1);
+			String xpath = new String(scope);
+			if(ignorecase)
+				xpath = xpath + XPATH_CONTAINS_IGNORECASE.replace("[INSERT-LABEL]", label.toLowerCase());
+			else
+				xpath = xpath + XPATH_CONTAINS.replace("[INSERT-LABEL]", label);
+			
 			List<WebElement> elements = searchContext.findElements(By.xpath(xpath));
 			List<ComparableLabel> scraped = new ArrayList<ComparableLabel>();
 			
@@ -77,13 +89,14 @@ public class ScreenScrapeElementLocator extends AbstractElementLocator {
 							.setLabel(label)
 							.setText(we.getText())
 							.setWebElement(we)
+							.setIgnorecase(false) // caseless match will be invoke only if case match fails
 							.setUseDefaultMethodIfIndeterminate(false);
 							
 					scraped.add(new ComparableScreenScrape(parms));
 				}
 			}
 			
-			Collections.sort(scraped);
+			located.addAll(ComparableLabel.getHighestRanked(scraped));
 		}
 		
 		return located;
@@ -110,5 +123,9 @@ public class ScreenScrapeElementLocator extends AbstractElementLocator {
 		}
 
 		return true;
+	}
+	
+	public String getInvalidparametersMessage() {
+		return invalidParmsMsg;
 	}
 }

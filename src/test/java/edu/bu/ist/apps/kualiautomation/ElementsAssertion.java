@@ -7,7 +7,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +35,8 @@ public class ElementsAssertion {
 	private Map<String, String> attributeAssertions = new HashMap<String, String>();
 	private String tagName;
 	private String text;
+	private HashSet<String> anyText;
+	private HashSet<String> anyTextFound;
 	private Locator locator;
 	private boolean webPageOpen;
 	
@@ -54,6 +59,8 @@ public class ElementsAssertion {
 		
 		List<Element> elements = locator.locateAll(elementType, attributeValues);
 		
+		assertElements(elements);
+		
 		return elements;
 	}
 	
@@ -68,6 +75,26 @@ public class ElementsAssertion {
 			for(Element element : elements) {
 				assertElement(element);
 			}
+		}
+		if(anyText != null && !anyText.isEmpty()) {
+			StringBuilder failMsg = new StringBuilder("Could not find all expected text() values:\n   UNFOUND: (");
+			for (Iterator<String> iterator = anyText.iterator(); iterator.hasNext();) {
+				String s = iterator.next();
+				failMsg.append("\"").append(s).append("\"");
+				if(iterator.hasNext())
+					failMsg.append(", ");
+			}
+			
+			failMsg.append(")\n   FOUND: (");
+			
+			for (Iterator<String> iterator = anyTextFound.iterator(); iterator.hasNext();) {
+				String s = iterator.next();
+				failMsg.append("\"").append(s).append("\"");
+				if(iterator.hasNext())
+					failMsg.append(", ");
+			}
+			
+			fail(failMsg.toString());
 		}
 	}
 	
@@ -85,7 +112,9 @@ public class ElementsAssertion {
 	 * @param element
 	 */
 	private void assertElement(Element element) {
-		assertEquals(elementType.getTagname(), element.getWebElement().getTagName().toLowerCase());
+		if(elementType.getTagname() != null) {
+			assertEquals(elementType.getTagname().toLowerCase(), element.getWebElement().getTagName().toLowerCase());
+		}
 		assertTrue(areEmptyOrEqual(elementType.getTypeAttribute(), element.getWebElement().getAttribute("type")));
 		if(tagName != null) {
 			assertTrue(tagName.equalsIgnoreCase(element.getWebElement().getTagName()));
@@ -95,6 +124,14 @@ public class ElementsAssertion {
 				fail("Expected text = \"" + text + "\", but was null");
 			}
 			assertEquals(text.trim(), element.getWebElement().getText().trim());
+		}
+		if(anyText != null && !anyText.isEmpty()) {
+			String text = element.getWebElement().getText().trim();
+			if(anyText.contains(text)) {
+				if(anyText.remove(text)) {
+					anyTextFound.add(text);
+				}		
+			}
 		}
 		for(String attributeName: attributeAssertions.keySet()) {
 			String assertValue = attributeAssertions.get(attributeName);
@@ -114,20 +151,23 @@ public class ElementsAssertion {
 	public String getUrl() {
 		return url;
 	}
-	public void setUrl(String url) {
+	public ElementsAssertion setUrl(String url) {
 		this.url = url;
+		return this;
 	}
 	public ElementType getElementType() {
 		return elementType;
 	}
-	public void setElementType(ElementType elementType) {
+	public ElementsAssertion setElementType(ElementType elementType) {
 		this.elementType = elementType;
+		return this;
 	}
 	public int getNumResults() {
 		return numResults;
 	}
-	public void setNumResults(int numResults) {
+	public ElementsAssertion setNumResults(int numResults) {
 		this.numResults = numResults;
+		return this;
 	}
 	public String getLabel() {
 		return label;
@@ -136,7 +176,7 @@ public class ElementsAssertion {
 	 * A label is just another attribute, but it must be the first in the list.
 	 * @param label
 	 */
-	public void setLabel(String label) {
+	public ElementsAssertion setLabel(String label) {
 		if(this.label == null) {
 			attributeValues.add(0, label);
 		}
@@ -144,36 +184,48 @@ public class ElementsAssertion {
 			attributeValues.set(0, label);
 		}
 		this.label = label;
+		return this;
 	}
 	public List<String> getAttributeValues() {
 		return attributeValues;
 	}
-	public void setAttributeValues(List<String> attributeValues) {
+	public ElementsAssertion setAttributeValues(List<String> attributeValues) {
 		this.attributeValues = attributeValues;
+		return this;
 	}
-	public void addAttributeValue(String attributeValue) {
+	public ElementsAssertion addAttributeValue(String attributeValue) {
 		attributeValues.add(attributeValue);
+		return this;
 	}
 	public Map<String, String> getAttributeAssertions() {
 		return attributeAssertions;
 	}
-	public void setAttributeAssertions(Map<String, String> attributeAssertions) {
+	public ElementsAssertion setAttributeAssertions(Map<String, String> attributeAssertions) {
 		this.attributeAssertions = attributeAssertions;
+		return this;
 	}
-	public void addAttributeAssertion(String attributeName, String assertValue) {
+	public ElementsAssertion addAttributeAssertion(String attributeName, String assertValue) {
 		attributeAssertions.put(attributeName, assertValue);
+		return this;
 	}
 	public String getTagName() {
 		return tagName;
 	}
-	public void setTagName(String tagName) {
+	public ElementsAssertion setTagName(String tagName) {
 		this.tagName = tagName;
+		return this;
 	}
 	public String getText() {
 		return text;
 	}
-	public void setText(String text) {
+	public ElementsAssertion setText(String text) {
 		this.text = text;
+		return this;
+	}
+	public ElementsAssertion setAnyText(String[] anyText) {
+		this.anyText = new HashSet<String>(Arrays.asList(anyText));
+		this.anyTextFound = new HashSet<String>();
+		return this;
 	}
 	
 }

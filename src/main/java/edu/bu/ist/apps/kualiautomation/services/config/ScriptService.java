@@ -227,6 +227,7 @@ public class ScriptService {
 		return cycle;
 	}
 	
+	@SuppressWarnings("unused")
 	private User getUser(Integer userId) {
         EntityManagerFactory factory = null;
         EntityManager em = null;

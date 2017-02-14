@@ -5,6 +5,7 @@ var GET_CYCLES_BY_USER_ID = '/rest/cycles';
 var DELETE_CYCLE_URL = '/rest/cycle/delete';
 var SAVE_CYCLE_URL = '/rest/cycle/save';
 var GET_ELEMENT_TYPES_URL = '/rest/cycle/element/types';
+var GET_SCREENSCRAPE_TYPES_URL = '/rest/cycle/element/types/screenscrape';
 var GET_SHORTCUTS_URL = '/rest/cycle/shortcut/types';
 var LAUNCH_CYCLE_URL = '/rest/cycle/launch/cycle';
 var LAUNCH_SUITE_URL = '/rest/cycle/launch/suite';
@@ -13,12 +14,13 @@ var cycleSvcFactory = function($http, $q) {
 	
 	var emptyCycleJson;
 	var elementTypes;
+	var screenScrapeTypes;
 	var cyclesCache;	
 	
 	return {
 		isInitialized : function() {
 			// Once these objects have been obtained and cached from the corresponding web services, we are initialized.
-			return emptyCycleJson && elementTypes;
+			return emptyCycleJson && elementTypes && screenScrapeTypes;
 		},
 		getEmptyCycle : function(userId) {
 			if(emptyCycleJson) {
@@ -150,6 +152,25 @@ var cycleSvcFactory = function($http, $q) {
 					.success(function(response) {
 						//elementTypes = angular.toJson(response.data);
 						elementTypes = response.data;
+						deferred.resolve(response.data);
+						
+					}).error(function(response){
+						deferred.reject(response);
+					});
+				return deferred.promise;
+			}
+		},
+		getScreenScrapeTypes : function() {
+			if(screenScrapeTypes) {
+				return screenScrapeTypes;
+			}
+			else {
+				// First load must come from the web service call (is a promise)
+				var deferred = $q.defer();
+				$http.get(GET_SCREENSCRAPE_TYPES_URL)
+					.success(function(response) {
+						//screenScrapeTypes = angular.toJson(response.data);
+						screenScrapeTypes = response.data;
 						deferred.resolve(response.data);
 						
 					}).error(function(response){

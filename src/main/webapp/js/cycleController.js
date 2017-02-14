@@ -6,6 +6,9 @@ var cycleCtrlFactory = function() {
 			// Load in Element Types
 			cycleSvc.getElementTypes();
 			
+			// Load in ScreenScrape Types
+			cycleSvc.getScreenScrapeTypes();
+			
 			// Add an event handler to query if the service has intialized yet.
 			scope.isInitialized = function() {
 				return cycleSvc.isInitialized();
@@ -20,6 +23,10 @@ var cycleCtrlFactory = function() {
 					}
 				}
 				return filtered;
+			};
+			
+			scope.getScreenScrapeTypes = function() {
+				return cycleSvc.getScreenScrapeTypes();
 			};
 			
 			scope.getShortcuts = function() {
@@ -42,6 +49,7 @@ var cycleCtrlFactory = function() {
 				var clickonly = false;
 				var textvalue = false;
 				var shortcut = false;
+				var screenscrape = false;
 				switch(lv.elementType) {
 					case 'BUTTON': 	case 'HOTSPOT': case 'HYPERLINK': case 'SHORTCUT':
 						clickonly = true;
@@ -52,6 +60,9 @@ var cycleCtrlFactory = function() {
 						break;
 					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'PASSWORD': case 'OTHER':
 						textvalue = true;
+						break;
+					case 'SCREENSCRAPE':
+						screenscrape = true;
 						break;
 					default:
 						return false;
@@ -64,10 +75,14 @@ var cycleCtrlFactory = function() {
 						return textvalue;
 					case 'navigates':
 						return clickonly && !shortcut;
-					case 'label': case 'identifier':
-						return !shortcut;
+					case 'label': 
+						return !shortcut
+					case 'identifier':
+						return !shortcut && !screenscrape;
 					case 'shortcut':
 						return shortcut;
+					case 'screenscrape':
+						return screenscrape;
 					default:
 						return lv.elementType;
 				}
@@ -82,6 +97,7 @@ var cycleCtrlFactory = function() {
 						if(lv.configShortcut) {
 							lv.configShortcut = null;
 						}
+						lv.screenScrapeType = null;
 						break;
 					case 'CHECKBOX': case 'RADIO': 
 						lv.value = lv.booleanValue;
@@ -89,6 +105,7 @@ var cycleCtrlFactory = function() {
 						if(lv.configShortcut) {
 							lv.configShortcut = null;
 						}
+						lv.screenScrapeType = null;
 						break;
 					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'PASSWORD': case 'OTHER':
 						lv.booleanValue = false;
@@ -97,6 +114,7 @@ var cycleCtrlFactory = function() {
 						if(lv.configShortcut) {
 							lv.configShortcut = null;
 						}
+						lv.screenScrapeType = null;
 						break;
 					case 'SHORTCUT':
 						lv.identifier = null;
@@ -105,6 +123,18 @@ var cycleCtrlFactory = function() {
 						lv.booleanValue = false;
 						if(lv.configShortcut) {
 							lv.navigates = (lv.navigates || scope.getShortcut(lv.configShortcut.id).navigates);
+						}
+						lv.screenScrapeType = null;
+						break;
+					case 'SCREENSCRAPE':
+						lv.screenScrapeType = scope.getScreenScrapeTypes()[0].id; // default to the first one
+						lv.identifier = null;
+						lv.label = null;
+						lv.value = null;
+						lv.booleanValue = false;
+						lv.navigates = false;
+						if(lv.configShortcut) {
+							lv.configShortcut = null;
 						}
 						break;
 					default:
@@ -258,6 +288,7 @@ var cycleCtrlFactory = function() {
 				s += (lv.id && lv.id > 0) ? 'id:' + lv.id : 'new';
 				s += ', type:';
 				var shortcut = '';
+				var screenscrape = '';
 				if(lv.elementType) {
 					s += lv.elementType;
 					if(lv.elementType == 'SHORTCUT') {
@@ -275,6 +306,12 @@ var cycleCtrlFactory = function() {
 				}
 				if(shortcut) {
 					s += (', shortcut:' + shortcut);
+				}
+				else if(lv.elementType == 'SCREENSCRAPE') {
+					s += ', screenscrape type:';
+					s += lv.screenScrapeType ? lv.screenScrapeType : '?';
+					s += ', label:';
+					s += lv.label ? lv.label : '?';
 				}
 				else {
 					s += ', label:';
