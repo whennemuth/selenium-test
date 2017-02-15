@@ -33,12 +33,19 @@ public class BasicElement implements Element {
 	
 	private void setWebElement(WebElement webElement) {
 		this.webElement = webElement;
-		this.elementType = ElementType.getInstance(webElement);
+		if(this.elementType == null) {
+			this.elementType = ElementType.getInstance(webElement);
+		}
 	}
 
 	@Override
 	public ElementType getElementType() {
 		return elementType;
+	}
+
+	@Override
+	public void setElementType(ElementType elementType) {
+		this.elementType = elementType;
 	}
 
 	@Override
@@ -84,6 +91,9 @@ public class BasicElement implements Element {
 			else {
 				return selected.get(0).getAttribute("value");
 			}
+		}
+		else if(ElementType.SCREENSCRAPE.equals(elementType)) {
+			return webElement.getText(); // WebElement is Subclassed to return a "scraped" value for getText()
 		}
 		else if(elementType.isCheckable()) {
 			return webElement.getAttribute("checked");

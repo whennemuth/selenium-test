@@ -11,6 +11,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Attribute;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 
 /**
  * Locate html elements whose class attribute(s) 
@@ -156,6 +158,11 @@ public class ClassBasedElementLocator extends AbstractElementLocator implements 
 		public List<String> getAttributeMatches() {
 			return attributeMatches;
 		}
+	}
+
+	@Override
+	protected Element getElement(WebDriver driver, WebElement we) {
+		return new BasicElement(driver, we);
 	}
 	
 	

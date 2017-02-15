@@ -63,9 +63,15 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 
 	@Column(nullable=false)
 	private byte navigate;
+
+	@Column(name="screen_scrape_id", nullable=false)
+	private int screenScrapeId;
 	
 	@Transient
 	private String screenScrapeType;
+	
+	@Transient
+	private String screenScrapeValue;
 	
 	// uni-directional one-to-one association to ConfigShortcut (ConfigShortcut cannot "see" LabelAndValue). 
 	// NOTE: Don't use CascadeType.REMOVE as removals of this entity will try to cascade the removal of the ConfigShortcut
@@ -81,7 +87,7 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 	@PrePersist
 	@PreUpdate
 	private void checkScreenScrape() {
-		if(ElementType.SCREENSCRAPE.equals(elementType) && value == null) {
+		if(ElementType.SCREENSCRAPE.is(elementType) && value == null) {
 			this.value = screenScrapeType;
 		}		
 	}
@@ -148,7 +154,7 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 	}
 
 	public String getValue() {
-		if(ElementType.SCREENSCRAPE.equals(elementType) && value == null) {
+		if(ElementType.SCREENSCRAPE.is(elementType) && value == null) {
 			this.value = screenScrapeType;
 		}
 		return this.value;
@@ -178,7 +184,7 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 
 	@Transient
 	public String getScreenScrapeType() {
-		if(ElementType.SCREENSCRAPE.equals(elementType) && screenScrapeType == null) {
+		if(ElementType.SCREENSCRAPE.is(elementType) && screenScrapeType == null) {
 			this.screenScrapeType = value;
 		}
 		return screenScrapeType;
@@ -187,6 +193,35 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 	@Transient
 	public void setScreenScrapeType(String screenScrapeType) {
 		this.screenScrapeType = screenScrapeType;
+	}
+
+	@Transient
+	public String getScreenScrapeValue() {
+		return screenScrapeValue;
+	}
+
+	@Transient
+	public void setScreenScrapeValue(String screenScrapeValue) {
+		this.screenScrapeValue = screenScrapeValue;
+	}
+
+	/**
+	 * @return The id of another LabelAndValue entity whose entityType is SCREENSCRAPE and whose
+	 * value indicates a screenScrapeType. That entity will be used to dynamically "scrape the screen"
+	 * for the text sought which will be used in place of the value property of this instance.
+	 */
+	public int getScreenScrapeId() {
+		return screenScrapeId;
+	}
+
+	public void setScreenScrapeId(int screenScrapeId) {
+		this.screenScrapeId = screenScrapeId;
+	}
+	
+	@JsonIgnore
+	@Transient
+	public boolean isScreenScrape() {
+		return ElementType.SCREENSCRAPE.is(elementType);
 	}
 	
 	public String getIdentifier() {

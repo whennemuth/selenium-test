@@ -67,7 +67,11 @@ public class ElementValue {
 			}
 			// TODO: Match by partial text?
 			break;
+		case SCREENSCRAPE:
+			// Do nothing. ScreenScrape instances find and apply their own values to themselves.
+			return true;
 		case SHORTCUT:
+			element.click();
 			break;
 		default:
 			break;

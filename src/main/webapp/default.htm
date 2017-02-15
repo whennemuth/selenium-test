@@ -142,7 +142,10 @@
 									
 										<div ng-show="lvShow(lv, 'value')" style="padding-top:5px;">
 											value<br>
-											<input type="text" value="{{lv.value}}" ng-model="lv.value">
+											<input type="text" value="{{lv.value}}" ng-model="lv.value" ng-disabled="lv.screenScrapeId > 0">
+											<select ng-model="lv.screenScrapeId" ng-change="lv.value = ''"
+												ng-options="ss.id as getScreenScrapeInfo(ss) for ss in screenscrapes | filter:filterScreenScrapes(suite, lv)">
+											</select>											
 										</div>
 									
 										<div ng-show="lvShow(lv, 'navigates')" style="padding-top:5px;">

@@ -9,6 +9,9 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.ComparableLabel;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
@@ -101,31 +104,31 @@ public class ScreenScrapeElementLocator extends AbstractElementLocator {
 		
 		return located;
 	}
-
-	private String invalidParmsMsg = null;
 	
 	private boolean validParameters() {
 		if(Utils.isEmpty(elementType)) {
-			invalidParmsMsg = "Invalid parameter: elementType cannot be null or empty";
+			message = "Invalid parameter: elementType cannot be null or empty";
 			return false;
 		}
 		if(parameters.size() < 2) {
-			invalidParmsMsg = "Invalid parameter: Expecting parameters list to have at least 2 entries";
+			message = "Invalid parameter: Expecting parameters list to have at least 2 entries";
 			return false;
 		}
 		if(Utils.isEmpty(parameters.get(0))) {
-			invalidParmsMsg = "Invalid parameter: First parameter (label) cannot be null or empty";
+			message = "Invalid parameter: First parameter (label) cannot be null or empty";
 			return false;
 		}
 		if(Utils.isEmpty(parameters.get(1))) {
-			invalidParmsMsg = "Invalid parameter: Second parameter (pattern) cannot be null or empty";
+			message = "Invalid parameter: Second parameter (pattern) cannot be null or empty";
 			return false;
 		}
 
 		return true;
 	}
-	
-	public String getInvalidparametersMessage() {
-		return invalidParmsMsg;
+	@Override
+	protected Element getElement(WebDriver driver, WebElement we) {
+		Element e = new BasicElement(driver, we);
+		e.setElementType(ElementType.SCREENSCRAPE);
+		return e;
 	}
 }

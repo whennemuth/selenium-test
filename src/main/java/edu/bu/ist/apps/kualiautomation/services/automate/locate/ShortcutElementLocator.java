@@ -19,7 +19,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelElementLocator;
 
 /**
- * Find a WebElement instance whose location has been described as part of a "hierarch". That is,
+ * Find a WebElement instance whose location has been described as part of a "hierarchy". That is,
  * the WebElement will exist within enclosing html that itself contains other labelling html. For
  * example, a hierarchy might be "label1 > label2 > mylink", which would indicate a hyperlink having
  * text "mylink" that exists inside html containing another element that has text  attribute "label2",
@@ -352,6 +352,13 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 
 	public void setTimeoutSeconds(Integer timeoutSeconds) {
 		this.timeoutSeconds = timeoutSeconds;
+	}
+
+	@Override
+	protected Element getElement(WebDriver driver, WebElement we) {
+		Element e = new BasicElement(driver, we);
+		e.setElementType(ElementType.SHORTCUT);
+		return e;
 	}
 	
 }

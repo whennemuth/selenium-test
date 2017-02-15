@@ -10,6 +10,7 @@ import java.util.Set;
 import org.openqa.selenium.WebDriver;
 
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
+import edu.bu.ist.apps.kualiautomation.services.automate.RunLog;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledElementLocator;
@@ -32,12 +33,14 @@ public class LocatorRunner {
 	private boolean ignoreDisabled;
 	private boolean busy;
 	private Set<Class<?>> additionalLocators = new LinkedHashSet<Class<?>>();
+	private RunLog runlog;
 	
 	@SuppressWarnings("unused")
 	private LocatorRunner() { /* Restrict the default constructor */ }
-	
-	public LocatorRunner(WebDriver driver) {
+		
+	public LocatorRunner(WebDriver driver, RunLog runlog) {
 		this.driver = driver;
+		this.runlog = runlog;
 	}
 	
 	public Element run(LabelAndValue lv) {
@@ -123,21 +126,23 @@ public class LocatorRunner {
 		
 		elements.addAll(runBatch(lv, additionalLocators, labelCanAlsoBeAnAttribute));
 		
-		if(elements.isEmpty()) {
-			System.out.println("Could not locate " + String.valueOf(lv.getLabel() + ": " + lv.getElementType()));
-		}
-		else if(elements.size() > 1){
-			System.out.println("Located multiple for " + String.valueOf(lv.getLabel() + ": " + lv.getElementType()));
-		}
-		else {
-			System.out.println("Located " + String.valueOf(lv.getLabel() + ": " + lv.getElementType()));
-		}
-		
 		return elements;
 	}
 	
 	private List<Element> locateElements(LabelAndValue lv, Locator locator) {
-		return locator.locateAll(lv.getElementTypeEnum(), Arrays.asList(new String[]{ lv.getLabel() }));
+		String[] parms = null;
+		if(lv.isScreenScrape()) {
+			parms = new String[]{ lv.getLabel(), lv.getScreenScrapeType() };
+		}
+		else {
+			parms = new String[]{ lv.getLabel() };
+		}
+		List<Element> elements = locator.locateAll(lv.getElementTypeEnum(), Arrays.asList(parms));
+		if(!Utils.isEmpty(locator.getMessage())) {
+			runlog.printMessage(lv, locator.getMessage());
+		}
+		
+		return elements;
 	}
 	
 	/**

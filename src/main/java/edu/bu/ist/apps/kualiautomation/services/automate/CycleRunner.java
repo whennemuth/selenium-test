@@ -32,24 +32,35 @@ public class CycleRunner {
 	@SuppressWarnings("unused")
 	private CycleRunner() { /* Restrict private constructor */ }
 	
+	public CycleRunner(Session session, RunLog runlog) {
+		this(session.getDriver(), session.getCycle(), runlog);
+	}
+	
+	public CycleRunner(WebDriver driver, Cycle cycle, RunLog runlog) {
+		this.driver = driver;
+		this.cycle = cycle;
+		this.runlog = runlog;
+	}
+	
 	public CycleRunner(Session session) {
-		this(session.getDriver(), session.getCycle());
+		this(session.getDriver(), session.getCycle(), null);
 	}
 	
 	public CycleRunner(WebDriver driver, Cycle cycle) {
-		this.driver = driver;
-		this.cycle = cycle;
+		this(driver, cycle, null);
 	}
 	
 	public RunLog run() {		
 		System.out.println("Processing Cycle: " + cycle.getName());
-		runlog = new RunLog();
+		if(runlog == null) {
+			runlog = new RunLog(true);
+		}
 		
 		outerloop:
 		for(Suite suite : cycle.getSuites()) {
 			System.out.println("Processing Suite: " + suite.getName());
 			for(LabelAndValue lv : suite.getLabelAndValues()) {
-				LocatorRunner locator = new LocatorRunner(driver);
+				LocatorRunner locator = new LocatorRunner(driver, runlog);
 				locator.setIgnoreHidden(true);
 				List<Element> elements = locator.runGreedy(lv);
 				if(elementLocated(lv, elements)) {
@@ -70,7 +81,9 @@ public class CycleRunner {
 	}
 
 	/**
-	 * Require that one element was found from the location attempt and make a log entry if not so.
+	 * Require that one element was found from the location attempt for non-screenscrapes
+	 * Require that at least one element was found from the location attempt for screenscrapes.
+	 * Make a log entry if not so.
 	 * 
 	 * @param lv
 	 * @param elements
@@ -80,10 +93,11 @@ public class CycleRunner {
 			runlog.elementNotFound(lv);
 			return false;
 		}
-		else if(elements.size() > 1) {
+		else if(elements.size() > 1 && !lv.isScreenScrape()) {
 			runlog.multipleElementCandidates(lv, elements);
 			return false;
 		}
+
 		return true;
 	}
 	
@@ -94,13 +108,56 @@ public class CycleRunner {
 	 * @param elements
 	 */
 	private boolean applyElementValue(LabelAndValue lv, Element element) {
-		ElementValue val = new ElementValue(driver, lv.getValue());
+		String valueString = null;
+		if(lv.isScreenScrape()) {
+			/**
+			 * SCENARIO A:
+			 * ScreenScrape instances find and apply their own values to themselves.
+			 * However, carry its value (a screen scrape) over to the LabelAndValue
+			 * instance on which it was based so it can be relocated and used in SCENARIO B later on.
+			 */
+			lv.setScreenScrapeValue(element.getValue());
+			return true;
+		}
+		if(lv.getScreenScrapeId() > 0) {
+			/**
+			 * SCENARIO B:
+			 * Get the value from a prior screenscrape LabelAndValue instance by searching for
+			 * it throughout the cycle and getting its getScreenScrapeValue() return value. 
+			 */
+			valueString = getScreenScrapeValue(lv.getScreenScrapeId());
+		}
+		else {
+			/**
+			 * SCENARIO C: 
+			 * Not screenscrape-related. Apply a value directly.
+			 */
+			valueString = lv.getValue();
+		}
+		ElementValue val = new ElementValue(driver, valueString);
 		runlog.log(element, lv);
 		if(!val.applyTo(element, lv.isNavigates())) {
 			runlog.valueApplicationError(lv, element);
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Obtain a screenscrape based on the id of a LabelAndValue instance whose ElementType is SCREENSCRAPE.
+	 * 
+	 * @param screenScrapeId
+	 * @return
+	 */
+	private String getScreenScrapeValue(Integer screenScrapeId) {
+		for(Suite suite : cycle.getSuites()) {
+			for(LabelAndValue lv : suite.getLabelAndValues()) {
+				if(screenScrapeId.equals(lv.getId()) && lv.isScreenScrape()) {
+					return lv.getScreenScrapeValue();
+				}
+			}
+		}
+		return null;
 	}
 	
 	public static void main(String[] args) {

@@ -111,7 +111,7 @@ public abstract class AbstractElementLocator implements Locator {
 			}
 			else {
 				for(WebElement we : webElements) {
-					results.add(new BasicElement(driver, we));
+					results.add(getElement(driver, we));
 				}
 			}
 		} 
@@ -136,6 +136,8 @@ public abstract class AbstractElementLocator implements Locator {
 	}
 
 	protected abstract List<WebElement> customLocate();
+	
+	protected abstract Element getElement(WebDriver driver, WebElement we);
 	
 	/**
 	 * This is the default method for locating a WebElement on an html page.

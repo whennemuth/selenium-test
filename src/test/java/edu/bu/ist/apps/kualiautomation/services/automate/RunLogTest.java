@@ -85,7 +85,7 @@ public class RunLogTest {
 		when(element3.getWebElement()).thenReturn(button1);
 		when(element3.isInteractive()).thenReturn(true);
 		
-		runlog = new RunLog();
+		runlog = new RunLog(true);
 	}
 
 	private String getStringResults() throws IOException {

@@ -30,12 +30,13 @@ public class KerberosLogin {
 	private int timeout;
 	private Element username;
 	private String failureMessage;
+	private RunLog runlog;
 	
 	private static final String TEST_DRIVE_USERNAME_OTHER_IDENTIFIER = "login_user";
 	private static final String TEST_DRIVE_PASSWORD_OTHER_IDENTIFIER = "login_pw";
 	private static final String TEST_DRIVE_SUBMIT_BUTTON_LABEL = "login";
 	
-	public KerberosLogin(Session session, int timeout) {
+	public KerberosLogin(Session session, int timeout, RunLog runlog) {
 		this.loginParms = session.getCycle().getKerberosLoginParms();
 		if(loginParms.getConfigEnvironmentId() == null || loginParms.getConfigEnvironmentId() < 1) {
 			this.loginUrl = session.getConfig().getCurrentEnvironment().getUrl();
@@ -45,7 +46,8 @@ public class KerberosLogin {
 					loginParms.getConfigEnvironmentId()).getUrl();
 		}
 		this.driver = session.getDriver();
-		this.locatorRunner = new LocatorRunner(driver);
+		this.runlog = runlog;
+		this.locatorRunner = new LocatorRunner(driver, this.runlog);
 		this.timeout = timeout;
 		this.wait = new WebDriverWait(driver, timeout);
 	}

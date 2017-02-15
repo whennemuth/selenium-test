@@ -110,6 +110,9 @@ var cycleCtrlFactory = function() {
 					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'PASSWORD': case 'OTHER':
 						lv.booleanValue = false;
 						lv.value = /^(true)|(false)$/i.test(lv.value) ? null : lv.value;
+						if(scope.isScreenScrapeType(lv.value)) {
+							lv.value = null;
+						}
 						lv.navigates = false;
 						if(lv.configShortcut) {
 							lv.configShortcut = null;
@@ -129,7 +132,6 @@ var cycleCtrlFactory = function() {
 					case 'SCREENSCRAPE':
 						lv.screenScrapeType = scope.getScreenScrapeTypes()[0].id; // default to the first one
 						lv.identifier = null;
-						lv.label = null;
 						lv.value = null;
 						lv.booleanValue = false;
 						lv.navigates = false;
@@ -150,10 +152,95 @@ var cycleCtrlFactory = function() {
 				}
 			};
 			
+			scope.isScreenScrapeType = function(id) {
+				for(var i=0; i<scope.getScreenScrapeTypes().length; i++) {
+					if(scope.getScreenScrapeTypes()[i].id == id) {
+						return true;
+					}
+				}
+				return false;
+			}
+			
+			/** An array used to bind to screenscrape picklists */
+			scope.screenscrapes = [];
+			
+			/**
+			 * Refresh the array that is bound to all screenscrape picklists.
+			 * This function should be called each time a screenscrape is added, removed or edited in any way.
+			 */
+			scope.refreshScreenScrapes = function() {
+				scope.screenscrapes.length = 0; // clears the array without rereferencing it.
+				// Add a default entry to the top of the array indicating it refers to a non-screenscrape value entry.
+				scope.screenscrapes[0] = {
+					id:0, 
+					label:'Manual Entry', 
+					sequence:0,
+					suiteId:0,
+					suiteName:'',
+					suiteSequence:0
+				}
+				for(x=0; x<scope.cycle.suites.length; x++) {
+					var suite = scope.cycle.suites[x];
+					for(var i=0; i<suite.labelAndValues.length; i++) {
+						var lv = suite.labelAndValues[i];
+						if(lv.elementType == 'SCREENSCRAPE') {
+							if(lv.id && lv.id > 0) {
+								// Only saved sceenscrapes will be available in the array.
+								// This is because the id of the entity will be needed as a reference.
+								scope.screenscrapes[scope.screenscrapes.length] = {
+									id: lv.id,
+									label: lv.label,
+									sequence: lv.sequence,
+									suiteId: suite.id,
+									suiteName: suite.name,
+									suiteSequence: suite.sequence
+								};							
+							}
+						}
+					}
+				}
+			};
+			
+			/**
+			 * Get a string that will be displayed as a single picklist entry for screen scrapes.
+			 */
+			scope.getScreenScrapeInfo = function(ss) {
+				if(ss.id == 0) {
+					return ss.label;
+				}
+				else {
+					return ss.suiteName + ': ' + ss.sequence + ') id:' + ss.id + ', "' + ss.label + '"';
+				}
+			};
+			
+			/**
+			 * A screenscrape picklist should not contain screen scrapes that appear AFTER the LabelAndValue
+			 * entry the picklist applies to. Otherwise, the user would have the option to attempt applying a 
+			 * screen scrape value to an element BEFORE it was "scraped".
+			 * ==============================================================================================
+			 * PARAMETERS:
+			 * ==============================================================================================
+			 *    screenscrape: the screenscrape that the filterable picklist item represents
+			 *    suite: The suite that the item displaying the picklist belongs to.
+			 *    lv: The LabelAndValue that is displaying the picklist
+			 */
+			scope.filterScreenScrapes = function(suite, lv) {
+				return function(screenscrape) {
+					if(screenscrape.suiteSequence > suite.sequence) {
+						return false;
+					}
+					if(screenscrape.sequence > lv.sequence) {
+						return false;
+					}
+					return true;					
+				}
+			};
+			
 			scope.resequence = function(items) {
 				for(var i=0; i<items.length; i++) {
 					items[i].sequence = (i+1);
 				}
+				scope.refreshScreenScrapes();
 			};
 			
 			// Define an event handler to load in an empty default cycle object bound to a ng-repeat block for new cycles
@@ -172,6 +259,7 @@ var cycleCtrlFactory = function() {
 			scope.backupCycle = function() {
 				scope.cycle.kerberosLoginParms.configEnvironmentId = scope.config.currentEnvironment.id;
 				scope.cycleBackup = angular.copy(scope.cycle);
+				scope.refreshScreenScrapes();
 			};
 				
 			scope.saveCycle = function() {

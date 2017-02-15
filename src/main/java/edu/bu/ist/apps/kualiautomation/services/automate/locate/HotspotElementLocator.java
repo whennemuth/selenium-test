@@ -7,6 +7,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
@@ -50,5 +51,10 @@ public class HotspotElementLocator extends AbstractElementLocator {
 		// If located is empty, then the ElementType.HOTSPOT regex will be used to attempt the search
 		
 		return located;
+	}
+
+	@Override
+	protected Element getElement(WebDriver driver, WebElement we) {
+		return new BasicElement(driver, we);
 	}
 }

@@ -12,6 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Attribute;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
@@ -139,5 +140,9 @@ public class LabelledElementLocator extends AbstractElementLocator {
 		JavascriptExecutor executor = (JavascriptExecutor)searchContext;
 		WebElement parentElement = (WebElement)executor.executeScript("return arguments[0].parentNode;", childElement);
 		return parentElement;
+	}
+	@Override
+	protected Element getElement(WebDriver driver, WebElement we) {
+		return new BasicElement(driver, we);
 	}
 }

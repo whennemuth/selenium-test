@@ -6,6 +6,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
@@ -39,5 +40,10 @@ public class BasicElementLocator extends AbstractElementLocator {
 
 	public List<Element> locateAll(List<String> parameters) {
 		return super.locateAll(elementType, parameters);
+	}
+
+	@Override
+	protected Element getElement(WebDriver driver, WebElement we) {
+		return new BasicElement(driver, we);
 	}
 }

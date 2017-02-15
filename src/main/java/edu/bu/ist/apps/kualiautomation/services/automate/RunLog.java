@@ -24,9 +24,11 @@ public class RunLog {
 	private Date start;
 	private Date stop;
 	private List<String> entries = new ArrayList<String>();
+	private boolean systemOut;
 
-	public RunLog() {
+	public RunLog(boolean systemOut) {
 		start = new Date(System.currentTimeMillis());
+		this.systemOut = systemOut;
 	}
 	
 	public void log(Element element, LabelAndValue lv) {
@@ -46,6 +48,8 @@ public class RunLog {
 		}
 
 		entries.add(s.toString());
+		if(systemOut)
+			System.out.println(s.toString());
 	}
 
 	public void elementNotFound(LabelAndValue lv) {
@@ -53,6 +57,17 @@ public class RunLog {
 		s.append("Cannot find element ");
 		printElement(s, null, lv);
 		entries.add(s.toString());
+		if(systemOut)
+			System.out.println(s.toString());
+	}
+	
+	public void printMessage(LabelAndValue lv, String msg) {
+		StringBuilder s = new StringBuilder();
+		s.append(msg).append(" ");
+		printElement(s, null, lv);
+		entries.add(s.toString());
+		if(systemOut)
+			System.out.println(s.toString());
 	}
 
 	public void multipleElementCandidates(LabelAndValue lv, List<Element> elements) {
@@ -68,6 +83,8 @@ public class RunLog {
 		}
 				
 		entries.add(s.toString());		
+		if(systemOut)
+			System.out.println(s.toString());
 	}
 
 	public void valueApplicationError(LabelAndValue lv, Element element) {
@@ -76,6 +93,8 @@ public class RunLog {
 		printElement(s, null, lv);
 		s.append("]");
 		entries.add(s.toString());
+		if(systemOut)
+			System.out.println(s.toString());
 	}
 
 	private void printElement(StringBuilder s, Element element, LabelAndValue lv) {

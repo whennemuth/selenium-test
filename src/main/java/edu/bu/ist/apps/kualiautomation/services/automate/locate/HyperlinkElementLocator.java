@@ -9,6 +9,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Attribute;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelElementLocator;
@@ -76,5 +77,10 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 			results.add(e.getWebElement());
 		}
 		return results;
+	}
+
+	@Override
+	protected Element getElement(WebDriver driver, WebElement we) {
+		return new BasicElement(driver, we);
 	}
 }

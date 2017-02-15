@@ -239,7 +239,7 @@ public class ComparableScreenScrape extends ComparableLabel {
 		for(String match : matches) {
 			int idx = match.indexOf(getRawLabel()) + getRawLabel().length();
 			String value = match.substring(idx);
-			value = value.replaceAll("[\\:\\-\\x20\\t]", ""); 
+			value = value.replaceAll("[\\:\\-\\s]", ""); 
 			scrapedValues.add(value);
 		}
 		return scrapedValues;

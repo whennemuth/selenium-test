@@ -187,6 +187,10 @@ public enum ElementType {
 		return useClickEvent;
 	}
 
+	public boolean is(String name) {
+		return this.name().equals(name);
+	}
+	
 	public List<WebElement> findAll(SearchContext ctx) {
 		boolean global = true;
 		if(ctx instanceof WebElement)

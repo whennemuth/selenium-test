@@ -27,6 +27,7 @@ public class Session implements Runnable {
 		this.config = config;
 		this.cycle = cycle;
 		this.terminate = terminate;
+		this.runLog = new RunLog(true);
 	}
 	
 	@Override
@@ -59,7 +60,7 @@ public class Session implements Runnable {
 
 	private void work() {
 		System.out.println("Running cycle...");
-		CycleRunner runner = new CycleRunner(this);
+		CycleRunner runner = new CycleRunner(this, runLog);
 		runLog = runner.run();		
 	}
 	
@@ -71,7 +72,7 @@ public class Session implements Runnable {
 	}
 
 	private boolean login() throws Exception {
-		KerberosLogin kerberos = new KerberosLogin(this, 10);
+		KerberosLogin kerberos = new KerberosLogin(this, 10, runLog);
 		if(kerberos.login()) {
 			return true;
 		}
