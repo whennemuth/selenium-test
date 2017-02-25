@@ -11,8 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import edu.bu.ist.apps.kualiautomation.services.automate.element.Attribute;
-import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.AttributeInspector;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 
@@ -170,7 +169,8 @@ public abstract class AbstractElementLocator implements Locator {
 				results.addAll(candidates);
 			}
 			else {
-				results.addAll(Attribute.findForValues(candidates, parameters));
+				AttributeInspector inspector = new AttributeInspector(candidates);
+				results.addAll(inspector.findForValues(parameters));
 			}
 			break;
 		case SHORTCUT: case SCREENSCRAPE:

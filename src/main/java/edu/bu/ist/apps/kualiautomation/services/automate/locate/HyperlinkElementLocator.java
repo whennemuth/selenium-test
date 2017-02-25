@@ -8,7 +8,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import edu.bu.ist.apps.kualiautomation.services.automate.element.Attribute;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.AttributeInspector;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
@@ -65,7 +65,8 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 			}
 			
 			//4)  With all of the anchor tags found, remove those that do not have an attribute value for each value in attributeValues
-			located.addAll(Attribute.findForValues(anchortags, attributeValues));
+			AttributeInspector inspector = new AttributeInspector(searchContext, anchortags);
+			located.addAll(inspector.findForValues(attributeValues));
 		}
 		
 		return located;

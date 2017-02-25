@@ -11,7 +11,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import edu.bu.ist.apps.kualiautomation.services.automate.element.Attribute;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.AttributeInspector;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
@@ -30,6 +30,8 @@ import edu.bu.ist.apps.kualiautomation.util.Utils;
  */
 public class LabelledElementLocator extends AbstractElementLocator {
 	
+	private boolean labelCanBeHyperlink = true;
+
 	public LabelledElementLocator(WebDriver driver){
 		super(driver);
 	}
@@ -55,6 +57,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 			LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext);
 			labelLocator.setIgnoreHidden(super.ignoreHidden);
 			labelLocator.setIgnoreDisabled(super.ignoreDisabled);
+			labelLocator.setLabelCanBeHyperlink(this.labelCanBeHyperlink);
 			List<Element> labelElements = labelLocator.locateAll(elementType, Arrays.asList(new String[]{label}));
 			for(Element labelElement : labelElements) {
 				List<WebElement> flds = tryTraditionalLabelSearchMethod(labelElement.getWebElement(), attributeValues);
@@ -124,7 +127,8 @@ public class LabelledElementLocator extends AbstractElementLocator {
 			else {
 				// If parameters are present beyond the first, they are attribute values, so pick only 
 				// those webElements that have every attributeValue accounted for among their attributes.
-				List<WebElement> filtered = Attribute.findForValues(candidates, attributeValues);
+				AttributeInspector inspector = new AttributeInspector(candidates);
+				List<WebElement> filtered = inspector.findForValues(attributeValues);				
 				return filtered;
 			}
 		}
@@ -144,5 +148,13 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	@Override
 	protected Element getElement(WebDriver driver, WebElement we) {
 		return new BasicElement(driver, we);
+	}
+	
+	public boolean isLabelCanBeHyperlink() {
+		return labelCanBeHyperlink;
+	}
+	
+	public void setLabelCanBeHyperlink(boolean labelCanBeHyperlink) {
+		this.labelCanBeHyperlink = labelCanBeHyperlink;
 	}
 }

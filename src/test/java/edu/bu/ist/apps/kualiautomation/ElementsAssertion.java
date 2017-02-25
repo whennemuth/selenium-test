@@ -33,9 +33,11 @@ public class ElementsAssertion {
 	private String label;
 	private List<String> attributeValues = new ArrayList<String>();
 	private Map<String, String> attributeAssertions = new HashMap<String, String>();
-	private String tagName;
-	private String text;
-	private HashSet<String> anyText;
+	private Map<String, String> anyAttributeAssertions;
+	private Map<String, String> anyAttributeAssertionsFound;
+	private String tagNameAssertion;
+	private String textAssertion;
+	private HashSet<String> anyTextAssertions;
 	private HashSet<String> anyTextFound;
 	private Locator locator;
 	private boolean webPageOpen;
@@ -76,9 +78,9 @@ public class ElementsAssertion {
 				assertElement(element);
 			}
 		}
-		if(anyText != null && !anyText.isEmpty()) {
+		if(anyTextAssertions != null && !anyTextAssertions.isEmpty()) {
 			StringBuilder failMsg = new StringBuilder("Could not find all expected text() values:\n   UNFOUND: (");
-			for (Iterator<String> iterator = anyText.iterator(); iterator.hasNext();) {
+			for (Iterator<String> iterator = anyTextAssertions.iterator(); iterator.hasNext();) {
 				String s = iterator.next();
 				failMsg.append("\"").append(s).append("\"");
 				if(iterator.hasNext())
@@ -90,6 +92,31 @@ public class ElementsAssertion {
 			for (Iterator<String> iterator = anyTextFound.iterator(); iterator.hasNext();) {
 				String s = iterator.next();
 				failMsg.append("\"").append(s).append("\"");
+				if(iterator.hasNext())
+					failMsg.append(", ");
+			}
+			
+			fail(failMsg.toString());
+		}
+		if(anyAttributeAssertions != null && !anyAttributeAssertions.isEmpty()) {
+			StringBuilder failMsg = new StringBuilder("Could not find all expected attribute values:\n   UNFOUND: (");
+
+			for (Iterator<String> iterator = anyAttributeAssertions.keySet().iterator(); iterator.hasNext();) {
+				String attribName = iterator.next();
+				String attribVal = anyAttributeAssertions.get(attribName);
+				String s = attribName + ":" +
+				failMsg.append("[").append(attribName).append(":").append(attribVal).append("]");
+				if(iterator.hasNext())
+					failMsg.append(", ");
+			}
+			
+			failMsg.append(")\n   FOUND: (");
+			
+			for (Iterator<String> iterator = anyAttributeAssertionsFound.keySet().iterator(); iterator.hasNext();) {
+				String attribName = iterator.next();
+				String attribVal = anyAttributeAssertions.get(attribName);
+				String s = attribName + ":" +
+				failMsg.append("[").append(attribName).append(":").append(attribVal).append("]");
 				if(iterator.hasNext())
 					failMsg.append(", ");
 			}
@@ -112,23 +139,25 @@ public class ElementsAssertion {
 	 * @param element
 	 */
 	private void assertElement(Element element) {
-		if(elementType.getTagname() != null) {
+		if(elementType.getTagname() != null && !elementType.equals(ElementType.HOTSPOT)) {
 			assertEquals(elementType.getTagname().toLowerCase(), element.getWebElement().getTagName().toLowerCase());
 		}
-		assertTrue(areEmptyOrEqual(elementType.getTypeAttribute(), element.getWebElement().getAttribute("type")));
-		if(tagName != null) {
-			assertTrue(tagName.equalsIgnoreCase(element.getWebElement().getTagName()));
+		if(!elementType.equals(ElementType.HOTSPOT)) {
+			assertTrue(areEmptyOrEqual(elementType.getTypeAttribute(), element.getWebElement().getAttribute("type")));
 		}
-		if(text != null) {
+		if(tagNameAssertion != null) {
+			assertTrue(tagNameAssertion.equalsIgnoreCase(element.getWebElement().getTagName()));
+		}
+		if(textAssertion != null) {
 			if(element.getWebElement().getText() == null) {
-				fail("Expected text = \"" + text + "\", but was null");
+				fail("Expected text = \"" + textAssertion + "\", but was null");
 			}
-			assertEquals(text.trim(), element.getWebElement().getText().trim());
+			assertEquals(textAssertion.trim(), element.getWebElement().getText().trim());
 		}
-		if(anyText != null && !anyText.isEmpty()) {
+		if(anyTextAssertions != null && !anyTextAssertions.isEmpty()) {
 			String text = element.getWebElement().getText().trim();
-			if(anyText.contains(text)) {
-				if(anyText.remove(text)) {
+			if(anyTextAssertions.contains(text)) {
+				if(anyTextAssertions.remove(text)) {
 					anyTextFound.add(text);
 				}		
 			}
@@ -137,6 +166,18 @@ public class ElementsAssertion {
 			String assertValue = attributeAssertions.get(attributeName);
 			String actualValue = element.getWebElement().getAttribute(attributeName);
 			assertTrue(areEmptyOrEqual(assertValue, actualValue));
+		}
+		if(anyAttributeAssertions != null && !anyAttributeAssertions.isEmpty()) {
+			Iterator<Map.Entry<String,String>> iter = anyAttributeAssertions.entrySet().iterator();
+			while (iter.hasNext()) {
+			    Map.Entry<String,String> entry = iter.next();
+			    String attributeName = entry.getKey();
+				String assertValue = entry.getValue();
+				String actualValue = element.getWebElement().getAttribute(attributeName);
+				if(areEmptyOrEqual(assertValue, actualValue)) {
+					iter.remove();
+				}
+			}	
 		}
 	}
 	
@@ -208,24 +249,31 @@ public class ElementsAssertion {
 		attributeAssertions.put(attributeName, assertValue);
 		return this;
 	}
-	public String getTagName() {
-		return tagName;
+	public String getTagNameAssertion() {
+		return tagNameAssertion;
 	}
-	public ElementsAssertion setTagName(String tagName) {
-		this.tagName = tagName;
+	public ElementsAssertion setTagNameAssertion(String tagName) {
+		this.tagNameAssertion = tagName;
 		return this;
 	}
-	public String getText() {
-		return text;
+	public String getTextAssertion() {
+		return textAssertion;
 	}
-	public ElementsAssertion setText(String text) {
-		this.text = text;
+	public ElementsAssertion setTextAssertion(String text) {
+		this.textAssertion = text;
 		return this;
 	}
-	public ElementsAssertion setAnyText(String[] anyText) {
-		this.anyText = new HashSet<String>(Arrays.asList(anyText));
+	public ElementsAssertion setAnyTextAssertions(String[] anyText) {
+		this.anyTextAssertions = new HashSet<String>(Arrays.asList(anyText));
 		this.anyTextFound = new HashSet<String>();
 		return this;
 	}
-	
+	public ElementsAssertion addAnyAttributeAssertion(String attributeName, String attributeValue) {
+		if(anyAttributeAssertions == null) {
+			anyAttributeAssertions = new HashMap<String, String>();
+			anyAttributeAssertionsFound = new HashMap<String, String>();
+		}
+		anyAttributeAssertions.put(attributeName, attributeValue);
+		return this;
+	}
 }

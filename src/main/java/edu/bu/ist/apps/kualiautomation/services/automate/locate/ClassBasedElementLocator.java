@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import org.openqa.selenium.SearchContext;
@@ -11,6 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Attribute;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.AttributeInspector;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 
@@ -104,7 +106,9 @@ public class ClassBasedElementLocator extends AbstractElementLocator implements 
 			// Determine how many parameters match attribute values of the WebElement
 			if(!classMatches.isEmpty()) {
 				for(String p : parameters) {
-					Attribute attribute = new Attribute(webElement);
+					AttributeInspector inspector = new AttributeInspector(webElement);
+					Map<String, String> attributes = inspector.getAttributes();
+					Attribute attribute = new Attribute(webElement, attributes.keySet());
 					if(attribute.existsForValue(p)) {
 						if(!attributeMatches.contains(p.toLowerCase())) {
 							attributeMatches.add(p.toLowerCase());

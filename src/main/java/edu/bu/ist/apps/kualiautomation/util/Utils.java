@@ -137,4 +137,21 @@ public class Utils {
 		}
 		return new File(url.getFile());
 	}
+	
+	public static boolean trimIgnoreCaseEqual(String s1, String s2) {
+		if(s1 == null || s2 == null)
+			return false;
+		return s1.trim().equalsIgnoreCase(s2.trim());
+	}
+	
+	
+	public static boolean trimIgnoreCaseUnemptyEqual(String s1, String s2) {
+		if(s1 == null || s2 == null)
+			return false;
+		if(s1.trim().isEmpty())
+			return false;
+		if(s2.trim().isEmpty())
+			return false;
+		return s1.trim().equalsIgnoreCase(s2.trim());
+	}
 }

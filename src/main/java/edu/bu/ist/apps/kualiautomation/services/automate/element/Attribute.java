@@ -2,11 +2,14 @@ package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.ComparableLabel;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**
  * Check attributes of the webElement for the specified attributeValue(s) in the order found in attributesToCheck.
@@ -17,40 +20,49 @@ import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.Comparable
 public class Attribute {
 
 	private WebElement webElement;
-	private String attributeValue;
-	private String attributeName;
 	private ElementType elementType;
-	private List<String> attributesToCheck = new ArrayList<String>();
-	public static String[] DEFAULT_ATTRIBUTES_TO_CHECK = new String[] {
-			"id", "title", "placeholder", "name", "value"
-	};
-	
-	public Attribute(WebElement webElement) {
+	private Set<String> attributesToCheck = new HashSet<String>();
+	private StringBuilder message = new StringBuilder();
+
+	public Attribute(WebElement webElement, Set<String> attributesToCheck) {
 		this.webElement = webElement;
+		this.attributesToCheck.addAll(attributesToCheck);
 		this.elementType = ElementType.getInstance(webElement);
 	}
 
+	public Attribute(WebElement webElement, String attributeToCheck) {
+		this.webElement = webElement;
+		this.attributesToCheck.add(attributeToCheck);
+		this.elementType = ElementType.getInstance(webElement);
+	}
+
+	public boolean exists(String attributeName) {
+		return webElement.getAttribute(attributeName) != null;
+	}
+	
+	public String getValue(String attributeName) {
+		return webElement.getAttribute(attributeName);
+	}
+	
 	/**
-	 * Check attributes of the webElement for the specified attributeValue in the following order:
-	 *     id, title, name, value (and text for hyperlinks).
+	 * Check attributes of the webElement for the specified attributeValue in the order:
+	 * they appear in the attributesToCheck list and return the names of those that were found.
 	 * @param attributeValue
 	 * @return
 	 */
-	public boolean existsForValue(String attributeValue) {
-		if(attributesToCheck.isEmpty()) {
-			this.attributesToCheck = Arrays.asList(DEFAULT_ATTRIBUTES_TO_CHECK);
-		}
-		this.attributeValue = attributeValue;
+	public List<String> forValue(String attributeValue) {
 		
-		for(String attrib : attributesToCheck) {
-			if(elementType.acceptsKeystrokes() && "value".equalsIgnoreCase(attrib)) {
+		List<String> found = new ArrayList<String>();
+		
+		for(String attributeName : attributesToCheck) {
+			if(elementType.acceptsKeystrokes() && "value".equalsIgnoreCase(attributeName)) {
 				// This attribute will have a value that is the result of user input, so skip it.
 				continue;
 			}
-			String attribval = webElement.getAttribute(attrib);
-			if(attribval != null && attribval.equalsIgnoreCase(attributeValue)) {
-				attributeName = attrib;
-				return true;
+			String attribval = webElement.getAttribute(attributeName);
+			if(Utils.trimIgnoreCaseUnemptyEqual(attributeValue, attribval)) {
+				setMessage(attributeName, attributeValue);
+				found.add(attributeName);
 			}
 		}
 
@@ -58,41 +70,36 @@ public class Attribute {
 			String cleanedVal = ComparableLabel.getCleanedValue(attributeValue);
 			String cleanedText = ComparableLabel.getCleanedValue(webElement.getText());
 			if(cleanedVal.equalsIgnoreCase(cleanedText)) {
-				return true;
+				found.add("innerText");
 			}
 		}
 		
-		return false;
+		return found;
 	}
 	
-	public boolean existsForValue(String attributeValue, String[] attributesToCheck) {
-		this.attributesToCheck = Arrays.asList(attributesToCheck);
-		return existsForValue(attributeValue);
+	public List<String> forValue(String attributeValue, String[] attributesToCheck) {
+		this.attributesToCheck = new HashSet<String>(Arrays.asList(attributesToCheck));
+		return forValue(attributeValue);
 	}
 	
-	public String getValue() {
-		return attributeValue;
-	}
-
-	public String getName() {
-		return attributeName;
+	public boolean existsForValue(String attributeValue) {
+		return forValue(attributeValue).isEmpty() == false;
 	}
 	
 	public WebElement getWebElement() {
 		return webElement;
 	}
 
-	public String getMessage() {
-		StringBuilder s = new StringBuilder();
+	private void setMessage(String attributeName, String attributeValue) {
 		if(attributeName == null) {
-			s.append("Could not find ")
+			message.append("Could not find ")
 				.append(webElement.getTagName())
 				.append(" element attribute having value \"")
 				.append(attributeValue)
 				.append("\"");
 		}
 		else {
-			s.append("Found ")
+			message.append("Found ")
 				.append(webElement.getTagName())
 				.append(" element attribute \"")
 				.append(attributeName)
@@ -100,65 +107,8 @@ public class Attribute {
 				.append(attributeValue)
 				.append("\"");
 		}
-		return s.toString();
 	}
-
-	/**
-	 * For a given list of webElements, find each that has an attribute with the specified attribute value.
-	 * Of those results, return a list of those whose attribute match are foremost in the array of attributes to check.
-	 *   
-	 * @param webElements
-	 * @param attributeValue
-	 * @return
-	 */
-	public static List<WebElement> findForValue(List<WebElement> webElements, String attributeValue) {
-		List<Attribute> candidates = new ArrayList<Attribute>();
-		List<WebElement> results = new ArrayList<WebElement>();
-		
-		// Find any WebElements that have any attribute that with attributeValue as a value.
-		for(WebElement we : webElements) {
-			Attribute attribute = new Attribute(we);
-			if(attribute.existsForValue(attributeValue)) {
-				candidates.add(attribute);
-			}
-		}
-		
-		// Pick from the candidates list only those attributes whose names are foremost in the array of attributes to check
-		// For example, if candidates contained 2 id matches and 2 title matches, only the 2 id matches would be picked.
-		for(String attrib : DEFAULT_ATTRIBUTES_TO_CHECK) {
-			if(!results.isEmpty()) {
-				break;
-			}
-			for(Attribute a : candidates) {
-				if(attrib.equalsIgnoreCase(a.getName())) {
-					results.add(a.getWebElement());
-				}
-			}
-		}
-		
-		return results;
-	}
-	
-	/**
-	 * For a given list of webElements, find each that has every one of the specified 
-	 * attribute values accounted for among its attributes.
-	 *  
-	 * @param webElements
-	 * @param attributeValues
-	 * @return
-	 */
-	public static List<WebElement> findForValues(List<WebElement> webElements, List<String> attributeValues) {
-		List<WebElement> results = new ArrayList<WebElement>();
-		outerloop:
-		for(WebElement we : webElements) {			 
-			for(String attributeValue : attributeValues) {
-				Attribute attribute = new Attribute(we);
-				if(!attribute.existsForValue(attributeValue)) {
-					continue outerloop;
-				}
-			}
-			results.add(we);
-		}
-		return results;
+	public String getMessage() {
+		return message.toString();
 	}
 }

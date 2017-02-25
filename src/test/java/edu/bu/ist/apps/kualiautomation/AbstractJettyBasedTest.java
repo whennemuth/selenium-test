@@ -28,7 +28,7 @@ import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer
  */
 public abstract class AbstractJettyBasedTest {
 	
-	private static Map<String, String> handlers = new HashMap<String, String>();	
+	protected static Map<String, String> handlers = new HashMap<String, String>();	
 	private static EmbeddedJettyStaticServer server;
 	private static boolean serverRunning;
 	protected static boolean javascriptEnabled = true;

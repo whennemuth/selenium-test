@@ -50,7 +50,7 @@ public class ScreenScrapeElementLocatorTest extends AbstractJettyBasedTest {
 				.setLabel("pears:")
 				.addAttributeValue(ScreenScrapeComparePattern.LABELLED_BLOCK.name())
 				.setNumResults(1)
-				.setText("bannanas"))
+				.setTextAssertion("bannanas"))
 			.findAndAssertElements();
 		
 		elements = (new ElementsAssertion(locator)
@@ -59,7 +59,7 @@ public class ScreenScrapeElementLocatorTest extends AbstractJettyBasedTest {
 				.setLabel("apples")
 				.addAttributeValue(ScreenScrapeComparePattern.LABELLED_BLOCK.name())
 				.setNumResults(1)
-				.setText("oranges"))
+				.setTextAssertion("oranges"))
 			.findAndAssertElements();
 		
 		// The label and value are separated by at least one blank line, which is a disqualifying condition.
@@ -77,7 +77,7 @@ public class ScreenScrapeElementLocatorTest extends AbstractJettyBasedTest {
 				.setLabel("mylabel1")
 				.addAttributeValue(ScreenScrapeComparePattern.LABELLED_BLOCK.name())
 				.setNumResults(1)
-				.setText("myvalue1"))
+				.setTextAssertion("myvalue1"))
 			.findAndAssertElements();
 		
 		elements = (new ElementsAssertion(locator)
@@ -86,7 +86,7 @@ public class ScreenScrapeElementLocatorTest extends AbstractJettyBasedTest {
 				.setLabel("mylabel2b")
 				.addAttributeValue(ScreenScrapeComparePattern.LABELLED_BLOCK.name())
 				.setNumResults(1)
-				.setText("myvalue2"))
+				.setTextAssertion("myvalue2"))
 			.findAndAssertElements();
 		
 		elements = (new ElementsAssertion(locator)
@@ -95,7 +95,7 @@ public class ScreenScrapeElementLocatorTest extends AbstractJettyBasedTest {
 				.setLabel("mylabel3a")
 				.addAttributeValue(ScreenScrapeComparePattern.LABELLED_BLOCK.name())
 				.setNumResults(1)
-				.setText("myvalue3a"))
+				.setTextAssertion("myvalue3a"))
 			.findAndAssertElements();
 		
 		elements = (new ElementsAssertion(locator)
@@ -104,7 +104,7 @@ public class ScreenScrapeElementLocatorTest extends AbstractJettyBasedTest {
 				.setLabel("mylabel3b")
 				.addAttributeValue(ScreenScrapeComparePattern.LABELLED_BLOCK.name())
 				.setNumResults(1)
-				.setText("myvalue3b"))
+				.setTextAssertion("myvalue3b"))
 			.findAndAssertElements();
 
 	}
@@ -124,7 +124,7 @@ public class ScreenScrapeElementLocatorTest extends AbstractJettyBasedTest {
 				.setLabel("Document ID:Status:")
 				.addAttributeValue(ScreenScrapeComparePattern.LABELLED_NUMBER.name())
 				.setNumResults(1)
-				.setText("10828"))
+				.setTextAssertion("10828"))
 			.findAndAssertElements();
 		
 		elements = (new ElementsAssertion(locator)
@@ -133,7 +133,7 @@ public class ScreenScrapeElementLocatorTest extends AbstractJettyBasedTest {
 					.setLabel("Requisitioner Unit:")
 					.addAttributeValue(ScreenScrapeComparePattern.LABELLED_WORD.name())
 					.setNumResults(1)
-					.setText("University"))
+					.setTextAssertion("University"))
 				.findAndAssertElements();
 		
 		elements = (new ElementsAssertion(locator)
@@ -142,7 +142,7 @@ public class ScreenScrapeElementLocatorTest extends AbstractJettyBasedTest {
 					.setLabel("Document")
 					.addAttributeValue(ScreenScrapeComparePattern.LABELLED_WORD.name())
 					.setNumResults(14)
-					.setAnyText(new String[]{"Overview", "Number", "was", "ID"}))
+					.setAnyTextAssertions(new String[]{"Overview", "Number", "was", "ID"}))
 				.findAndAssertElements();
 
 	}

@@ -44,6 +44,8 @@ public class LabelElementLocator extends AbstractElementLocator {
 			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
 			+ "'abcdefghijklmnopqrstuvwxyz')), \"[INSERT-LABEL]\")]]";
 	
+	private boolean labelCanBeHyperlink = true;
+	
 	private LabelElementLocator() {
 		super(null); // Restrict the default constructor
 	}
@@ -110,8 +112,10 @@ public class LabelElementLocator extends AbstractElementLocator {
 		// Wrap the web elements in ComparableLabel instances for sorting so higher ranked results are on top.
 		List<ComparableLabel> labels = new ArrayList<ComparableLabel>();
 		for(WebElement elmt : elements) {
-			String text = getText(driver, elmt);
-			labels.add(new BasicComparableLabel(elmt, label, text));
+			if(!isDisallowedHyperlink(elmt)) {
+				String text = getText(driver, elmt);
+				labels.add(new BasicComparableLabel(elmt, label, text));
+			}
 		}
 		
 		// Unwrap the highest ranked result(s) back into a WebElement collection.
@@ -126,6 +130,18 @@ public class LabelElementLocator extends AbstractElementLocator {
 	@Override
 	protected Element getElement(WebDriver driver, WebElement we) {
 		return new BasicElement(driver, we);
+	}
+	
+	public boolean isDisallowedHyperlink(WebElement we) {
+		return "a".equalsIgnoreCase(we.getTagName()) && labelCanBeHyperlink == false;
+	}
+	
+	public boolean isLabelCanBeHyperlink() {
+		return labelCanBeHyperlink;
+	}
+	
+	public void setLabelCanBeHyperlink(boolean labelCanBeHyperlink) {
+		this.labelCanBeHyperlink = labelCanBeHyperlink;
 	}
 
 }

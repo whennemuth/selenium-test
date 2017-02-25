@@ -118,11 +118,11 @@ public class BasicElement implements Element {
 				.append("displayed=").append(Boolean.valueOf(webElement.isDisplayed())).append(", ")
 				.append("selected=").append(Boolean.valueOf(webElement.isSelected())).append(", ")
 				.append("html=<").append(webElement.getTagName()).append(" ");
-			for (int i = 0; i < Attribute.DEFAULT_ATTRIBUTES_TO_CHECK.length; i++) {
-				String attribute = Attribute.DEFAULT_ATTRIBUTES_TO_CHECK[i];
+			for (int i = 0; i < AttributeInspector.DEFAULT_ATTRIBUTES_TO_CHECK.length; i++) {
+				String attribute = AttributeInspector.DEFAULT_ATTRIBUTES_TO_CHECK[i];
 				builder.append(attribute).append("='").append(String.valueOf(webElement.getAttribute(attribute)));
 				builder.append("'");
-				if((i+1) == Attribute.DEFAULT_ATTRIBUTES_TO_CHECK.length)
+				if((i+1) == AttributeInspector.DEFAULT_ATTRIBUTES_TO_CHECK.length)
 					break;
 				builder.append(" ");
 			}
