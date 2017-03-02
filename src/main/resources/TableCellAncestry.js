@@ -1,7 +1,7 @@
 /**
  * Given a particular web element (node), return an object that represents the html table that
  * the web element is expected to be a descendent of. A list of table cells is built for this
- * object, one cell for for the containing td/th element that contains the web element and all
+ * object, one cell for the containing td/th element that contains the web element and all
  * additional 'outer' cells where there is a nested table hierarchy. NOTE: a "descendent" is not
  * necessarily a descendent of an ancestor, but will be a descendent of the row of that ancestor.
  * 
@@ -14,7 +14,10 @@ function getAncestorTableCells(node, cells, depth) {
 	if(node) {
 		if(isCell(node)) {
 			var table = getTable(node, depth);
+			var tableTag = getFullTag(table);
 			var id = getAttribute(node, "id");
+			var tag = getFullTag(node);
+			var first100Chars = getFirst100Chars(node);
 			if(table) {
 				cells[cells.length] = {
 					id: id, 
@@ -24,7 +27,10 @@ function getAncestorTableCells(node, cells, depth) {
 					y: node.parentNode.rowIndex + 1,
 					table: table,
 					tableRows: table.rows.length,
-					tableCols: table.rows[0].cells.length
+					tableCols: table.rows[0].cells.length,
+					tableTag: tableTag,
+					tag: tag,
+					first100Chars: first100Chars
 				};
 			}
 		}
@@ -102,6 +108,104 @@ function getCommonAncestorRow(nodes) {
 	}
 }
 
+/**
+ * Object that represents a table column that is a parent, grandparent, etc. to a web element (originalField)
+ */
+function cellObject(originalField) {
+	this.originalField = originalField;
+	this.cell = getCell(originalField);
+	this.sameColumn = function(othercell) {
+		if(!this.cell || !othercell)
+			return false;
+		return this.cell.cellIndex == othercell.cell.cellIndex;
+	};
+	this.getDepth = function() {
+		return getDepth(this.cell);
+	};
+	this.deeperThan = function(othercell) {
+		if(!this.cell || !othercell)
+			return false;
+		return this.getDepth() > othercell.getDepth();
+	};
+	this.sameTable = function(othercell) {
+		if(!this.cell || !othercell)
+			return false;
+		var table1 = getTable(this.cell);
+		var table2 = getTable(othercell.cell);
+		return table1 === table2;
+	}
+	this.nextcell = function() {
+		if(this.cell) {
+			this.cell = getParentCell(this.cell);
+		}		
+		return this.cell != null;
+	}	
+}
+
+/**
+ * Given a particular web element that is in a table, select out of a list of other web elements those that are
+ * in the same column of the table. If no matches are found for the immediate parent column, look for an outer table
+ * and repeat the same check for the "grandparent" column. Repeat this until a match is found or the document root is reached.
+ * 
+ * @param node
+ * @param nodes
+ */
+function getNodesInSameColumn(node, nodes) {
+	
+	// If this is the first call, node will be a web element. Wrap it in an object that will carry it through recursive calls.
+	var cell = node;
+	var cells = nodes;
+	var exit = false;
+	
+	if(!node.originalField) {
+		cell = new cellObject(node);
+		for(var i=0; i<nodes.length; i++) {
+			cells[i] = new cellObject(nodes[i]);
+		}
+	}
+	else {
+		var ascend = true;
+		var fieldsAbove = false;
+		for(var i=0; i<cells.length; i++) {
+			var othercell = cells[i];
+			if(othercell.cell && othercell.deeperThan(cell)) {
+				if(othercell.nextcell()) {
+					ascend = false;
+				}
+			}
+			else if(!cell.sameTable(othercell)) {
+				fieldsAbove = true;
+			}
+		}
+		
+		if(ascend) {
+			if(fieldsAbove) {
+				cell.nextcell();
+			}
+			else {
+				exit = true;
+			}
+		}		
+	}
+
+	var filtered = [];
+	if(cell.cell) {
+		for(var i=0; i<cells.length; i++) {
+			var othercell = cells[i];
+			if(cell.sameColumn(othercell)) {
+				if(cell.sameTable(othercell)) {
+					filtered[filtered.length] = othercell.originalField;
+				}
+			}
+		}
+		if(filtered.length == 0 && !exit) {
+			return getNodesInSameColumn(cell, cells);
+		}
+	}
+	
+	return filtered;
+}
+
 function getAttribute(node, attributeName) {
 	if(!node)
 		return null;
@@ -156,6 +260,23 @@ function getRow(node) {
 	return null;
 }
 
+function getCell(node) {
+	if(node) {
+		if(node.nodeName.toLowerCase() == 'td' || node.nodeName.toLowerCase() == 'th') {
+			return node;
+		} 		
+		return getCell(node.parentNode);
+	}
+	return null;	
+}
+
+function getParentCell(node) {
+	if(node) {
+		return getCell(node.parentNode);
+	}
+	return null;
+}
+
 /**
  * @returns The first html cell ancestor of node that is at the specified depth beneath the document root.
  */
@@ -199,6 +320,52 @@ function isRow(node) {
 	return node && node.nodeName && node.nodeName.toLowerCase() == 'tr';
 }
 
+/**
+ * Get the full content within the opening tag of a node.
+ * @param node
+ * @returns
+ */
+function getFullTag(node) {
+	if(!node.outerHTML)
+		return null;
+	if(!node.innerHTML)
+		return node.outerHTML;
+		
+	return node.outerHTML.slice(0, node.outerHTML.indexOf(node.innerHTML));
+}
+
+function getFirst100Chars(node) {
+	if(!node.outerHTML)
+		return null;
+	var html = removeEmptyLines(node.outerHTML);
+	if(html.length <= 100)
+		return html;
+	if(html.length > 100) {
+		return html.substr(0, 100) + ' [more...]';
+	}
+}
+
+function removeEmptyLines(content) {
+	if(content) {
+		content = content.replace(/(((\r\n)|\n)+[\x20\t]*){2,}/, '\n');
+	}
+	return content;
+}
+
+function doTest() {
+	var node = document.getElementById('div2');
+	var nodes = [
+	    document.getElementById('txt2'),
+	    document.getElementById('txt8')
+	];
+	var results = getNodesInSameColumn(node, nodes);
+	var s = '';
+	for(var i=0; i<results.length; i++) {
+		s += (results[i].id + ', ');
+	}
+	alert(s);
+}
+
 var task = arguments[0];
 
 if(task == 'cell') {
@@ -217,4 +384,10 @@ else if(task == 'ancestorcell') {
 	var depth = arguments[2];
 	var ancestor = getAncestorCellAtDepth(cell, depth);
 	return ancestor;
+}
+else if(task == 'column') {
+	var node = arguments[1];
+	var nodes = arguments[2];
+	var filtered = getNodesInSameColumn(node, nodes);
+	return filtered;
 }

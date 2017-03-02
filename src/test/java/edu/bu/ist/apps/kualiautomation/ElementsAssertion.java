@@ -163,8 +163,8 @@ public class ElementsAssertion {
 			}
 		}
 		for(String attributeName: attributeAssertions.keySet()) {
-			String assertValue = attributeAssertions.get(attributeName);
-			String actualValue = element.getWebElement().getAttribute(attributeName);
+			String assertValue = attributeAssertions.get(attributeName).trim();
+			String actualValue = element.getWebElement().getAttribute(attributeName).trim();
 			assertTrue(areEmptyOrEqual(assertValue, actualValue));
 		}
 		if(anyAttributeAssertions != null && !anyAttributeAssertions.isEmpty()) {

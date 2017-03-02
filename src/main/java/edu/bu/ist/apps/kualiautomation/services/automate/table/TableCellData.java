@@ -32,7 +32,10 @@ public class TableCellData {
 	private WebElement childWebElement;
 	private WebElement webElement;
 	private WebElement tableWebElement;
-	private List<WebElement> parentCells = new ArrayList<WebElement>();
+	private String tag;
+	private String tableTag;
+	private String first100Chars;
+	private String childHTML;
 
 	private int tableRows;
 	private int tableColumns;
@@ -63,6 +66,7 @@ public class TableCellData {
 		cell.childWebElement = childWebElement;		
 		cell.javascript = Utils.getClassPathResourceContent(JavascriptResourceURL);		
 		cell.executor = (JavascriptExecutor) searchContext;
+		cell.childHTML = (String) cell.executor.executeScript("return arguments[0].outerHTML;", childWebElement);
 		
 		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> cellsinfo = (List<Map<String, Object>>) cell.executor.executeScript(
@@ -101,6 +105,9 @@ public class TableCellData {
 			this.tableWebElement = (WebElement) cellinfo.get("table");
 			this.tableRows = Integer.valueOf(cellinfo.get("tableRows").toString());
 			this.tableColumns = Integer.valueOf(cellinfo.get("tableCols").toString());
+			this.tag = String.valueOf(cellinfo.get("tag"));
+			this.first100Chars = String.valueOf(cellinfo.get("first100Chars"));
+			
 			if(ancestorCell != null) {
 				this.ancestorCell = ancestorCell;
 				ancestorCell.descendentCell = this;
@@ -156,18 +163,16 @@ public class TableCellData {
 	}
 
 	public int getIndexInSharedRow(TableCellData deeperCell) {
-//		if(!deeperCell.parentCells.isEmpty()) {
-//			return Integer.valueOf(deeperCell.parentCells.get(0).getAttribute("columnIndex"));
-//		}
-//		
+
 		WebElement parentCell = (WebElement) executor.executeScript(
 				javascript, 
 				"ancestorcell", 
 				deeperCell.webElement, 
 				depth);
 		
-//		deeperCell.parentCells.add(0, parentCell);
-		
+		if(parentCell == null) {
+			return deeperCell.columnIndex;
+		}
 		return Integer.valueOf(parentCell.getAttribute("columnIndex"));
 	}
 	
@@ -197,6 +202,18 @@ public class TableCellData {
 		return tableColumns;
 	}
 
+	public String getTag() {
+		return tag;
+	}
+
+	public String getTableTag() {
+		return tableTag;
+	}
+
+	public String getFirst100Chars() {
+		return first100Chars;
+	}
+
 	public boolean sameRowAndTableSize(Object obj) {
 		if (this == obj)
 			return true;
@@ -211,6 +228,35 @@ public class TableCellData {
 			return false;
 		if (tableRows != other.tableRows)
 			return false;
+		return true;
+	}
+	
+	/**
+	 * 2 Instances will be equivalent if they both occupy the same row and column in a table of the same
+	 * column size and row size. These may yet be two different tables, so equivalence may not mean equality.
+	 * @param obj
+	 * @return
+	 */
+	public boolean isEquivalent(Object obj) {
+		if(!sameRowAndTableSize(obj)) 
+			return false;
+		TableCellData other = (TableCellData) obj;
+		if(columnIndex != other.columnIndex)
+			return false;
+		return true;
+	}
+	
+	public static boolean areAllEquivalent(List<TableCellData> cells) {
+		if(cells.isEmpty())
+			return false;
+		if(cells.size() == 1)
+			return true;
+		TableCellData first = cells.get(0);
+		for(TableCellData cell : cells) {
+			if(!cell.isEquivalent(first)) {
+				return false;
+			}
+		}
 		return true;
 	}
 
@@ -232,6 +278,10 @@ public class TableCellData {
 			String ancestor = cell.ancestorCell == null ? "null" : "{dataId:" + String.valueOf(cell.ancestorCell.dataId) + "}";
 			builder.append("TableCellData [\n")
 					.append(indent.toString()).append("id=").append(cell.id).append(", \n")
+					.append(indent.toString()).append("tag=").append(cell.tag).append(", \n")
+					.append(indent.toString()).append("first100Chars=").append(cell.first100Chars).append(", \n")
+					.append(indent.toString()).append("childHTML=").append(cell.childHTML).append(", \n")
+					.append(indent.toString()).append("tableTag=").append(cell.tableTag).append(", \n")
 					.append(indent.toString()).append("dataId=").append(cell.dataId).append(", \n")
 					.append(indent.toString()).append("rowIndex=").append(cell.rowIndex).append(", \n")
 					.append(indent.toString()).append("columnIndex=").append(cell.columnIndex).append(", \n")

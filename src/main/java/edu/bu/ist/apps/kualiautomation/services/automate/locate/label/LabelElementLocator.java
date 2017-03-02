@@ -79,11 +79,13 @@ public class LabelElementLocator extends AbstractElementLocator {
 		/** 1) Search for full length match */
 		String xpath = scope + XPATH_EQUALS.replace("[INSERT-LABEL]", label);
 		List<WebElement> elements = searchContext.findElements(By.xpath(xpath));
+		applyFiltering(elements);
 		
 		/** 2) Search for match that starts with the provided value */
 		if(elements.isEmpty()) {
 			xpath = scope + XPATH_STARTS_WITH.replace("[INSERT-LABEL]", cleanedLabel);
 			elements = searchContext.findElements(By.xpath(xpath));
+			applyFiltering(elements);
 			
 			if(!elements.isEmpty()) {
 				/**
@@ -107,6 +109,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 		if(elements.isEmpty()) {
 			xpath = scope + XPATH_CONTAINS.replace("[INSERT-LABEL]", cleanedLabel);
 			elements = searchContext.findElements(By.xpath(xpath));
+			applyFiltering(elements);
 		}
 
 		// Wrap the web elements in ComparableLabel instances for sorting so higher ranked results are on top.
@@ -127,6 +130,17 @@ public class LabelElementLocator extends AbstractElementLocator {
 		
 		return located;
 	}
+	
+	private void applyFiltering(List<WebElement> elements) {
+		for (Iterator<WebElement> iterator = elements.iterator(); iterator.hasNext();) {
+			WebElement we = (WebElement) iterator.next();
+			if(ignoreHidden && !we.isDisplayed())
+				iterator.remove();
+			else if(ignoreDisabled && !we.isEnabled())
+				iterator.remove();
+		}		
+	}
+	
 	@Override
 	protected Element getElement(WebDriver driver, WebElement we) {
 		return new BasicElement(driver, we);

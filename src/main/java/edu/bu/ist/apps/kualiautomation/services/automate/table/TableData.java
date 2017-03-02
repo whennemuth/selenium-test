@@ -1,9 +1,9 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.table;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -30,6 +30,7 @@ public class TableData {
 	private List<TableCellData> hostCells = new ArrayList<TableCellData>();
 	private TableCellData labelCell;
 	private WebElement thisTable;
+	private WebElement sharedRow;
 	private int rows;
 	private int columns;
 	private Integer depth;
@@ -48,11 +49,6 @@ public class TableData {
 		
 		this.driver = driver;
 		this.webElements = webElements;
-		
-		WebElement sharedRow = getFirstSharedTableRow();
-		if(sharedRow == null) {
-			return; // There is no common table to all of webElements. Proceed no further.
-		}
 
 		createHostCell(labelElement, 0);
 		
@@ -64,6 +60,11 @@ public class TableData {
 			}
 		}
 		
+		sharedRow = getFirstSharedTableRow();
+		if(sharedRow == null) {
+			return; // There is no common table to all of webElements. Proceed no further.
+		}
+		
 		thisTable = hostCells.get(0).getTableWebElement();
 		String sDepth = String.valueOf(thisTable.getAttribute("depth"));
 		if(!Utils.isEmpty(sDepth) && sDepth.matches("\\d+")) {
@@ -73,6 +74,11 @@ public class TableData {
 		columns = hostCells.get(0).getTableColumns();
 	}
 
+	/**
+	 * Create a TableCellData instance to wrap the provided web element. Add this instance to the hostCells collection.
+	 * @param we The web element the created TableCellData instance is to wrap.
+	 * @param dataId
+	 */
 	private void createHostCell(WebElement we, int dataId) {
 		TableCellData cell = TableCellData.getInstance(dataId, labelCell, driver, we, JAVASCRIPT_URL);
 		if(cell != null) {
@@ -111,12 +117,15 @@ public class TableData {
 	 * same table row with any of the others in its ancestor hierarchy.
 	 */
 	public WebElement getFirstSharedTableRow() {
+		
+		if(sharedRow != null)
+			return sharedRow;
+		
 		if(allWebElementsShareSameAncestorsTable()) {
 			String javascript = Utils.getClassPathResourceContent(JAVASCRIPT_URL);
 			
 			JavascriptExecutor executor = (JavascriptExecutor) driver;
 			
-			@SuppressWarnings("unchecked")
 			WebElement tablerow = (WebElement) executor.executeScript(
 					javascript, 
 					"row", 
@@ -127,6 +136,7 @@ public class TableData {
 		return null;
 	}
 	
+	
 	/**
 	 * Given a TableCellData instance, find the other TableCellData instances that are closest to the
 	 * right of that instance in the represented table (more than one in case of a tie). If none are 
@@ -134,7 +144,7 @@ public class TableData {
 	 * 
 	 * @return
 	 */
-	public List<TableCellData> getClosestTableCells(TableCellData cell) {
+	private List<TableCellData> getClosestTableCells(TableCellData cell) {
 		
 		// 1) Create a list of all host cells except the one containing the label
 		List<TableCellData> candidates = new ArrayList<TableCellData>();
@@ -215,16 +225,35 @@ public class TableData {
 			// Results have been narrowed down to a subset. These must now compete with each other for best
 			// proximity with outermost and leftmost (or rightmost) cell of the table they all share in common.
 			// Recursing this way should narrow down to one cell.
-			TableCellData shallowest = null;
-			for(TableCellData candidate: newCandidates) {
-				if(shallowest == null || candidate.getDepth() < shallowest.getDepth())
-					shallowest = candidate;
-			}
-			WebElement bordercell = getBorderCell(shallowest.getWebElement(), direction);
-			TableCellData newcell = TableCellData.getInstance(
-					shallowest.getDataId(), cell, driver, bordercell, JAVASCRIPT_URL);
 			
-			return getClosestTableCells(newcell, direction, newCandidates);
+			if(areAllSameCell(newCandidates)) {
+				// The web elements probably abutt each other in the same table cell
+				if("right".equals(direction)) {
+					// newCandidates.remove(1);
+				}
+				if("left".equals(direction)) {
+					// newCandidates.remove(0);
+				}
+			}
+			else if(newCandidates.size() == candidates.size()) {
+				// Could not narrow down cells. Return what we have to avoid endless loop.
+				return candidates;
+			}
+			else {
+				// Of the candidate table cells find which is outermost (closest to document root).
+				TableCellData shallowest = null;
+				for(TableCellData candidate: newCandidates) {
+					if(shallowest == null || candidate.getDepth() < shallowest.getDepth())
+						shallowest = candidate;
+				}
+				// Get the cell at the edge of the same row containing shallowest.
+				WebElement bordercell = getBorderCell(shallowest.getWebElement(), direction);
+				// Get a TableCellData instance for the border cell
+				TableCellData newcell = TableCellData.getInstance(
+						shallowest.getDataId(), cell, driver, bordercell, JAVASCRIPT_URL);
+				// Find among the candidates which is horizontally the closest to the border cell
+				return getClosestTableCells(newcell, direction, newCandidates);				
+			}
 		}
 		
 		return newCandidates;
@@ -239,6 +268,28 @@ public class TableData {
 				"return arguments[0] === arguments[1]", 
 				webElement1, 
 				webElement2);
+	}
+	
+	/**
+	 * Determine if all table cell web elements in a list are all the same cell.
+	 * 
+	 * @param cells
+	 * @return
+	 */
+	public boolean areAllSameCell(List<TableCellData> cells) {
+		// 1) Compare without invoking javascript
+		if(!TableCellData.areAllEquivalent(cells))
+			return false;
+		if(cells.size() == 1)
+			return true;
+		// 2) Compare using javascript
+		TableCellData first = cells.get(0);
+		for(TableCellData cell : cells) {
+			if(!bothAreSameWebElement(first.getWebElement(), cell.getWebElement())) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	/**
@@ -259,6 +310,7 @@ public class TableData {
 					"return cells[cells.length-1];", cell);
 		}
 	}
+	
 	
 	public int getRowCount() {
 		return rows;

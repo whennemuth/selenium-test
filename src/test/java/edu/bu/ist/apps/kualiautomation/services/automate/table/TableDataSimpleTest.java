@@ -89,7 +89,6 @@ public class TableDataSimpleTest extends AbstractJettyBasedTest {
 		assertEquals("outer-label1", labelElement.getText().trim());		
 		table = new TableData(driver, labelElement, labelledElements);
 		List<TableCellData> hostcells = table.getHostCells();
-		assertTrue(hostcells.isEmpty()); // Host cell computation should have been skipped.		
 		assertNull(table.getFirstSharedTableRow());
 		
 		// 2) Two separate tables with same depth, rows count, and column count can be told apart by javascript
@@ -100,7 +99,6 @@ public class TableDataSimpleTest extends AbstractJettyBasedTest {
 		assertEquals("outer-label2", labelElement.getText().trim());		
 		table = new TableData(driver, labelElement, labelledElements);
 		hostcells = table.getHostCells();
-		assertTrue(hostcells.isEmpty()); // Host cell computation should have been skipped.		
 		assertNull(table.getFirstSharedTableRow());
 		
 		// 3) Two WebElements with the same table ancestry and same row
@@ -121,7 +119,6 @@ public class TableDataSimpleTest extends AbstractJettyBasedTest {
 		assertEquals("outer-label3", labelElement.getText().trim());		
 		table = new TableData(driver, labelElement, labelledElements);
 		hostcells = table.getHostCells();
-		assertTrue(hostcells.isEmpty()); // Host cell computation should have been skipped.		
 		assertNull(table.getFirstSharedTableRow());
 		
 	}
@@ -172,7 +169,7 @@ public class TableDataSimpleTest extends AbstractJettyBasedTest {
 		// TD is right under TABLE and TR, or TABLE, TBODY and TR
 		assertTrue((labelCell.getDepth() - table.getDepth()) <= 3); 
 		
-		List<TableCellData> closest = table.getClosestTableCells(labelCell);
+		List<TableCellData> closest = table.getClosestTableCells();
 
 		return closest;
 	}

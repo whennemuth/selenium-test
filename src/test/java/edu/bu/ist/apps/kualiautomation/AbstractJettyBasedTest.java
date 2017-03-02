@@ -13,6 +13,7 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.WebClient;
 
 import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 
@@ -32,6 +33,7 @@ public abstract class AbstractJettyBasedTest {
 	private static EmbeddedJettyStaticServer server;
 	private static boolean serverRunning;
 	protected static boolean javascriptEnabled = true;
+	protected static boolean javascriptIgnoreExceptions;
 	private static boolean headless;
 	private static boolean windows;
 	
@@ -49,10 +51,16 @@ public abstract class AbstractJettyBasedTest {
 				capabilities.setCapability("platform", Platform.WINDOWS);
 				capabilities.setCapability("name", "Testing Selenium");	
 				capabilities.setJavascriptEnabled(javascriptEnabled);
-				driver = new HtmlUnitDriver(capabilities);
+				if(javascriptIgnoreExceptions)
+					driver = new CustomHtmlUnitDriver(capabilities);
+				else
+					driver = new HtmlUnitDriver(capabilities);
 			}
 			else {
-				driver = new HtmlUnitDriver(BrowserVersion.FIREFOX_38, javascriptEnabled);
+				if(javascriptIgnoreExceptions)
+					driver = new CustomHtmlUnitDriver(BrowserVersion.FIREFOX_38, javascriptEnabled);
+				else
+					driver = new HtmlUnitDriver(BrowserVersion.FIREFOX_38, javascriptEnabled);
 			}
 		}
 		else {
@@ -91,4 +99,22 @@ public abstract class AbstractJettyBasedTest {
 		driver.quit();		
 	}
 
+	/**
+	 * Allow for enabled javascript, but do not throw exceptions.
+	 * @author wrh
+	 *
+	 */
+	public static class CustomHtmlUnitDriver extends HtmlUnitDriver {
+		public CustomHtmlUnitDriver(DesiredCapabilities capabilities) {
+			super(capabilities);
+		}
+		public CustomHtmlUnitDriver(BrowserVersion firefox38, boolean javascriptEnabled) {
+			super(firefox38, javascriptEnabled);
+		}
+		@Override protected WebClient modifyWebClient(WebClient client) {
+			WebClient modifiedClient = super.modifyWebClient(client);
+			modifiedClient.getOptions().setThrowExceptionOnScriptError(false);
+			return modifiedClient;
+		}
+	}
 }

@@ -96,8 +96,13 @@ public class LocatorRunner {
 			break;
 		case HYPERLINK:
 			locators.add(HyperlinkElementLocator.class);
-			locators.add(HotspotElementLocator.class);
 			elements.addAll(runBatch(lv, locators, labelCanAlsoBeAnAttribute));
+			if(elements.isEmpty()) {
+				// No hyperlinks found. Try hotspots.
+				locators.clear();
+				locators.add(HotspotElementLocator.class);
+				elements.addAll(runBatch(lv, locators, labelCanAlsoBeAnAttribute));
+			}
 			break;
 		case TEXTBOX: case PASSWORD: case TEXTAREA: case SELECT: case RADIO: case CHECKBOX:
 			elements.addAll(locateElements(lv, new LabelledElementLocator(driver)));
@@ -135,8 +140,19 @@ public class LocatorRunner {
 			parms = new String[]{ lv.getLabel(), lv.getScreenScrapeType() };
 		}
 		else {
-			parms = new String[]{ lv.getLabel() };
+			if(Utils.isEmpty(lv.getIdentifier())) {
+				parms = new String[]{ lv.getLabel() };
+			}
+			else {
+				parms = new String[]{ lv.getLabel(), lv.getIdentifier() };
+			}
 		}
+		
+		if(locator instanceof AbstractElementLocator) {
+			((AbstractElementLocator) locator).setIgnoreHidden(ignoreHidden);
+			((AbstractElementLocator) locator).setIgnoreDisabled(ignoreDisabled);
+		}
+		
 		List<Element> elements = locator.locateAll(lv.getElementTypeEnum(), Arrays.asList(parms));
 		if(!Utils.isEmpty(locator.getMessage())) {
 			runlog.printMessage(lv, locator.getMessage());

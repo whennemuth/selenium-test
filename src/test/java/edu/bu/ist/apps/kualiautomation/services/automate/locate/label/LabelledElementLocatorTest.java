@@ -14,7 +14,9 @@ public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 	private LabelledElementLocator locator;
 
 	static {
-		javascriptEnabled = false;
+		// This test operates on iframe content directly without outer page and its scripts present.
+		// Normally this would cause a javascript exception due to the missing scripts, so suppress. 
+		javascriptIgnoreExceptions = true;		
 	}
 	
 	@Override
@@ -36,6 +38,8 @@ public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 		handlers.put("prop-log-lookup-frame", "ProposalLogLookup_files/ProposalLogLookupFrame.htm");
 		handlers.put("prop-log-lookup", "ProposalLogLookup.htm");
 		handlers.put("ProposalLogLookup_files", "ProposalLogLookup_files");
+		handlers.put("subaward-entry-1", "SubawardEntry.htm");
+		handlers.put("SubawardEntry_files", "SubawardEntry_files");
 	}
 	
 	/**
@@ -50,50 +54,60 @@ public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 	 * Find all fields in a frame in an html page based on their labels
 	 */
 	@Test 
-	public void findFieldsInFrame() {
-		findFields("http://localhost:8080/prop-log-lookup-frame");		
+	public void test01FindFieldsInFrame() {
+		findFields("http://localhost:8080/prop-log-lookup-frame");
 	}
 	
 	@Test
-	public void findButtonImageByNearestLabel() {
+	public void test02FindButtonImageByNearestLabel() {
 		findButtonImageByNearestLabel("http://localhost:8080/prop-log-lookup");
 		findButtonImageByNearestLabel("http://localhost:8080/prop-log-lookup-frame");
 	}
-	public void findButtonImageByNearestLabel(String url) {
+	private void findButtonImageByNearestLabel(String url) {
 		
-		ElementsAssertion asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Proposal Log Status");
-		asserter.setElementType(ElementType.BUTTONIMAGE);
-		asserter.setNumResults(2);
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Proposal Log Status")
+		.setElementType(ElementType.BUTTONIMAGE)
+		.setNumResults(2)
+		.findAndAssertElements();
 
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Proposal Log Status");
-		asserter.addAttributeValue("Search Proposal Log Status");
-		asserter.setElementType(ElementType.BUTTONIMAGE);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("title", "Search Proposal Log Status");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Proposal Log Status")
+		.addAttributeValue("Search Proposal Log Status")
+		.setElementType(ElementType.BUTTONIMAGE)
+		.setNumResults(1)
+		.addAttributeAssertion("title", "Search Proposal Log Status")
+		.findAndAssertElements();
 	}
 	
 	@Test
-	public void findButtonImageByTitle() {
+	public void test03FindButtonImageByTitle() {
 		findButtonImageByTitle("http://localhost:8080/prop-log-lookup");
 		findButtonImageByTitle("http://localhost:8080/prop-log-lookup-frame");
 	}
-	public void findButtonImageByTitle(String url) {
+	private void findButtonImageByTitle(String url) {
 
-		ElementsAssertion asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.addAttributeValue("Search Proposal Log Status");
-		asserter.setElementType(ElementType.BUTTONIMAGE);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("title", "Search Proposal Log Status");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.addAttributeValue("Search Proposal Log Status")
+		.setElementType(ElementType.BUTTONIMAGE)
+		.setNumResults(1)
+		.addAttributeAssertion("title", "Search Proposal Log Status")
+		.findAndAssertElements();
 	}
 	
+	@Test
+	public void test04SubawardEntry() {
+		new ElementsAssertion(locator)
+		.setUrl("http://localhost:8080/subaward-entry-1")
+		.setElementType(ElementType.SELECT)
+		.setLabel("Requisitioner Unit:")
+		.setNumResults(1)
+		.findAndAssertElements();		
+	}
+
 	private void findFields(String url) {
 		
 		ElementsAssertion asserter = new ElementsAssertion(locator);

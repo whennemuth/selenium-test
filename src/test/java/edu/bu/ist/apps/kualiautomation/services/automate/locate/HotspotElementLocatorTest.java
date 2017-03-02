@@ -23,8 +23,8 @@ public class HotspotElementLocatorTest extends AbstractJettyBasedTest {
 	@Override
 	public void loadHandlers(Map<String, String> handlers) {
 		handlers.put("hotspot-test-page", "HotspotTestPage1.htm");
-//		handlers.put("subaward-saved", "SubawardSaved.htm");
-//		handlers.put("SubawardSaved_files", "SubawardSaved_files");
+		handlers.put("subaward-entry-1", "SubawardEntry.htm");
+		handlers.put("SubawardEntry_files", "SubawardEntry_files");
 	}
 	
 	/**
@@ -112,16 +112,17 @@ public class HotspotElementLocatorTest extends AbstractJettyBasedTest {
 			.addAttributeAssertion("myprop", "bettermatch")
 			.findAndAssertElements();
 		
-//		ElementsAssertion asserter = new ElementsAssertion(locator);
-//		asserter
-//			.setUrl("http://localhost:8080/subaward-saved")
-//			.setTagNameAssertion("input")
-//			.setLabel("Requisitioner User Name:")
-//			.setElementType(ElementType.HOTSPOT)
-//			.setNumResults(1)
-//			.addAttributeValue("Search")
-//			.addAttributeAssertion("type", "image")
-//			.findAndAssertElements();
+		asserter = new ElementsAssertion(locator);
+		asserter
+			.setUrl("http://localhost:8080/subaward-entry-1")
+			.setTagNameAssertion("input")
+			.setLabel("Requisitioner User Name:")
+			.setElementType(ElementType.HOTSPOT)
+			.setNumResults(1)
+			.addAttributeValue("Search")
+			.addAttributeAssertion("title", "Search")
+			.addAttributeAssertion("type", "image")
+			.findAndAssertElements();
 		
 	}
 }
