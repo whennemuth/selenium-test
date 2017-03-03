@@ -13,7 +13,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.AbstractWebElem
  * This class adapts {@link org.openqa.selenium.WebElement} to change the value getText() returns.
  * The value to return for getText() becomes the value sought through "screen scraping" and not the entire
  * innerText of the WebElement that scraped value was nested in. For example:
- * <pre>{@code
+ * <pre style="font: inherit">{@code
  * 
  *    WebElement.text(): "This is the inner text with a nested mylabel: myvalue substring nested inside"
  *    

@@ -1,7 +1,6 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.table;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -12,10 +11,19 @@ import org.openqa.selenium.WebElement;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**
- * This class represents an html table that is a parent in the hierarchy to all WebElement intances
- * in a specified list. The purpose is to gain more information about those WebElement instances 
- * with respect to their position in the table. This information makes it possible to determine for a 
- * label which WebElement it applies to (it will be the WebElement closest to it to the right).
+ * This class represents an html table that is treated as a parent in the hierarchy to all WebElement 
+ * intances in a specified list and a web element representing a label. The purpose is to gain more 
+ * information about those WebElement instances with respect to their position in the table, or if they 
+ * all exist in a common table at all. This information makes it possible to determine for the label  
+ * which WebElement it applies to. Two types of searches are attempted in order:
+ * 
+ * <pre style="font: inherit">
+ * 
+ *  1) Horizonal: Find web elements in the table closest to the right of the label in the same row.
+ *  2) Vertical: Treat the label as if it were the header of a column and trim away web elements that
+ *     are not in the same column and keep only those that are closest to the top of the column.
+ * </pre>
+ *  
  * @author wrh
  *
  */
@@ -136,15 +144,36 @@ public class TableData {
 		return null;
 	}
 	
+	/**
+	 * Find those table cells "closest" to the label cell of this instance.
+	 * See {@link TableData#getClosestTableCells(TableCellData)} for details.
+	 * @return
+	 */
+	public List<TableCellData> getTableCellsClosestToLabel() {
+		return getClosestTableCells(labelCell);
+	}
 	
 	/**
-	 * Given a TableCellData instance, find the other TableCellData instances that are closest to the
-	 * right of that instance in the represented table (more than one in case of a tie). If none are 
-	 * found to the right, then repeat the same process for the left side.
+	 * Find those web elements within table cells that are "closest" to the cell containing the
+	 * label cell of this instance. See {@link TableData#getClosestTableCells(TableCellData)} for details.
+	 * @return
+	 */
+	public WebElement getWebElementClosestToLabel() {
+		List<TableCellData> cells = getClosestTableCells(labelCell);
+		if(cells.isEmpty()) {
+			return null;
+		}
+		return cells.get(0).getWebChildElement();
+	}
+		
+	/**
+	 * Given a table cell, represented by a TableCellData instance, find the other TableCellData 
+	 * instances that are closest to the right of that instance in the represented table (more than one 
+	 * in case of a tie). If none are found to the right, then repeat the same process for the left side.
 	 * 
 	 * @return
 	 */
-	private List<TableCellData> getClosestTableCells(TableCellData cell) {
+	public List<TableCellData> getClosestTableCells(TableCellData cell) {
 		
 		// 1) Create a list of all host cells except the one containing the label
 		List<TableCellData> candidates = new ArrayList<TableCellData>();
@@ -165,18 +194,6 @@ public class TableData {
 		else {		
 			return leftcells;
 		}
-	}
-	
-	public List<TableCellData> getClosestTableCells() {
-		return getClosestTableCells(labelCell);
-	}
-	
-	public WebElement getClosestWebElement() {
-		List<TableCellData> cells = getClosestTableCells(labelCell);
-		if(cells.isEmpty()) {
-			return null;
-		}
-		return cells.get(0).getWebChildElement();
 	}
 
 	/**

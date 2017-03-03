@@ -169,7 +169,7 @@ public class TableDataSimpleTest extends AbstractJettyBasedTest {
 		// TD is right under TABLE and TR, or TABLE, TBODY and TR
 		assertTrue((labelCell.getDepth() - table.getDepth()) <= 3); 
 		
-		List<TableCellData> closest = table.getClosestTableCells();
+		List<TableCellData> closest = table.getTableCellsClosestToLabel();
 
 		return closest;
 	}

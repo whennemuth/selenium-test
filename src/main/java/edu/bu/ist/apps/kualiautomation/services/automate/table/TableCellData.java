@@ -1,6 +1,5 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.table;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +40,8 @@ public class TableCellData {
 	private int tableColumns;
 	private String javascript;
 	private JavascriptExecutor executor;
+		
+	private TableCellData() { /* Restrict default constructor */ }
 	
 	/**
 	 * Invoke a javascript function to return a Map containing data about each table cell that wraps childWebElement.
@@ -82,8 +83,6 @@ public class TableCellData {
 			return cell;
 		}
 	}
-		
-	private TableCellData() { /* Restrict default constructor */ }
 
 	/**
 	 * Build the TableCellData instance out of the data in cellsinfo.
@@ -91,7 +90,7 @@ public class TableCellData {
 	 * @param ancestorCell The next cell to build further up the table hierarchy. 
 	 * NOTE: a "descendent" is not necessarily a descendent of an ancestor, but will be a descendent of 
 	 * the row of that ancestor.
-	 * @param cellsinfo
+	 * @param cellsinfo A list of meta-data maps output from a javascript function that describe table cells.
 	 */
 	private void buildHierarchy(TableCellData ancestorCell, List<Map<String, Object>> cellsinfo) {
 		if(!cellsinfo.isEmpty()) {

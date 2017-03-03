@@ -26,7 +26,7 @@ import edu.bu.ist.apps.kualiautomation.util.Utils;
 /**
  * With a specified WebElement that serves as a label, traverse up the DOM one element at a time until
  * a descendant is found that matches the criteria of elementType. This should be the field that is labelled.
- * 
+ * <br><br>
  * ASSUMPTION: This method assumes that a label and its field will share the same parent, grandparent, etc. - but
  * not with any other labels and fields - other fields and labels exist outside of the shared ancestor.
  * The one exception to this is for fields found in a table row for a particular label. The rules for selecting
@@ -228,7 +228,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 		TableData tableData = new TableData(driver, labelElement, located);
 		WebElement row = tableData.getFirstSharedTableRow();
 		if(row != null) {
-			List<TableCellData> cells = tableData.getClosestTableCells();
+			List<TableCellData> cells = tableData.getTableCellsClosestToLabel();
 			if(cells.size() <= located.size() && !cells.isEmpty()) {
 				List<WebElement> filtered = new ArrayList<WebElement>();
 				for(TableCellData cell : cells) {

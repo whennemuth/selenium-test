@@ -82,7 +82,7 @@ public class TableDataNestedTest extends AbstractJettyBasedTest {
 			assertNotNull(tablerow);
 			assertEquals(rowId, tablerow.getAttribute("id"));
 		}
-		WebElement closest = table.getClosestWebElement();
+		WebElement closest = table.getWebElementClosestToLabel();
 		if(closestWebElementId == null) {
 			assertNull(closest);
 		}

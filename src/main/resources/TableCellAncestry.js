@@ -134,12 +134,33 @@ function cellObject(originalField) {
 		var table2 = getTable(othercell.cell);
 		return table1 === table2;
 	}
-	this.nextcell = function() {
+	this.nextCell = function() {
 		if(this.cell) {
 			this.cell = getParentCell(this.cell);
 		}		
 		return this.cell != null;
-	}	
+	}
+	this.rowIndex = function() {
+		return this.cell.parentNode.rowIndex;
+	}
+	this.clone = function() {
+		// Most of the time you would want to produce a clone before the nextCell function
+		// is called to get a clone of the instance as it was when it was first created.
+		cellObject = new cellObject(originalField);
+	}
+}
+
+function cloneCellObjectArray(array) {
+	if(!array)
+		return null;
+	if(!Array.isArray(array)) 
+		return cloneCellObjects([array]);
+	
+	var clones = [];
+	for(var i=0; i<array.length; i++) {
+		clones[clones.length] = new cellObject(array[i].originalField);
+	}
+	return clones;
 }
 
 /**
@@ -169,7 +190,7 @@ function getNodesInSameColumn(node, nodes) {
 		for(var i=0; i<cells.length; i++) {
 			var othercell = cells[i];
 			if(othercell.cell && othercell.deeperThan(cell)) {
-				if(othercell.nextcell()) {
+				if(othercell.nextCell()) {
 					ascend = false;
 				}
 			}
@@ -180,7 +201,7 @@ function getNodesInSameColumn(node, nodes) {
 		
 		if(ascend) {
 			if(fieldsAbove) {
-				cell.nextcell();
+				cell.nextCell();
 			}
 			else {
 				exit = true;
@@ -194,7 +215,7 @@ function getNodesInSameColumn(node, nodes) {
 			var othercell = cells[i];
 			if(cell.sameColumn(othercell)) {
 				if(cell.sameTable(othercell)) {
-					filtered[filtered.length] = othercell.originalField;
+					filtered[filtered.length] = othercell;
 				}
 			}
 		}
@@ -204,6 +225,80 @@ function getNodesInSameColumn(node, nodes) {
 	}
 	
 	return filtered;
+}
+
+/**
+ * 
+ * @param label
+ * @param nodes
+ */
+function getSameColumnNodeObjects(label, nodes) {
+	var objects = [];
+	var filtered1 = getNodesInSameColumn(label, nodes);
+	var filtered2 = cloneCellObjectArray(filtered1);
+	var labelLevelCells = getCellsInSharedColumn([label].concat(filtered1));
+	var otherLevelCells = getCellsInSharedColumn(filtered2);
+	
+	for(var i=0; i<otherLevelCells.length; i++) {
+		var cellinfo = otherLevelCells[i];
+		objects[objects.length] = {
+			originalField: otherLevelCells[i].originalField,
+			commonColumnIndex: otherLevelCells[i].cell.cellIndex,
+			rowIndex: otherLevelCells[i].cell.parentNode.rowIndex,
+			label: labelLevelCells[0].cell,
+			labelColumnIndex: labelLevelCells[0].cell.cellIndex,
+			labelRowIndex: labelLevelCells[i+1].cell.parentNode.rowIndex
+		};
+	}
+
+	return objects;
+}
+
+/**
+ * Given two or more web elements, recurse up the html hierarchy toward the table column 
+ * they all share in common and return meta data objects for the cells they each occupy in that column.
+ */
+function getCellsInSharedColumn(nodes) {
+	if(!Array.isArray(nodes)) {
+		return getCellsInSharedColumn([nodes]);
+	}
+	if(nodes.length == 0) {
+		return [];
+	}
+	nodes.forEach(function(node, index, array) {
+		if(!node.originalField) {
+			array[index] = new cellObject(node);
+		}
+	});
+		
+	if(nodes.length > 1) {
+		for(;;) {
+			nodes.forEach(function(node, index, array) {
+				if(!node)
+					return;
+				var othernode = array[(index + 1) < array.length ? (index + 1) : (index - 1)];
+				if(!othernode)
+					return;
+				if(node.sameTable(othernode))
+					return;
+				if(node.deeperThan(othernode))
+					node.nextCell();
+				else if(othernode.deeperThan(node))
+					othernode.nextCell();
+			});		
+			
+			if(nodes.every(function(node, index, array) {
+				var othernode = array[(index + 1) < array.length ? (index + 1) : (index - 1)];
+				if(!node || !othernode)
+					return true;
+				return node.sameTable(othernode);
+			})) {
+				break;
+			}
+		}
+	}
+	
+	return nodes;
 }
 
 function getAttribute(node, attributeName) {
@@ -352,18 +447,33 @@ function removeEmptyLines(content) {
 	return content;
 }
 
+/**
+ * Get a copy of an array with the item at the specified index removed.
+ */
+Array.prototype.copyWithout = function(index) {
+	return this.clone().splice(index, 1);
+};
+
+Array.prototype.clone = function() {
+	return this.slice(0);
+}
+
 function doTest() {
-	var node = document.getElementById('div2');
+	var node = document.getElementById('div1');
 	var nodes = [
 	    document.getElementById('txt2'),
-	    document.getElementById('txt8')
+	    document.getElementById('txt7'),
+	    document.getElementById('txt12')
 	];
-	var results = getNodesInSameColumn(node, nodes);
-	var s = '';
-	for(var i=0; i<results.length; i++) {
-		s += (results[i].id + ', ');
-	}
-	alert(s);
+//	var results = getNodesInSameColumn(node, nodes);
+//	var s = '';
+//	for(var i=0; i<results.length; i++) {
+//		s += (results[i].id + ', ');
+//	}
+//	alert(s);
+	
+	var results = getSameColumnNodeObjects(node, nodes);
+	alert(results);
 }
 
 var task = arguments[0];
@@ -388,6 +498,6 @@ else if(task == 'ancestorcell') {
 else if(task == 'column') {
 	var node = arguments[1];
 	var nodes = arguments[2];
-	var filtered = getNodesInSameColumn(node, nodes);
+	var filtered = getSameColumnNodeObjects(node, nodes);
 	return filtered;
 }
