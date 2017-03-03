@@ -19,7 +19,9 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledElementBatches.Batch;
 import edu.bu.ist.apps.kualiautomation.services.automate.table.TableCellData;
+import edu.bu.ist.apps.kualiautomation.services.automate.table.TableColumnData;
 import edu.bu.ist.apps.kualiautomation.services.automate.table.TableData;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
@@ -70,83 +72,47 @@ public class LabelledElementLocator extends AbstractElementLocator {
 			List<Element> labelElements = labelLocator.locateAll(elementType, Arrays.asList(new String[]{label}));
 			
 			// Assume that more than one label is found and subdivide searches by each.
-			boolean oneToOneMatch = false;
-			List<List<WebElement>> locatedByLabel1 = new ArrayList<List<WebElement>>();
+			LabelledElementBatches batches1 = new LabelledElementBatches();
+			
 			for(Element labelElement : labelElements) {
 				List<WebElement> flds = tryTraditionalLabelSearchMethod(labelElement.getWebElement(), attributeValues);
 				if(flds.isEmpty()) {
 					flds = trySearchingOutwardFromLabel(labelElement.getWebElement(), attributeValues);
 				}
-				if(flds.size() == 1) {
-					oneToOneMatch = true;
-				}				
-				locatedByLabel1.add(flds);
+				batches1.add(labelElement, flds);
 			}
 			
-			List<WebElement> leastResults = combineSmallestResultBatches(locatedByLabel1);
+			batches1.loadOneToOneResultBatches(located);
 			
-			if(leastResults.size() == 1) {
-				// SCENARIO 1: One label-based search returned a single match when the rest returned more. Return this.
-				located.addAll(leastResults);
-			}
-			else if(oneToOneMatch) {
-				// SCENARIO 2: Multiple label searches returned a single result. Combine only these and return them.
-				for(List<WebElement> flds : locatedByLabel1) {
-					if(flds.size() == 1) {
-						located.addAll(flds);
-					}
-				}
-			}
-			else{
-				// SCENARIO 3: No label search produced a single result. Assume these labels and fields exist in a table
+			if(located.isEmpty()) {
+				// No label search produced a single result. Assume these labels and fields exist in a table
 				// and try to narrow down the results for each label by their relative proximity within the table that label.
-				List<List<WebElement>> locatedByLabel2 = new ArrayList<List<WebElement>>();
-				for(int i=0; i<locatedByLabel1.size(); i++) {
-					Element labelElement = labelElements.get(i);
-					List<WebElement> flds = locatedByLabel1.get(i);
-					List<WebElement> tableFlds = tryTabularSearchMethod(labelElement.getWebElement(), flds);
-					locatedByLabel2.add(tableFlds);
+				LabelledElementBatches batches2 = new LabelledElementBatches();
+				for(Batch batch : batches1.getBatches()) {
+					List<WebElement> tableFlds = tryTabularSearchMethod(
+							batch.getLabel().getWebElement(), 
+							batch.getBatch());
+
+					batches2.add(batch.getLabel(), tableFlds);
 				}
-				leastResults = combineSmallestResultBatches(locatedByLabel2);
-				located.addAll(leastResults);
+				
+				batches2.loadOneToOneResultBatches(located);
+				
+				if(located.isEmpty()) {
+					batches2.loadSmallestResultBatches(located);
+				}
+				
+				if(located.isEmpty()) {
+					batches2.loadAllResultBatches(located);
+				}
+				
+				if(located.isEmpty()) {
+					batches1.loadAllResultBatches(located);
+				}
 			}
 		}
 		
 		return located;
-	}
-
-	/**
-	 * The results of any single search attempt are in the form of a list of WebElement instances, or
-	 * a "batch". A group of these are provided in another list or "batches". Find the smallest
-	 * batch and any of the same size and return their combined content in a new list. 
-	 * @param batches
-	 * @return
-	 */
-	private List<WebElement> combineSmallestResultBatches(List<List<WebElement>> batches) {
-		List<WebElement> smallest = new ArrayList<WebElement>();
-		
-		// Sort the results so that those that returned the least results are at the top.
-		Collections.sort(batches, new Comparator<List<WebElement>>(){
-			@Override public int compare(List<WebElement> o1, List<WebElement> o2) {
-				return new Integer(o1.size()).compareTo(new Integer(o2.size()));
-			}});
-		
-		// Add the the result or results of smallest size.
-		for (ListIterator<List<WebElement>> iterator = batches.listIterator(); iterator.hasNext();) {
-			if(iterator.hasPrevious()) {
-				 List<WebElement> previous = batches.get(iterator.previousIndex());
-				 List<WebElement> flds = (List<WebElement>) iterator.next();
-				 if(flds.size() > previous.size() && !previous.isEmpty()) {
-					 break;
-				 }
-				 smallest.addAll(flds);
-			}
-			else {
-				smallest.addAll((List<WebElement>) iterator.next());				
-			}
-		}
-		
-		return smallest;
 	}
 	
 	/**
@@ -225,19 +191,42 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	 * @return
 	 */
 	private List<WebElement> tryTabularSearchMethod(WebElement labelElement, List<WebElement> located) {
+		
+		// 1) Try a column-based search first.
+		TableColumnData data = new TableColumnData(driver, labelElement, located, TableData.JAVASCRIPT_URL);		
+		List<WebElement> filtered = data.getFirstElementsBelowLabelInSameColumn();		
+		if(filtered.size() == 1) {
+			return filtered;
+		}
+
+		// 2) Try a search based on shared table row proximity.
 		TableData tableData = new TableData(driver, labelElement, located);
-		WebElement row = tableData.getFirstSharedTableRow();
-		if(row != null) {
-			List<TableCellData> cells = tableData.getTableCellsClosestToLabel();
+		filtered = new ArrayList<WebElement>();		
+		if(tableData.getFirstSharedTableRow() != null) {
+			
+			List<TableCellData> cells = tableData.getTableCellsClosestToLabel();			
+			
 			if(cells.size() <= located.size() && !cells.isEmpty()) {
-				List<WebElement> filtered = new ArrayList<WebElement>();
 				for(TableCellData cell : cells) {
 					filtered.add(cell.getWebChildElement());
 				}
-				return filtered;
+			}
+			
+			if(filtered.size() > 1) {
+				// 3) Try column-based search again against filtered set.
+				data = new TableColumnData(driver, labelElement, filtered, TableData.JAVASCRIPT_URL);
+				List<WebElement> refiltered = data.getFirstElementsBelowLabelInSameColumn();
+				if(!refiltered.isEmpty() && refiltered.size() < filtered.size()) {
+					filtered.clear();
+					filtered.addAll(refiltered);
+				}
 			}
 		}
-		return located;
+
+		if(filtered.isEmpty())
+			return located;
+		else
+			return filtered;
 	}
 	
 	/**

@@ -42,6 +42,8 @@ public class TableData {
 	private int rows;
 	private int columns;
 	private Integer depth;
+
+	private List<TableCellData> lastResults = new ArrayList<TableCellData>();
 	
 	/**
 	 * This constructor first checks that each webElement in webElements share a common table.
@@ -189,11 +191,15 @@ public class TableData {
 		// 3) If there are no cells to the left of the specified cell, get those that are closest to the right.
 		if(leftcells.isEmpty()) {
 			List<TableCellData> rightcells = getClosestTableCells(cell, "left", candidates);
-			return rightcells;
+			lastResults.clear();
+			lastResults.addAll(rightcells);
 		}
 		else {		
-			return leftcells;
+			lastResults.clear();
+			lastResults.addAll(leftcells);
 		}
+		
+		return lastResults;
 	}
 
 	/**
@@ -348,5 +354,4 @@ public class TableData {
 	public Integer getDepth() {
 		return depth;
 	}
-	
 }

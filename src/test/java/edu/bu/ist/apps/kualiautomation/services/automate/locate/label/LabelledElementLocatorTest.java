@@ -104,7 +104,21 @@ public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 		.setUrl("http://localhost:8080/subaward-entry-1")
 		.setElementType(ElementType.SELECT)
 		.setLabel("Requisitioner Unit:")
+		.setTagNameAssertion("select")
 		.setNumResults(1)
+		.findAndAssertElements();		
+	}
+	
+	@Test
+	public void test05SubawardEntry() {
+		new ElementsAssertion(locator)
+		.setUrl("http://localhost:8080/subaward-entry-1")
+		.setElementType(ElementType.TEXTBOX)
+		.setLabel("Other:")
+		.setNumResults(1)
+		.setTagNameAssertion("input")
+		.addAttributeAssertion("type", "text")
+		.addAttributeAssertion("title", "Other")
 		.findAndAssertElements();		
 	}
 

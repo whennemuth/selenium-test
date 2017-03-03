@@ -47,37 +47,28 @@ public class TableColumnData {
 		
 		List<TableColumnCell> filtered = TableColumnCell.getInstances(datamaps);
 		
-		Collections.sort(filtered, new Comparator<TableColumnCell>() {
-			@Override
-			public int compare(TableColumnCell cell1, TableColumnCell cell2) {
-				// Returns a negative integer, zero, or a positive integer as 
-				// the first argument is less than, equal to, or greater than the second.
-				if(cell1.getLabelRowIndex() < cell2.getLabelRowIndex()) {
-					return -1;
-				}
-				if(cell1.getLabelRowIndex() > cell2.getLabelRowIndex()) {
-					return 1;
-				}
-				if(cell1.getCommonColumnIndex() < cell2.getCommonColumnIndex()) {
-					return -1;
-				}
-				if(cell1.getCommonColumnIndex() > cell2.getCommonColumnIndex()) {
-					return 1;
-				}
-				if(cell1.getRowIndex() == cell2.getRowIndex()) {
-					return 0;
-				}
-				return cell1.getRowIndex() < cell2.getRowIndex() ? -1 : 1;
-			}});
+		Collections.sort(filtered);
 		
 		return filtered;
 	}
 	
 	/**
-	 * @return The web element closest to the label web element in the same table column.
+	 * @return The web elements closest to the label web element in the same table column.
+	 * If the returned list has multiple items then each of them have the same parent table cell.
 	 */
-	public WebElement getFirstElementBelowLabelInSameColumn() {
-		return  getElementsInSameColumnAsLabel().get(0).getOriginalField();
+	public List<WebElement> getFirstElementsBelowLabelInSameColumn() {
+		List<TableColumnCell> cells = getElementsInSameColumnAsLabel();
+		List<WebElement> results = new ArrayList<WebElement>();
+		for (TableColumnCell cell : cells) {
+			if(results.isEmpty()) {
+				results.add(cell.getOriginalField());
+				continue;
+			}
+			if(cell.compareTo(results.get(0)) != 0) {
+				break;
+			}
+		}
+		return results;
 	}
 	
 	/**
@@ -86,7 +77,7 @@ public class TableColumnData {
 	 * @author wrh
 	 *
 	 */
-	public static class TableColumnCell {
+	public static class TableColumnCell implements Comparable {
 
 		private WebElement originalField;
 		private Integer rowIndex;
@@ -142,6 +133,32 @@ public class TableColumnData {
 				cells.add(new TableColumnCell(map));
 			}
 			return cells;
+		}
+
+		@Override
+		public int compareTo(Object other) {
+			// Returns a negative integer, zero, or a positive integer as 
+			// the first argument is less than, equal to, or greater than the second.
+			if(other == null || other instanceof TableColumnCell == false) {
+				return -1;
+			}
+			TableColumnCell othercell = (TableColumnCell) other;
+			if(this.getLabelRowIndex() < othercell.getLabelRowIndex()) {
+				return -1;
+			}
+			if(this.getLabelRowIndex() > othercell.getLabelRowIndex()) {
+				return 1;
+			}
+			if(this.getCommonColumnIndex() < othercell.getCommonColumnIndex()) {
+				return -1;
+			}
+			if(this.getCommonColumnIndex() > othercell.getCommonColumnIndex()) {
+				return 1;
+			}
+			if(this.getRowIndex() == othercell.getRowIndex()) {
+				return 0;
+			}
+			return this.getRowIndex() < othercell.getRowIndex() ? -1 : 1;
 		}
 	};
 }
