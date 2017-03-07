@@ -32,7 +32,7 @@ public class HotspotElementLocatorTest extends AbstractJettyBasedTest {
 	 */
 	@Test
 	public void test01() {
-		(new ElementsAssertion(locator))
+		new ElementsAssertion(locator)
 			.setUrl("http://localhost:8080/hotspot-test-page")
 			.setTagNameAssertion("input")
 			.setLabel("label1")
@@ -48,7 +48,7 @@ public class HotspotElementLocatorTest extends AbstractJettyBasedTest {
 	 */
 	@Test
 	public void test02() {
-		(new ElementsAssertion(locator))
+		new ElementsAssertion(locator)
 			.setUrl("http://localhost:8080/hotspot-test-page")
 			.setTagNameAssertion("a")
 			.setLabel("label2")
@@ -66,7 +66,7 @@ public class HotspotElementLocatorTest extends AbstractJettyBasedTest {
 	*/
 	@Test
 	public void test03() {
-	(new ElementsAssertion(locator))
+	new ElementsAssertion(locator)
 		.setUrl("http://localhost:8080/hotspot-test-page")
 		.setTagNameAssertion("a")
 		.setLabel("label3")
@@ -85,8 +85,7 @@ public class HotspotElementLocatorTest extends AbstractJettyBasedTest {
 	public void test04() {
 		
 		// Find hyperlink without the aid of an attribute (innerText only)
-		ElementsAssertion asserter = new ElementsAssertion(locator);
-		asserter
+		new ElementsAssertion(locator)
 			.setUrl("http://localhost:8080/hotspot-test-page")
 			.setTagNameAssertion("a")
 			.setLabel("label4")
@@ -98,10 +97,8 @@ public class HotspotElementLocatorTest extends AbstractJettyBasedTest {
 	}
 	
 	@Test
-	public void test05SubawardSaved() {
-		
-		ElementsAssertion asserter = new ElementsAssertion(locator);
-		asserter
+	public void test05() {		
+		new ElementsAssertion(locator)
 			.setUrl("http://localhost:8080/hotspot-test-page")
 			.setTagNameAssertion("input")
 			.setLabel("label5b:")
@@ -111,9 +108,11 @@ public class HotspotElementLocatorTest extends AbstractJettyBasedTest {
 			.addAttributeAssertion("type", "image")
 			.addAttributeAssertion("myprop", "bettermatch")
 			.findAndAssertElements();
-		
-		asserter = new ElementsAssertion(locator);
-		asserter
+	}
+	
+	@Test
+	public void test06SubawardSaved() {
+		new ElementsAssertion(locator)
 			.setUrl("http://localhost:8080/subaward-entry-1")
 			.setTagNameAssertion("input")
 			.setLabel("Requisitioner User Name:")
@@ -122,7 +121,19 @@ public class HotspotElementLocatorTest extends AbstractJettyBasedTest {
 			.addAttributeValue("Search")
 			.addAttributeAssertion("title", "Search")
 			.addAttributeAssertion("type", "image")
-			.findAndAssertElements();
-		
+			.findAndAssertElements();		
+	}
+	
+	@Test public void test07SubawardSavedFindTab() {
+		new ElementsAssertion(locator)
+		.setUrl("http://localhost:8080/subaward-entry-1")
+		.setTagNameAssertion("input")
+		.setLabel("Financial")
+		.setElementType(ElementType.HOTSPOT)
+		.setNumResults(1)
+//		.addAttributeValue("Search")
+//		.addAttributeAssertion("title", "Search")
+		.addAttributeAssertion("type", "submit")
+		.findAndAssertElements();				
 	}
 }

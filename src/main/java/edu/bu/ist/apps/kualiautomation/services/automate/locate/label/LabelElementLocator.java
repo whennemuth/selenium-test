@@ -12,8 +12,10 @@ import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.BasicComparableLabel;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 public class LabelElementLocator extends AbstractElementLocator {
 	
@@ -45,6 +47,10 @@ public class LabelElementLocator extends AbstractElementLocator {
 			+ "'abcdefghijklmnopqrstuvwxyz')), \"[INSERT-LABEL]\")]]";
 	
 	private boolean labelCanBeHyperlink = true;
+	
+	private static final String[] DISALLOWED_TAGNAMES = new String[] {
+		"option"
+	};
 	
 	private LabelElementLocator() {
 		super(null); // Restrict the default constructor
@@ -79,13 +85,22 @@ public class LabelElementLocator extends AbstractElementLocator {
 		/** 1) Search for full length match */
 		String xpath = scope + XPATH_EQUALS.replace("[INSERT-LABEL]", label);
 		List<WebElement> elements = searchContext.findElements(By.xpath(xpath));
-		applyFiltering(elements);
+		applyFiltering(elements, label);
 		
-		/** 2) Search for match that starts with the provided value */
+		/** 2) Search for full length match where the label is the value of a button
+		 * <input type="[value]"> or... <button>[value]</button> 
+		 * (yes, some applications disguise buttons as hotspots or links).
+		 */
+		if(elements.isEmpty()) {
+			elements = ElementType.BUTTON.findAll(searchContext);
+			applyFiltering(elements, label);
+		}
+		
+		/** 3) Search for match that starts with the provided value */
 		if(elements.isEmpty()) {
 			xpath = scope + XPATH_STARTS_WITH.replace("[INSERT-LABEL]", cleanedLabel);
 			elements = searchContext.findElements(By.xpath(xpath));
-			applyFiltering(elements);
+			applyFiltering(elements, label);
 			
 			if(!elements.isEmpty()) {
 				/**
@@ -103,20 +118,29 @@ public class LabelElementLocator extends AbstractElementLocator {
 			}
 		}
 		
-		/** 3) Search for a match that would start with the provided value if garbage characters 
+		/** 4) Search for a match that would start with the provided value if garbage characters 
 		 * are trimmed from the start.
 		 */
 		if(elements.isEmpty()) {
 			xpath = scope + XPATH_CONTAINS.replace("[INSERT-LABEL]", cleanedLabel);
 			elements = searchContext.findElements(By.xpath(xpath));
-			applyFiltering(elements);
+			applyFiltering(elements, label);
 		}
 
 		// Wrap the web elements in ComparableLabel instances for sorting so higher ranked results are on top.
 		List<ComparableLabel> labels = new ArrayList<ComparableLabel>();
 		for(WebElement elmt : elements) {
 			if(!isDisallowedHyperlink(elmt)) {
-				String text = getText(driver, elmt);
+				String text = null;
+				if(isButton(elmt)) {
+					text = elmt.getAttribute("value");
+					if(Utils.isEmpty(text) && "button".equalsIgnoreCase(elmt.getTagName())) {
+						text = elmt.getText();
+					}
+				}
+				else {
+					text = getText(driver, elmt);
+				}
 				labels.add(new BasicComparableLabel(elmt, label, text));
 			}
 		}
@@ -131,14 +155,42 @@ public class LabelElementLocator extends AbstractElementLocator {
 		return located;
 	}
 	
-	private void applyFiltering(List<WebElement> elements) {
+	private void applyFiltering(List<WebElement> elements, String label) {
 		for (Iterator<WebElement> iterator = elements.iterator(); iterator.hasNext();) {
 			WebElement we = (WebElement) iterator.next();
-			if(ignoreHidden && !we.isDisplayed())
+			if(ignoreHidden && !we.isDisplayed()) {
 				iterator.remove();
-			else if(ignoreDisabled && !we.isEnabled())
+			}
+			else if(ignoreDisabled && !we.isEnabled()) {
 				iterator.remove();
+			}
+			else {
+				for(String tagname : DISALLOWED_TAGNAMES) {
+					if(tagname.equalsIgnoreCase(we.getTagName())) {
+						iterator.remove();
+					}
+				}
+				if(isButton(we)) {
+					String val = we.getAttribute("value");
+					if(Utils.isEmpty(val) && "button".equalsIgnoreCase(we.getTagName())) {
+						val = we.getText();
+					}
+					if(Utils.isEmpty(val)) {
+						iterator.remove();
+					}
+					else {
+						val = val.trim();
+						if(!label.equalsIgnoreCase(val)) {
+							iterator.remove();
+						}
+					}
+				}
+			}
 		}		
+	}
+	
+	private boolean isButton(WebElement we) {
+		return ElementType.getInstance(we).is(ElementType.BUTTON.name());
 	}
 	
 	@Override

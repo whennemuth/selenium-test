@@ -31,6 +31,7 @@ public class KerberosLogin {
 	private Element username;
 	private String failureMessage;
 	private RunLog runlog;
+	private boolean testDrive;
 	
 	private static final String TEST_DRIVE_USERNAME_OTHER_IDENTIFIER = "login_user";
 	private static final String TEST_DRIVE_PASSWORD_OTHER_IDENTIFIER = "login_pw";
@@ -89,7 +90,13 @@ public class KerberosLogin {
 		lv.setIdentifier(loginParms.getPasswordOtherIdentifier());		
 		LabelAndValue lvTstDrv = (LabelAndValue) lv.copy();
 		lvTstDrv.setIdentifier(TEST_DRIVE_PASSWORD_OTHER_IDENTIFIER);		
-		Element password = locatorRunner.run(new LabelAndValue[]{ lv, lvTstDrv });
+		Element password = null;
+		if(testDrive) {
+			password = locatorRunner.run(lvTstDrv, false);
+		}
+		else {
+			password = locatorRunner.run(lv, false);
+		}
 		
 		// 2) Get the submit button
 		lv = new LabelAndValue();
@@ -97,7 +104,13 @@ public class KerberosLogin {
 		lv.setLabel(loginParms.getSubmitButtonLabel());
 		lvTstDrv = (LabelAndValue) lv.copy();
 		lvTstDrv.setLabel(TEST_DRIVE_SUBMIT_BUTTON_LABEL);		
-		Element submit = locatorRunner.run(new LabelAndValue[]{ lv, lvTstDrv });
+		Element submit = null;
+		if(testDrive) {
+			submit = locatorRunner.run(lvTstDrv, false);
+		}
+		else {
+			submit = locatorRunner.run(lv, false);
+		}
 		
 		username.setValue(loginParms.getUsername());
 		if(password != null && password.isInteractive()) {
@@ -126,10 +139,17 @@ public class KerberosLogin {
 					LabelAndValue lv = new LabelAndValue();
 					lv.setElementType(ElementType.TEXTBOX.name());
 					lv.setLabel(loginParms.getUsernameLabel());
-					lv.setIdentifier(loginParms.getUsernameOtherIdentifier());		
+					lv.setIdentifier(loginParms.getUsernameOtherIdentifier());
 					LabelAndValue lvTstDrv = (LabelAndValue) lv.copy();
-					lvTstDrv.setIdentifier(TEST_DRIVE_USERNAME_OTHER_IDENTIFIER);		
-					username = locatorRunner.run(new LabelAndValue[]{ lv, lvTstDrv });
+					lvTstDrv.setIdentifier(TEST_DRIVE_USERNAME_OTHER_IDENTIFIER);
+					
+					username = locatorRunner.run(lv, false);
+					if(username == null) {
+						username = locatorRunner.run(lvTstDrv);
+						if(username != null) {
+							testDrive = true;
+						}
+					}
 					
 					return usernameLocated();
 				} 

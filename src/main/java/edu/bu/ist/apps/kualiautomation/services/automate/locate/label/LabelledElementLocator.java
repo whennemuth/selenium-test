@@ -2,10 +2,7 @@ package edu.bu.ist.apps.kualiautomation.services.automate.locate.label;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.ListIterator;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidSelectorException;
@@ -71,48 +68,82 @@ public class LabelledElementLocator extends AbstractElementLocator {
 			labelLocator.setLabelCanBeHyperlink(this.labelCanBeHyperlink);
 			List<Element> labelElements = labelLocator.locateAll(elementType, Arrays.asList(new String[]{label}));
 			
-			// Assume that more than one label is found and subdivide searches by each.
-			LabelledElementBatches batches1 = new LabelledElementBatches();
-			
-			for(Element labelElement : labelElements) {
-				List<WebElement> flds = tryTraditionalLabelSearchMethod(labelElement.getWebElement(), attributeValues);
-				if(flds.isEmpty()) {
-					flds = trySearchingOutwardFromLabel(labelElement.getWebElement(), attributeValues);
-				}
-				batches1.add(labelElement, flds);
-			}
-			
-			batches1.loadOneToOneResultBatches(located);
+			located.addAll(tryLabelIsSoughtField(labelElements, attributeValues));
 			
 			if(located.isEmpty()) {
-				// No label search produced a single result. Assume these labels and fields exist in a table
-				// and try to narrow down the results for each label by their relative proximity within the table that label.
-				LabelledElementBatches batches2 = new LabelledElementBatches();
-				for(Batch batch : batches1.getBatches()) {
-					List<WebElement> tableFlds = tryTabularSearchMethod(
-							batch.getLabel().getWebElement(), 
-							batch.getBatch());
-
-					batches2.add(batch.getLabel(), tableFlds);
+				// Assume that more than one label is found and subdivide searches by each.
+				LabelledElementBatches batches1 = new LabelledElementBatches();
+				
+				for(Element labelElement : labelElements) {				
+					List<WebElement> flds = tryTraditionalLabelSearchMethod(labelElement.getWebElement(), attributeValues);
+					if(flds.isEmpty()) {
+						flds = trySearchingOutwardFromLabel(labelElement.getWebElement(), attributeValues);
+					}
+					batches1.add(labelElement, flds);
 				}
 				
-				batches2.loadOneToOneResultBatches(located);
-				
-				if(located.isEmpty()) {
-					batches2.loadSmallestResultBatches(located);
-				}
+				batches1.loadOneToOneResultBatches(located);
 				
 				if(located.isEmpty()) {
-					batches2.loadAllResultBatches(located);
+					// No label search produced a single result. Assume these labels and fields exist in a table
+					// and try to narrow down the results for each label by their relative proximity within the table that label.
+					LabelledElementBatches batches2 = new LabelledElementBatches();
+					for(Batch batch : batches1.getBatches()) {
+						List<WebElement> tableFlds = tryTabularSearchMethod(
+								batch.getLabel().getWebElement(), 
+								batch.getBatch());
+	
+						batches2.add(batch.getLabel(), tableFlds);
+					}
+					
+					batches2.loadOneToOneResultBatches(located);
+					
+					if(located.isEmpty()) {
+						batches2.loadSmallestResultBatches(located);
+					}
+					
+					if(located.isEmpty()) {
+						batches2.loadAllResultBatches(located);
+					}
+					
+					if(located.isEmpty()) {
+						batches1.loadAllResultBatches(located);
+					}
 				}
-				
-				if(located.isEmpty()) {
-					batches1.loadAllResultBatches(located);
-				}
-			}
+			}			
 		}
 		
 		return located;
+	}
+
+	/**
+	 * Some applications disguise buttons to look like hotspots or links, are label-like in appearance.
+	 * If the label that was found is a button with the label text being value of the value attribute,
+	 * then assume the user specified a labelling value as not being the text of a nearby web element, 
+	 * but the web element itself.
+	 * 
+	 * @param labelElements
+	 * @param attributeValues
+	 * @return
+	 */
+	private List<WebElement> tryLabelIsSoughtField(List<Element> labelElements, List<String> attributeValues) {
+		List<WebElement> filtered = new ArrayList<WebElement>();
+		List<WebElement> buttonLabels = new ArrayList<WebElement>();
+		for(Element elmt : labelElements) {
+			if(isButton(elmt.getWebElement())) {
+				buttonLabels.add(elmt.getWebElement());
+			}
+		}
+		if(!buttonLabels.isEmpty()) {
+			if(!attributeValues.isEmpty()) {
+				AttributeInspector inspector = new AttributeInspector(buttonLabels);
+				filtered.addAll(inspector.findForValues(attributeValues));								
+			}
+			else {
+				filtered.addAll(buttonLabels);
+			}
+		}
+		return filtered;
 	}
 	
 	/**
@@ -248,6 +279,10 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	
 	public boolean isLabelCanBeHyperlink() {
 		return labelCanBeHyperlink;
+	}
+	
+	private boolean isButton(WebElement we) {
+		return ElementType.getInstance(we).is(ElementType.BUTTON.name());
 	}
 	
 	public void setLabelCanBeHyperlink(boolean labelCanBeHyperlink) {

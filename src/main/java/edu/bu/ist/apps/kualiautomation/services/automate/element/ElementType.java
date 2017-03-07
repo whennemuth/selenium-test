@@ -208,8 +208,9 @@ public enum ElementType {
 	}
 	
 	public static ElementType getInstance(WebElement we) {
-		String type = we.getAttribute("type");
+		String type = null;
 		if(we != null && !Utils.isEmpty(we.getTagName())) {
+			type = we.getAttribute("type");
 			for(ElementType et : ElementType.values()) {
 				if(we.getTagName().equalsIgnoreCase(et.getTagname())) {
 					if(Utils.isEmpty(type) && Utils.isEmpty(et.getTypeAttribute())) {
@@ -235,6 +236,9 @@ public enum ElementType {
 		}
 		if("input".equalsIgnoreCase(we.getTagName())) {
 			if("submit".equalsIgnoreCase(type)) {
+				return BUTTON;
+			}
+			else if("button".equalsIgnoreCase(type)) {
 				return BUTTON;
 			}
 			else if(Utils.isEmpty(type)) {

@@ -66,6 +66,16 @@ public class BatchElementLocator implements Locator {
 		}
 	}
 	
+	@Override
+	public Element locateFirst(ElementType elementType, List<String> parms) {
+		return locateFirst(elementType, parseParms(parms));
+	}
+
+	@Override
+	public List<Element> locateAll(ElementType elementType, List<String> parms) {
+		return locateAll(elementType, parseParms(parms), true);
+	}
+	
 	private List<Element> locateAll(ElementType elementType, Map<Class<?>, List<String>> parms, boolean greedy) {
 		
 		defaultRan = false;
@@ -155,16 +165,6 @@ public class BatchElementLocator implements Locator {
 		}
 		
 		return result;
-	}
-	
-	@Override
-	public Element locateFirst(ElementType elementType, List<String> parms) {
-		return locateFirst(elementType, parseParms(parms));
-	}
-
-	@Override
-	public List<Element> locateAll(ElementType elementType, List<String> parms) {
-		return locateAll(elementType, parseParms(parms), true);
 	}
 	
 	private Map<Class<?>, List<String>> parseParms(List<String> parms) {

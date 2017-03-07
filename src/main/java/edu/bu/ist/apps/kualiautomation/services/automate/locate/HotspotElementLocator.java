@@ -16,9 +16,13 @@ import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledEl
 
 /**
  * Locate a hotspot element by searching for elements of various clickable types in the following order:
- *    1) HYPERLINK (matches the ElementType.HYPERLINK regex)
+ * <pre style="font:inherit">
+ * 
+ *    1) BUTTON (where the ElementType.BUTTON regex matched, and the label value is the value attribute of the button)
  *    2) BUTTONIMAGE (matches the ElementType.BUTTONIMAGE regex)
- *    3) HOTSPOT (matches the ElementType.HOTSPOT regex, which overlaps much of what a the prior searches did, with some extra possibilities)
+ *    3) HYPERLINK (matches the ElementType.HYPERLINK regex)
+ *    4) HOTSPOT (matches the ElementType.HOTSPOT regex, which overlaps much of what a the prior searches did, with some extra possibilities)
+ * </pre>
  */
 public class HotspotElementLocator extends AbstractElementLocator {
 
@@ -29,32 +33,6 @@ public class HotspotElementLocator extends AbstractElementLocator {
 	public HotspotElementLocator(WebDriver driver, SearchContext searchContext) {
 		super(driver, searchContext);
 	}
-
-//	@Override
-//	protected List<WebElement> customLocate() {
-//		List<WebElement> located = new ArrayList<WebElement>();
-//		
-//		if(elementType != null && elementType.getTagname() != null) {
-//			
-//			HyperlinkElementLocator locator1 = new HyperlinkElementLocator(driver, searchContext);
-//			List<Element> elements = locator1.locateAll(ElementType.HYPERLINK, parameters);
-//			
-//			if(elements.isEmpty()) {
-//				elements.addAll(new BasicElementLocator(
-//						ElementType.BUTTONIMAGE,
-//						driver, 
-//						searchContext).locateAll(parameters));
-//			}
-//			
-//			for(Element e : elements) {
-//				located.add(e.getWebElement());
-//			}
-//		}		
-//		
-//		// If located is empty, then the ElementType.HOTSPOT regex will be used to attempt the search
-//		
-//		return located;
-//	}
 
 	@Override
 	protected List<WebElement> customLocate() {
@@ -68,7 +46,10 @@ public class HotspotElementLocator extends AbstractElementLocator {
 			locator1.setLabelCanBeHyperlink(false);
 			elements.addAll(locator1.locateAll(ElementType.BUTTONIMAGE, parameters));
 			
-			if(elements.isEmpty() || !attributeMatched(elements)) {
+			if(!elements.isEmpty() && allButtons(elements)) {
+				// The labels themselves are the search results (rare case for buttons that look like labels).
+			}			
+			else if(elements.isEmpty() || !attributeMatched(elements)) {
 				HyperlinkElementLocator locator2 = new HyperlinkElementLocator(driver, searchContext);
 				List<Element> hyperlinks = locator2.locateAll(ElementType.HYPERLINK, parameters);
 				if(elements.isEmpty()) {
@@ -89,6 +70,20 @@ public class HotspotElementLocator extends AbstractElementLocator {
 		// If located is empty, then the ElementType.HOTSPOT regex will be used to attempt the search
 		
 		return located;
+	}
+
+	/**
+	 * Determine if all elements in a list correspond to button elements (not button image)
+	 * @param elements
+	 * @return
+	 */
+	private boolean allButtons(List<Element> elements) {
+		for(Element elmt : elements) {
+			if(!ElementType.getInstance(elmt.getWebElement()).is(ElementType.BUTTON.name())) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private boolean attributeMatched(List<Element> elements) {

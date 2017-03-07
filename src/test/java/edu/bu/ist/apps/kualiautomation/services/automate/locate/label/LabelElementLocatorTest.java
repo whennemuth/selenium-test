@@ -153,5 +153,4 @@ public class LabelElementLocatorTest extends AbstractJettyBasedTest {
 		assertEquals("label", element.getWebElement().getTagName().toLowerCase());
 		assertEquals("Proposal Number:", element.getWebElement().getText());
 	}
-
 }

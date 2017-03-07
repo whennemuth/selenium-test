@@ -34,6 +34,7 @@ public class LocatorRunner {
 	private boolean busy;
 	private Set<Class<?>> additionalLocators = new LinkedHashSet<Class<?>>();
 	private RunLog runlog;
+	private boolean quitFast;
 	
 	@SuppressWarnings("unused")
 	private LocatorRunner() { /* Restrict the default constructor */ }
@@ -52,6 +53,43 @@ public class LocatorRunner {
 		if(elements.isEmpty())
 			return null;
 		return elements.get(0);
+	}
+
+	public Element run(LabelAndValue lv, boolean greedy) {
+		
+		List<Element> elements = new ArrayList<Element>();
+		if(greedy) {
+			return run(lv);
+		}
+		else {
+			elements.addAll(runNonGreedy(new LabelAndValue[]{ lv }));
+		}
+		if(elements.isEmpty())
+			return null;
+		return elements.get(0);
+	}
+	
+	public List<Element> runNonGreedy(LabelAndValue lv) {
+		return runNonGreedy(new LabelAndValue[]{ lv });
+	}
+
+	public List<Element> runNonGreedy(LabelAndValue[] lvs) {
+		try {
+			quitFast = true;
+			busy = true;
+			List<Element> elements = new ArrayList<Element>();
+			for(LabelAndValue lv : lvs) {
+				elements.addAll(doRun(lv));
+				if(!elements.isEmpty()) {
+					break;
+				}
+			}
+			return elements;
+		} 
+		finally {
+			quitFast = false;
+			busy = false;
+		}
 	}
 
 	public List<Element> runGreedy(LabelAndValue lv) {
@@ -193,7 +231,14 @@ public class LocatorRunner {
 			parameters[i] = s.toString();
 			i++;
 		}
-		List<Element> elements = locator.locateAll(lv.getElementTypeEnum(), Arrays.asList(parameters));
+		
+		List<Element> elements = new ArrayList<Element>();
+		if(quitFast) {
+			elements.add(locator.locateFirst(lv.getElementTypeEnum(), Arrays.asList(parameters)));
+		}
+		else {
+			elements.addAll(locator.locateAll(lv.getElementTypeEnum(), Arrays.asList(parameters)));
+		}
 		
 		return elements;
 	}
@@ -231,4 +276,5 @@ public class LocatorRunner {
 	public void removeLocator(Class<?> locator) {
 		additionalLocators.remove(locator);
 	}
+	
 }
