@@ -85,8 +85,8 @@ public class LabelledElementLocator extends AbstractElementLocator {
 				batches1.loadOneToOneResultBatches(located);
 				
 				if(located.isEmpty()) {
-					// No label search produced a single result. Assume these labels and fields exist in a table
-					// and try to narrow down the results for each label by their relative proximity within the table that label.
+					// No label search produced a single result. Assume these labels and fields exist in a table and try to
+					// narrow down the results for each label by their relative proximity within the table to that label.
 					LabelledElementBatches batches2 = new LabelledElementBatches();
 					for(Batch batch : batches1.getBatches()) {
 						List<WebElement> tableFlds = tryTabularSearchMethod(
@@ -197,6 +197,9 @@ public class LabelledElementLocator extends AbstractElementLocator {
 			return candidates;
 		}
 		else {
+			if(ElementType.HYPERLINK.equals(elementType)) {
+				System.out.println("RESUME NEXT");
+			}
 			if(attributeValues.isEmpty()) {
 				return candidates;
 			}
@@ -204,7 +207,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 				// If parameters are present beyond the first, they are attribute values, so pick only 
 				// those webElements that have every attributeValue accounted for among their attributes.
 				AttributeInspector inspector = new AttributeInspector(candidates);
-				List<WebElement> filtered = inspector.findForValues(attributeValues);				
+				List<WebElement> filtered = inspector.findForValues(attributeValues);
 				return filtered;
 			}
 		}

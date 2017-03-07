@@ -9,7 +9,6 @@ import org.junit.runners.MethodSorters;
 import edu.bu.ist.apps.kualiautomation.AbstractJettyBasedTest;
 import edu.bu.ist.apps.kualiautomation.ElementsAssertion;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
-import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledElementLocator;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
@@ -30,11 +29,6 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 	@Override
 	public void loadHandlers(Map<String, String> handlers) {
 		handlers.put("hyperlink-page", "HyperlinkPage.htm");
-		handlers.put("prop-log-lookup-frame", "ProposalLogLookup_files/ProposalLogLookupFrame.htm");
-		handlers.put("prop-log-lookup", "ProposalLogLookup.htm");
-		handlers.put("ProposalLogLookup_files", "ProposalLogLookup_files");	
-		handlers.put("address-book-lookup", "AddressBookLookup1.htm");
-		handlers.put("AddressBookLookup_files", "AddressBookLookup1_files");
 	}
 
 	@Test
@@ -42,36 +36,36 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		
 		String url = "http://localhost:8080/hyperlink-page";
 		
-		ElementsAssertion asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("anchor tag 1");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a1");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("anchor tag 1")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a1")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("anchor TAG 2");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a2");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("anchor TAG 2")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a2")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.addAttributeValue("anchor tag 2");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a2");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.addAttributeValue("anchor tag 2")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a2")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("anchor tag");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(9);
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("anchor tag")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(9)
+		.findAndAssertElements();
 	}
 
 	@Test
@@ -79,39 +73,39 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		
 		String url = "http://localhost:8080/hyperlink-page";
 		
-		ElementsAssertion asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("anchor tag 3");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(2);
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("anchor tag 3")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(2)
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("anchor tag 3");
-		asserter.addAttributeValue("anchor3b");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a4");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("anchor tag 3")
+		.addAttributeValue("anchor3b")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a4")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.addAttributeValue("anchor tag 3");
-		asserter.addAttributeValue("anchor3a");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a3");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.addAttributeValue("anchor tag 3")
+		.addAttributeValue("anchor3a")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a3")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.addAttributeValue("anchor tag 3");
-		asserter.addAttributeValue("anchor3b");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a4");
-		asserter.findAndAssertElements();
+		 new ElementsAssertion(locator)
+		.setUrl(url)
+		.addAttributeValue("anchor tag 3")
+		.addAttributeValue("anchor3b")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a4")
+		.findAndAssertElements();
 	}
 
 	@Test
@@ -119,38 +113,38 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		
 		String url = "http://localhost:8080/hyperlink-page";
 		
-		ElementsAssertion asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("anchor tag 4");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(2);
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("anchor tag 4")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(2)
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("anchor tag 4");
-		asserter.addAttributeValue("anchor4");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a5");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("anchor tag 4")
+		.addAttributeValue("anchor4")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a5")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.addAttributeValue("anchor4");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a5");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.addAttributeValue("anchor4")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a5")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("label 4");
-		asserter.addAttributeValue("anchor tag 4");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a6");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("label 4")
+		.addAttributeValue("anchor tag 4")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a6")
+		.findAndAssertElements();
 	}
 
 	@Test
@@ -158,38 +152,38 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		
 		String url = "http://localhost:8080/hyperlink-page";
 		
-		ElementsAssertion asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("anchor tag 5");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(2);
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("anchor tag 5")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(2)
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("anchor tag 5");
-		asserter.addAttributeValue("anchor5");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a8");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("anchor tag 5")
+		.addAttributeValue("anchor5")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a8")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.addAttributeValue("anchor5");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a8");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.addAttributeValue("anchor5")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a8")
+		.findAndAssertElements();
 		
 		//
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("label 5a");
-		asserter.addAttributeValue("anchor tag 5");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(2);
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("label 5a")
+		.addAttributeValue("anchor tag 5")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(2)
+		.findAndAssertElements();
 	}
 
 	@Test
@@ -197,67 +191,46 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		
 		String url = "http://localhost:8080/hyperlink-page";
 
-		ElementsAssertion asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("label 6");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a9");
-		asserter.findAndAssertElements();
-		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("anchor tag 6");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a9");
-		asserter.findAndAssertElements();
-		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.addAttributeValue("anchor tag 6");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a9");
-		asserter.findAndAssertElements();
-		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.addAttributeValue("label 6");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a9");
-		asserter.findAndAssertElements();
-		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("top label");
-		asserter.addAttributeValue("anchor tag 6");
-		asserter.setElementType(ElementType.HYPERLINK);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("testid", "a9");
-		asserter.findAndAssertElements();
-
-	}
-	
-	@Test
-	public void assert06TableColumnLinks() {
-		long start = System.currentTimeMillis();
-		
-		LabelledElementLocator locator = new LabelledElementLocator(driver);
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("label 6")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a9")
+		.findAndAssertElements();
 		
 		new ElementsAssertion(locator)
-			.setUrl("http://localhost:8080/address-book-lookup")
-			.setLabel("search")
-			.setElementType(ElementType.BUTTON)
-			.setNumResults(1)
-			.addAttributeAssertion("title", "search")
-			.findAndAssertElements();
+		.setUrl(url)
+		.setLabel("anchor tag 6")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a9")
+		.findAndAssertElements();
 		
-		long end = System.currentTimeMillis();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.addAttributeValue("anchor tag 6")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a9")
+		.findAndAssertElements();
 		
-		Long duration = (end - start) / 1000L;
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.addAttributeValue("label 6")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a9")
+		.findAndAssertElements();
 		
-		System.out.println("duration is " + duration.toString() + " seconds");
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("top label")
+		.addAttributeValue("anchor tag 6")
+		.setElementType(ElementType.HYPERLINK)
+		.setNumResults(1)
+		.addAttributeAssertion("testid", "a9")
+		.findAndAssertElements();
+
 	}
 }

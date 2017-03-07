@@ -55,6 +55,7 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 			for(@SuppressWarnings("unused") WebElement label : labels) {
 				//if(!attributeValues.isEmpty()) {
 					LabelledElementLocator labelledLocator = new LabelledElementLocator(driver, searchContext);
+					labelledLocator.setLabelCanBeHyperlink(false);
 					List<Element> anchorTagElements = labelledLocator.locateAll(ElementType.HYPERLINK, parameters);
 					for(Element anchorTagElement : anchorTagElements) {
 						if(!anchortags.contains(anchorTagElement.getWebElement())) {

@@ -124,136 +124,136 @@ public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 
 	private void findFields(String url) {
 		
-		ElementsAssertion asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Proposal Number");
-		asserter.setElementType(ElementType.TEXTBOX);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "proposalNumber");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Proposal Number")
+		.setElementType(ElementType.TEXTBOX)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "proposalNumber")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Proposal Log Type");
-		asserter.setElementType(ElementType.SELECT);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "proposalLogTypeCode");
-		asserter.addAttributeAssertion("name", "proposalLogTypeCode");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Proposal Log Type")
+		.setElementType(ElementType.SELECT)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "proposalLogTypeCode")
+		.addAttributeAssertion("name", "proposalLogTypeCode")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Proposal Log Status");
-		asserter.setElementType(ElementType.SELECT);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "logstatus");
-		asserter.addAttributeAssertion("name", "logstatus");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Proposal Log Status")
+		.setElementType(ElementType.SELECT)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "logstatus")
+		.addAttributeAssertion("name", "logstatus")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Proposal Merged With");
-		asserter.setElementType(ElementType.TEXTBOX);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "mergedwith");
-		asserter.addAttributeAssertion("name", "mergedwith");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Proposal Merged With")
+		.setElementType(ElementType.TEXTBOX)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "mergedwith")
+		.addAttributeAssertion("name", "mergedwith")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Created Institutional Proposal");
-		asserter.setElementType(ElementType.TEXTBOX);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "instProposalNumber");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Created Institutional Proposal")
+		.setElementType(ElementType.TEXTBOX)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "instProposalNumber")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Proposal Type");
-		asserter.setElementType(ElementType.SELECT);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "proposalTypeCode");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Proposal Type")
+		.setElementType(ElementType.SELECT)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "proposalTypeCode")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Title");
-		asserter.setElementType(ElementType.TEXTBOX);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "title");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Title")
+		.setElementType(ElementType.TEXTBOX)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "title")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Principal Investigator (Employee)");
-		asserter.setElementType(ElementType.TEXTBOX);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "person.username");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Principal Investigator (Employee)")
+		.setElementType(ElementType.TEXTBOX)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "person.username")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Principal Investigator (Non-Employee)");
-		asserter.setElementType(ElementType.TEXTBOX);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "rolodexId");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Principal Investigator (Non-Employee)")
+		.setElementType(ElementType.TEXTBOX)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "rolodexId")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Lead Unit");
-		asserter.setElementType(ElementType.TEXTBOX);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "leadunit");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Lead Unit")
+		.setElementType(ElementType.TEXTBOX)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "leadunit")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Sponsor");
-		asserter.setElementType(ElementType.TEXTBOX);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "sponsorcode");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Sponsor")
+		.setElementType(ElementType.TEXTBOX)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "sponsorcode")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Sponsor Name");
-		asserter.setElementType(ElementType.TEXTBOX);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "sponsorname");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Sponsor Name")
+		.setElementType(ElementType.TEXTBOX)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "sponsorname")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Comments");
-		asserter.setElementType(ElementType.TEXTBOX);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "comments");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Comments")
+		.setElementType(ElementType.TEXTBOX)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "comments")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Deadline Date From");
-		asserter.setElementType(ElementType.TEXTBOX);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "rangeLowerBoundKeyPrefix_deadlineDate");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Deadline Date From")
+		.setElementType(ElementType.TEXTBOX)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "rangeLowerBoundKeyPrefix_deadlineDate")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Deadline Date To");
-		asserter.setElementType(ElementType.TEXTBOX);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "deadlinedate");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Deadline Date To")
+		.setElementType(ElementType.TEXTBOX)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "deadlinedate")
+		.findAndAssertElements();
 		
-		asserter = new ElementsAssertion(locator);
-		asserter.setUrl(url);
-		asserter.setLabel("Principal Investigator (Employee)");
-		asserter.setElementType(ElementType.TEXTBOX);
-		asserter.setNumResults(1);
-		asserter.addAttributeAssertion("id", "person.userName");
-		asserter.findAndAssertElements();
+		new ElementsAssertion(locator)
+		.setUrl(url)
+		.setLabel("Principal Investigator (Employee)")
+		.setElementType(ElementType.TEXTBOX)
+		.setNumResults(1)
+		.addAttributeAssertion("id", "person.userName")
+		.findAndAssertElements();
 		
 		
 	}

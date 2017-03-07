@@ -14,9 +14,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.openqa.selenium.WebDriver;
+
+import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.Locator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.LocatorRunner;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**
@@ -42,11 +46,20 @@ public class ElementsAssertion {
 	private Locator locator;
 	private boolean webPageOpen;
 	
+	private LocatorRunner runner;
+	private List<LabelAndValue> lvs = new ArrayList<LabelAndValue>();
+	private boolean greedy;
+	
 	@SuppressWarnings("unused")
 	private ElementsAssertion() { /* Restrict default constructor */ }
 	
 	public ElementsAssertion(Locator locator) {
 		this.locator = locator;
+		this.greedy = greedy;
+	}
+	
+	public ElementsAssertion(LocatorRunner runner, boolean greedy) {
+		this.runner = runner;
 	}
 	
 	/**
@@ -59,7 +72,20 @@ public class ElementsAssertion {
 		
 		openWebPage();
 		
-		List<Element> elements = locator.locateAll(elementType, attributeValues);
+		List<Element> elements = null;
+		
+		long start = System.currentTimeMillis();
+
+		if(runner == null) 
+			elements = locator.locateAll(elementType, attributeValues);
+		else if(greedy)
+			elements = runner.runNonGreedy(lvs.toArray(new LabelAndValue[lvs.size()]));
+		else
+			elements = runner.runGreedy(lvs.toArray(new LabelAndValue[lvs.size()]));
+		
+		long end = System.currentTimeMillis();		
+		Long duration = (end - start) / 1000L;		
+		System.out.println("location duration is " + duration.toString() + " seconds");
 		
 		assertElements(elements);
 		
@@ -127,8 +153,15 @@ public class ElementsAssertion {
 	
 	public void openWebPage() {
 		if(!webPageOpen) {
-			if(locator.getWebDriver().getCurrentUrl() == null || !locator.getWebDriver().getCurrentUrl().equalsIgnoreCase(url)) {
-				locator.getWebDriver().get(url);
+			WebDriver driver = null;
+		
+			if(locator == null) 
+				driver = runner.getWebDriver();
+			else
+				driver = locator.getWebDriver();
+			
+			if(driver.getCurrentUrl() == null || !driver.getCurrentUrl().equalsIgnoreCase(url)) {
+				driver.get(url);
 				webPageOpen = true;
 			}
 		}
@@ -139,11 +172,13 @@ public class ElementsAssertion {
 	 * @param element
 	 */
 	private void assertElement(Element element) {
-		if(elementType.getTagname() != null && !elementType.equals(ElementType.HOTSPOT)) {
-			assertEquals(elementType.getTagname().toLowerCase(), element.getWebElement().getTagName().toLowerCase());
-		}
-		if(!elementType.equals(ElementType.HOTSPOT)) {
-			assertTrue(areEmptyOrEqual(elementType.getTypeAttribute(), element.getWebElement().getAttribute("type")));
+		if(locator != null) {
+			if(elementType.getTagname() != null && !elementType.equals(ElementType.HOTSPOT)) {
+				assertEquals(elementType.getTagname().toLowerCase(), element.getWebElement().getTagName().toLowerCase());
+			}
+			if(!elementType.equals(ElementType.HOTSPOT)) {
+				assertTrue(areEmptyOrEqual(elementType.getTypeAttribute(), element.getWebElement().getAttribute("type")));
+			}
 		}
 		if(tagNameAssertion != null) {
 			assertTrue(tagNameAssertion.equalsIgnoreCase(element.getWebElement().getTagName()));
@@ -164,8 +199,11 @@ public class ElementsAssertion {
 		}
 		for(String attributeName: attributeAssertions.keySet()) {
 			String assertValue = attributeAssertions.get(attributeName).trim();
-			String actualValue = element.getWebElement().getAttribute(attributeName).trim();
-			assertTrue(areEmptyOrEqual(assertValue, actualValue));
+			String actualValue = element.getWebElement().getAttribute(attributeName);
+			if(Utils.isEmpty(actualValue))
+				fail("Expected attribute value: " + assertValue + ", but was null");
+			else 
+				assertTrue(areEmptyOrEqual(assertValue, actualValue.trim()));
 		}
 		if(anyAttributeAssertions != null && !anyAttributeAssertions.isEmpty()) {
 			Iterator<Map.Entry<String,String>> iter = anyAttributeAssertions.entrySet().iterator();
@@ -274,6 +312,10 @@ public class ElementsAssertion {
 			anyAttributeAssertionsFound = new HashMap<String, String>();
 		}
 		anyAttributeAssertions.put(attributeName, attributeValue);
+		return this;
+	}
+	public ElementsAssertion addLabelAndValue(LabelAndValue lv) {
+		lvs.add(lv);
 		return this;
 	}
 }

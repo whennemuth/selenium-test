@@ -29,9 +29,11 @@ public abstract class AbstractElementLocator implements Locator {
 	 */
 	protected boolean busy; 
 	protected boolean skipFrameSearch;
-	protected boolean ignoreHidden;
-	protected boolean ignoreDisabled;
+	protected boolean ignoreHidden = true;
+	protected boolean ignoreDisabled = true;
 	protected String message;
+	
+	public static boolean printDuration;
 	
 	public AbstractElementLocator(WebDriver driver) {
 		this.driver = driver;
@@ -54,8 +56,12 @@ public abstract class AbstractElementLocator implements Locator {
 	
 	@Override
 	public List<Element> locateAll(ElementType elementType, List<String> parameters) {
-		List<Element> results;
+		List<Element> results = new ArrayList<Element>();
+		long start = 0;
 		try {
+			if(printDuration)
+				start = System.currentTimeMillis();
+			
 			busy = true;
 			defaultRan = false;
 			if(elementType != null) {
@@ -116,6 +122,16 @@ public abstract class AbstractElementLocator implements Locator {
 		} 
 		finally {
 			busy = false;
+			if(printDuration && skipFrameSearch) {
+				long end = System.currentTimeMillis();
+				Long mils = end - start;
+				//Long duration = (end - start) / 1000L;		
+				//System.out.println(this.getClass().getName() + " ran in " + duration.toString() + " seconds for parameter(s):");
+				System.out.println(this.getClass().getName() + " found " + String.valueOf(results.size()) + " results in " + mils.toString() + " milliseconds for parameter(s):");
+				for(String p : parameters) {
+					System.out.println(p);
+				}
+			}				
 		}
 		
 		return results;
@@ -244,5 +260,4 @@ public abstract class AbstractElementLocator implements Locator {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	
 }

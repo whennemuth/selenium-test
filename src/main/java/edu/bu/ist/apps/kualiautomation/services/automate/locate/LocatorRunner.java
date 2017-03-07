@@ -29,8 +29,8 @@ public class LocatorRunner {
 
 	private WebDriver driver;
 	private BatchElementLocator locator;
-	private boolean ignoreHidden;
-	private boolean ignoreDisabled;
+	private boolean ignoreHidden = true;
+	private boolean ignoreDisabled = true;
 	private boolean busy;
 	private Set<Class<?>> additionalLocators = new LinkedHashSet<Class<?>>();
 	private RunLog runlog;
@@ -275,6 +275,10 @@ public class LocatorRunner {
 	
 	public void removeLocator(Class<?> locator) {
 		additionalLocators.remove(locator);
+	}
+
+	public WebDriver getWebDriver() {
+		return driver;
 	}
 	
 }
