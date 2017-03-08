@@ -2,6 +2,7 @@ package edu.bu.ist.apps.kualiautomation.services.automate.locate.label;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -38,6 +39,9 @@ import edu.bu.ist.apps.kualiautomation.util.Utils;
 public class LabelledElementLocator extends AbstractElementLocator {
 	
 	private boolean labelCanBeHyperlink = true;
+	private List<String> attributeValues = new ArrayList<String>();
+	private List<Element> labelElements = new ArrayList<Element>();
+	private List<WebElement> tableElements = new ArrayList<WebElement>();
 
 	public LabelledElementLocator(WebDriver driver){
 		super(driver);
@@ -45,6 +49,26 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	
 	public LabelledElementLocator(WebDriver driver, SearchContext searchContext){
 		super(driver, searchContext);
+	}
+	
+	public LabelledElementLocator(WebDriver driver, SearchContext searchContext, List<Element> labelElements){
+		super(driver, searchContext);
+		this.labelElements.addAll(labelElements);
+	}
+	
+	public static List<WebElement> getBestInTable(
+			WebDriver driver,
+			ElementType elementType,
+			List<Element> labelElements, 
+			List<WebElement> tableElements,
+			List<String> parameters) {
+		
+		LabelledElementLocator locator = new LabelledElementLocator(driver);
+		locator.elementType = elementType;
+		locator.labelElements.addAll(labelElements);
+		locator.tableElements.addAll(tableElements);
+		locator.parameters = parameters;
+		return locator.customLocate();
 	}
 	
 	/**
@@ -58,28 +82,39 @@ public class LabelledElementLocator extends AbstractElementLocator {
 		if(elementType != null && elementType.getTagname() != null) {
 			
 			String label = new String(parameters.get(0));
-			List<String> attributeValues = new ArrayList<String>();
 			if(parameters.size() > 1) {
-				attributeValues = parameters.subList(1, parameters.size());
+				attributeValues.addAll(parameters.subList(1, parameters.size()));
 			}
-			LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext);
-			labelLocator.setIgnoreHidden(super.ignoreHidden);
-			labelLocator.setIgnoreDisabled(super.ignoreDisabled);
-			labelLocator.setLabelCanBeHyperlink(this.labelCanBeHyperlink);
-			List<Element> labelElements = labelLocator.locateAll(elementType, Arrays.asList(new String[]{label}));
 			
-			located.addAll(tryLabelIsSoughtField(labelElements, attributeValues));
+			if(labelElements.isEmpty()) {
+				LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext);
+				labelLocator.setIgnoreHidden(super.ignoreHidden);
+				labelLocator.setIgnoreDisabled(super.ignoreDisabled);
+				labelLocator.setLabelCanBeHyperlink(this.labelCanBeHyperlink);
+				labelElements.addAll(labelLocator.locateAll(elementType, Arrays.asList(new String[]{label})));
+			}
+			
+			if(tableElements.isEmpty()) {
+				located.addAll(tryLabelIsSoughtField(labelElements));
+			}
 			
 			if(located.isEmpty()) {
 				// Assume that more than one label is found and subdivide searches by each.
 				LabelledElementBatches batches1 = new LabelledElementBatches();
 				
-				for(Element labelElement : labelElements) {				
-					List<WebElement> flds = tryTraditionalLabelSearchMethod(labelElement.getWebElement(), attributeValues);
-					if(flds.isEmpty()) {
-						flds = trySearchingOutwardFromLabel(labelElement.getWebElement(), attributeValues);
+				if(tableElements.isEmpty()) {
+					for(Element labelElement : labelElements) {				
+						List<WebElement> flds = tryTraditionalLabelSearchMethod(labelElement.getWebElement());
+						if(flds.isEmpty()) {
+							flds = trySearchingOutwardFromLabel(labelElement.getWebElement());
+						}
+						batches1.add(labelElement, flds);
 					}
-					batches1.add(labelElement, flds);
+				}
+				else {
+					for(Element labelElement : labelElements) {	
+						batches1.add(labelElement, tableElements);
+					}
 				}
 				
 				batches1.loadOneToOneResultBatches(located);
@@ -117,16 +152,15 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	}
 
 	/**
-	 * Some applications disguise buttons to look like hotspots or links, are label-like in appearance.
+	 * Some applications disguise buttons to look like hotspots or links and are label-like in appearance.
 	 * If the label that was found is a button with the label text being value of the value attribute,
 	 * then assume the user specified a labelling value as not being the text of a nearby web element, 
 	 * but the web element itself.
 	 * 
 	 * @param labelElements
-	 * @param attributeValues
 	 * @return
 	 */
-	private List<WebElement> tryLabelIsSoughtField(List<Element> labelElements, List<String> attributeValues) {
+	private List<WebElement> tryLabelIsSoughtField(List<Element> labelElements) {
 		List<WebElement> filtered = new ArrayList<WebElement>();
 		List<WebElement> buttonLabels = new ArrayList<WebElement>();
 		for(Element elmt : labelElements) {
@@ -154,7 +188,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	 * @param attributeValues
 	 * @return
 	 */
-	private List<WebElement> tryTraditionalLabelSearchMethod(WebElement labelElement, List<String> attributeValues) {
+	private List<WebElement> tryTraditionalLabelSearchMethod(WebElement labelElement) {
 		List<WebElement> flds = new ArrayList<WebElement>();
 		if("label".equals(labelElement.getTagName())) {
 			String id = labelElement.getAttribute("for");
@@ -176,15 +210,19 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	 * @param labelElement
 	 * @return
 	 */
-	private List<WebElement> trySearchingOutwardFromLabel(WebElement labelElement, List<String> attributeValues) {
+	private List<WebElement> trySearchingOutwardFromLabel(WebElement labelElement) {
+		return trySearchingOutwardFromLabel(labelElement, labelElement);
+	}
+	
+	private List<WebElement> trySearchingOutwardFromLabel(WebElement searchCtx, WebElement labelElement) {
 
-		List<WebElement> candidates = elementType.findAll(labelElement);
+		List<WebElement> candidates = elementType.findAll(searchCtx);
 
 		if(candidates.isEmpty()) {
 			// WebElement parent = getParentElement(element);
 			WebElement parent = null;
 			try {
-				parent = labelElement.findElement(By.xpath("./.."));
+				parent = searchCtx.findElement(By.xpath("./.."));
 			} 
 			catch (InvalidSelectorException e) {
 				// Runtime exception thrown when you are at the top of the DOM and try to select higher.
@@ -192,14 +230,12 @@ public class LabelledElementLocator extends AbstractElementLocator {
 				return candidates;
 			}
 			if(parent != null) {
-				return trySearchingOutwardFromLabel(parent, attributeValues);
+				return trySearchingOutwardFromLabel(parent, labelElement);
 			}
 			return candidates;
 		}
 		else {
-			if(ElementType.HYPERLINK.equals(elementType)) {
-				System.out.println("RESUME NEXT");
-			}
+			filterHyperlinkCandidates(labelElement, candidates);
 			if(attributeValues.isEmpty()) {
 				return candidates;
 			}
@@ -207,8 +243,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 				// If parameters are present beyond the first, they are attribute values, so pick only 
 				// those webElements that have every attributeValue accounted for among their attributes.
 				AttributeInspector inspector = new AttributeInspector(candidates);
-				List<WebElement> filtered = inspector.findForValues(attributeValues);
-				return filtered;
+				return inspector.findForValues(attributeValues);
 			}
 		}
 	}
@@ -264,6 +299,30 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	}
 	
 	/**
+	 * A list of hyperlinks can be found as the result of a search for anything nearest the label that
+	 * matches the hyperlink tag. However, if the hyperlink does not wrap any child elements and does
+	 * does not have innerText that matches the label, then it must be removed from the list.
+	 * TODO:
+	 *    Introduce logic that only does this if there are no attributes to further identify the hyperlink/
+	 *    One of the attributes could be the value that is compared to the innerText of the hyperlink.
+	 * @param labelElement
+	 * @param candidates
+	 */
+	private void filterHyperlinkCandidates(WebElement labelElement, List<WebElement> candidates) {
+		if(ElementType.HYPERLINK.equals(elementType)) {
+			for (Iterator<WebElement> iterator = candidates.iterator(); iterator.hasNext();) {
+				WebElement candidate = (WebElement) iterator.next();
+				List<WebElement> children = candidate.findElements(By.xpath(".//*"));
+				if(children.isEmpty()) {
+					if(!Utils.trimIgnoreCaseUnemptyEqual(candidate.getText(), labelElement.getText())) {
+						iterator.remove();
+					}
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Find a web element that is a parent to the specified child element.
 	 * This only works if javascript is enabled on the driver.
 	 * @param childElement
@@ -275,6 +334,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 		WebElement parentElement = (WebElement)executor.executeScript("return arguments[0].parentNode;", childElement);
 		return parentElement;
 	}
+	
 	@Override
 	protected Element getElement(WebDriver driver, WebElement we) {
 		return new BasicElement(driver, we);

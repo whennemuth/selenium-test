@@ -138,6 +138,9 @@ public class ClassBasedElementLocatorTest {
 				}
 				return retval;
 			}}).when(webElement).getAttribute(any(String.class));
+		
+		when(webElement.isDisplayed()).thenReturn(true);
+		when(webElement.isEnabled()).thenReturn(true);
 	}
 	
 	@Test

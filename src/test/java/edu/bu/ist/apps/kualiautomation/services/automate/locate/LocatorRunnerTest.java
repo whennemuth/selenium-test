@@ -31,11 +31,6 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		handlers.put("address-book-lookup", "AddressBookLookup1.htm");
 		handlers.put("AddressBookLookup1_files", "AddressBookLookup1_files");
 	}
-
-	@Test
-	public void test() {
-		fail("Not yet implemented");
-	}
 	
 	@Test
 	public void assert01FindSearchButtonImage() {

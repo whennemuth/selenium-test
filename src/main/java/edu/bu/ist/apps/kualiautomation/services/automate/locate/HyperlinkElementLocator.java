@@ -52,6 +52,7 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 			}
 			
 			// 3) If a WebElement is not an anchor tag, regard it as an element that labels an anchor tag and use the LabelledElementLocator to find it.
+			boolean foundOne = false;
 			for(@SuppressWarnings("unused") WebElement label : labels) {
 				//if(!attributeValues.isEmpty()) {
 					LabelledElementLocator labelledLocator = new LabelledElementLocator(driver, searchContext);
@@ -60,9 +61,28 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 					for(Element anchorTagElement : anchorTagElements) {
 						if(!anchortags.contains(anchorTagElement.getWebElement())) {
 							anchortags.add(anchorTagElement.getWebElement());
+							foundOne = true;
 						}
 					}
 				//}
+			}
+			if(!foundOne) {
+				// Treat the anchortags as if they exist in a table and that the label is a row or column header of that
+				// table. Reduce the list down to those that are "closest" in the table to the label.
+				List<Element> lbls = new ArrayList<Element>();
+				for(WebElement label : labels) {
+					lbls.add(new BasicElement(driver, label));
+				}
+				List<WebElement> tableBased = LabelledElementLocator.getBestInTable(
+						driver, 
+						elementType, 
+						lbls, 
+						anchortags, 
+						parameters);
+				if(!tableBased.isEmpty()) {
+					anchortags.clear();
+					anchortags.addAll(tableBased);
+				}
 			}
 			
 			//4)  With all of the anchor tags found, remove those that do not have an attribute value for each value in attributeValues
