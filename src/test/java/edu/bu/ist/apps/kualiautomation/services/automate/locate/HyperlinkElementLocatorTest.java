@@ -20,6 +20,7 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 	}
 
 	private HyperlinkElementLocator locator;
+	private String url = "http://localhost:8080/hyperlink-page";
 	
 	@Override
 	public void setupBefore() { 
@@ -30,20 +31,20 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 	public void loadHandlers(Map<String, String> handlers) {
 		handlers.put("hyperlink-page", "HyperlinkPage.htm");
 	}
-
+	
 	@Test
-	public void assert01Links1and2() {
-		
-		String url = "http://localhost:8080/hyperlink-page";
-		
+	public void assert01Links1and2() {		
 		new ElementsAssertion(locator)
-		.setUrl(url)
+		.setUrl("http://localhost:8080/hyperlink-page")
 		.setLabel("anchor tag 1")
 		.setElementType(ElementType.HYPERLINK)
 		.setNumResults(1)
 		.addAttributeAssertion("testid", "a1")
-		.findAndAssertElements();
-		
+		.findAndAssertElements();		
+	}
+	
+	@Test
+	public void assert02Links1and2() {				
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.setLabel("anchor TAG 2")
@@ -51,7 +52,10 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		.setNumResults(1)
 		.addAttributeAssertion("testid", "a2")
 		.findAndAssertElements();
-		
+	}
+	
+	@Test
+	public void assert03Links1and2() {			
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.addAttributeValue("anchor tag 2")
@@ -59,7 +63,10 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		.setNumResults(1)
 		.addAttributeAssertion("testid", "a2")
 		.findAndAssertElements();
-		
+	}
+	
+	@Test
+	public void assert04Links1and2() {			
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.setLabel("anchor tag")
@@ -69,57 +76,17 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 	}
 
 	@Test
-	public void assert02Links3() {
-		
-		String url = "http://localhost:8080/hyperlink-page";
-		
+	public void assert05Links4() {		
 		new ElementsAssertion(locator)
 		.setUrl(url)
-		.setLabel("anchor tag 3")
+		.setLabel("anchor tag 4")
 		.setElementType(ElementType.HYPERLINK)
 		.setNumResults(2)
-		.findAndAssertElements();
-		
-		new ElementsAssertion(locator)
-		.setUrl(url)
-		.setLabel("anchor tag 3")
-		.addAttributeValue("anchor3b")
-		.setElementType(ElementType.HYPERLINK)
-		.setNumResults(1)
-		.addAttributeAssertion("testid", "a4")
-		.findAndAssertElements();
-		
-		new ElementsAssertion(locator)
-		.setUrl(url)
-		.addAttributeValue("anchor tag 3")
-		.addAttributeValue("anchor3a")
-		.setElementType(ElementType.HYPERLINK)
-		.setNumResults(1)
-		.addAttributeAssertion("testid", "a3")
-		.findAndAssertElements();
-		
-		 new ElementsAssertion(locator)
-		.setUrl(url)
-		.addAttributeValue("anchor tag 3")
-		.addAttributeValue("anchor3b")
-		.setElementType(ElementType.HYPERLINK)
-		.setNumResults(1)
-		.addAttributeAssertion("testid", "a4")
 		.findAndAssertElements();
 	}
 
 	@Test
-	public void assert03Links4() {
-		
-		String url = "http://localhost:8080/hyperlink-page";
-		
-		new ElementsAssertion(locator)
-		.setUrl(url)
-		.setLabel("anchor tag 4")
-		.setElementType(ElementType.HYPERLINK)
-		.setNumResults(2)
-		.findAndAssertElements();
-		
+	public void assert06Links4() {		
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.setLabel("anchor tag 4")
@@ -128,7 +95,10 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		.setNumResults(1)
 		.addAttributeAssertion("testid", "a5")
 		.findAndAssertElements();
-		
+	}
+
+	@Test
+	public void assert07Links4() {		
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.addAttributeValue("anchor4")
@@ -136,7 +106,10 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		.setNumResults(1)
 		.addAttributeAssertion("testid", "a5")
 		.findAndAssertElements();
-		
+	}
+
+	@Test
+	public void assert08Links4() {		
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.setLabel("label 4")
@@ -148,17 +121,17 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 	}
 
 	@Test
-	public void assert04Links5() {
-		
-		String url = "http://localhost:8080/hyperlink-page";
-		
+	public void assert09Links5() {		
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.setLabel("anchor tag 5")
 		.setElementType(ElementType.HYPERLINK)
 		.setNumResults(2)
 		.findAndAssertElements();
-		
+	}
+
+	@Test
+	public void assert10Links5() {		
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.setLabel("anchor tag 5")
@@ -167,7 +140,10 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		.setNumResults(1)
 		.addAttributeAssertion("testid", "a8")
 		.findAndAssertElements();
-		
+	}
+
+	@Test
+	public void assert11Links5() {		
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.addAttributeValue("anchor5")
@@ -175,8 +151,10 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		.setNumResults(1)
 		.addAttributeAssertion("testid", "a8")
 		.findAndAssertElements();
-		
-		//
+	}
+
+	@Test
+	public void assert12Links5() {		
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.setLabel("label 5a")
@@ -187,10 +165,7 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 	}
 
 	@Test
-	public void assert05Links6() {
-		
-		String url = "http://localhost:8080/hyperlink-page";
-
+	public void assert13Links6() {
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.setLabel("label 6")
@@ -198,7 +173,10 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		.setNumResults(1)
 		.addAttributeAssertion("testid", "a9")
 		.findAndAssertElements();
-		
+	}
+
+	@Test
+	public void assert14Links6() {
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.setLabel("anchor tag 6")
@@ -206,7 +184,10 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		.setNumResults(1)
 		.addAttributeAssertion("testid", "a9")
 		.findAndAssertElements();
-		
+	}
+
+	@Test
+	public void assert15Links6() {
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.addAttributeValue("anchor tag 6")
@@ -214,7 +195,10 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		.setNumResults(1)
 		.addAttributeAssertion("testid", "a9")
 		.findAndAssertElements();
-		
+	}
+
+	@Test
+	public void assert16Links6() {
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.addAttributeValue("label 6")
@@ -222,7 +206,10 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		.setNumResults(1)
 		.addAttributeAssertion("testid", "a9")
 		.findAndAssertElements();
-		
+	}
+
+	@Test
+	public void assert17Links6() {
 		new ElementsAssertion(locator)
 		.setUrl(url)
 		.setLabel("top label")
@@ -231,6 +218,5 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 		.setNumResults(1)
 		.addAttributeAssertion("testid", "a9")
 		.findAndAssertElements();
-
 	}
 }

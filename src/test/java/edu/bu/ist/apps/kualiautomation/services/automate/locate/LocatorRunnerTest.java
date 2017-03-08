@@ -67,6 +67,7 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		new ElementsAssertion(runner, true)
 		.setUrl("http://localhost:8080/address-book-lookup")
 		.addLabelAndValue(lv)
+		.addAttributeValue("return value")
 		.setNumResults(1)
 		.setTagNameAssertion("a")
 		.setTextAssertion("return value")
