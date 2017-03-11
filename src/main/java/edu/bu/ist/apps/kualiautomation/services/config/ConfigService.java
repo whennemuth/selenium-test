@@ -39,7 +39,7 @@ public class ConfigService {
         EntityManagerFactory factory = null;
         EntityManager em = null;
         try {
-            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME + "-readonly");
             em = factory.createEntityManager();
         	List<Config> configs = new ArrayList<Config>();
         	if(user == null) {
@@ -59,10 +59,7 @@ public class ConfigService {
 			}
 		} 
 	    finally {
-	    	if(em != null && em.isOpen())
-	    		em.close();
-	    	if(factory != null && factory.isOpen())
-	    		factory.close();
+	    	shutdown(factory, em);
 		}
 	}
 	
@@ -70,16 +67,13 @@ public class ConfigService {
         EntityManagerFactory factory = null;
         EntityManager em = null;
         try {
-            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME + "-readonly");
             em = factory.createEntityManager();
         	Config cfg = em.find(Config.class, configId);
         	return cfg;
 		} 
 	    finally {
-	    	if(em != null && em.isOpen())
-	    		em.close();
-	    	if(factory != null && factory.isOpen())
-	    		factory.close();
+	    	shutdown(factory, em);
 		}
 	}
 	
@@ -87,19 +81,17 @@ public class ConfigService {
         EntityManagerFactory factory = null;
         EntityManager em = null;
         try {
-            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
-            em = factory.createEntityManager();
+        	factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME + "-readonly");
+        	em = factory.createEntityManager(); 
+        	
             ConfigEnvironment env = em.find(ConfigEnvironment.class, cfgEnvId);
         	return env;
 		} 
 	    finally {
-	    	if(em != null && em.isOpen())
-	    		em.close();
-	    	if(factory != null && factory.isOpen())
-	    		factory.close();
+	    	shutdown(factory, em);
 		}
 	}
-
+	
 	private Config getEmptyConfig(boolean defaultEnvironments) {
 		Config cfg = new Config();
 		ConfigDefaults.populate(cfg);
@@ -167,11 +159,24 @@ public class ConfigService {
         	throw e;
         }
 	    finally {
-	    	if(em != null && em.isOpen())
-	    		em.close();
-	    	if(factory != null && factory.isOpen())
-	    		factory.close();
+	    	shutdown(factory, em);
 		}			
+	}
+
+	private void shutdown(EntityManagerFactory factory, EntityManager em) {
+		EntityTransaction trans = null;
+		if(em != null && em.isOpen()) {
+			//trans = em.getTransaction();
+		    //trans.begin();
+		    //em.createNativeQuery("SHUTDOWN").executeUpdate();
+		    //if(trans.isActive()) {
+			//    trans.commit();
+		    //}
+    		em.close();
+    	}
+    	if(factory != null && factory.isOpen()) {
+    		factory.close();
+    	}
 	}
 	
 	/**

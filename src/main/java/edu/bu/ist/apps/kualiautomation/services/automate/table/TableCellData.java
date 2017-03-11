@@ -7,6 +7,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
+import edu.bu.ist.apps.kualiautomation.services.automate.element.AbstractWebElement;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**
@@ -67,13 +68,15 @@ public class TableCellData {
 		cell.childWebElement = childWebElement;		
 		cell.javascript = Utils.getClassPathResourceContent(JavascriptResourceURL);		
 		cell.executor = (JavascriptExecutor) searchContext;
-		cell.childHTML = (String) cell.executor.executeScript("return arguments[0].outerHTML;", childWebElement);
+		cell.childHTML = (String) cell.executor.executeScript(
+				"return arguments[0].outerHTML;", 
+				AbstractWebElement.unwrap(childWebElement));
 		
 		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> cellsinfo = (List<Map<String, Object>>) cell.executor.executeScript(
 				cell.javascript, 
 				"cell", 
-				childWebElement);
+				AbstractWebElement.unwrap(childWebElement));
 		
 		if(cellsinfo.isEmpty()) {
 			return null; // The childWebElement was not found to have a table anywhere along its element ancestry.
@@ -163,11 +166,11 @@ public class TableCellData {
 
 	public int getIndexInSharedRow(TableCellData deeperCell) {
 
-		WebElement parentCell = (WebElement) executor.executeScript(
+		WebElement parentCell = AbstractWebElement.wrap((WebElement) executor.executeScript(
 				javascript, 
 				"ancestorcell", 
-				deeperCell.webElement, 
-				depth);
+				AbstractWebElement.unwrap(deeperCell.webElement), 
+				depth));
 		
 		if(parentCell == null) {
 			return deeperCell.columnIndex;

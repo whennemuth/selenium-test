@@ -2,9 +2,14 @@ package edu.bu.ist.apps.kualiautomation.services.automate;
 
 import java.io.OutputStream;
 
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.WebClient;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
@@ -33,11 +38,15 @@ public class Session implements Runnable {
 	@Override
 	public void run() {
 		
+		System.setProperty("webdriver.chrome.driver", "C:\\Users\\wrh\\Desktop\\chromedriver_win32\\chromedriver.exe");
+		
 		try {
 			if(config.isHeadless())
-				driver = new HtmlUnitDriver();
+				driver = new CustomHtmlUnitDriver(BrowserVersion.FIREFOX_38, true);
 			else
-				driver = new FirefoxDriver();	
+				driver = new org.openqa.selenium.chrome.ChromeDriver();
+				//driver = new FirefoxDriver();
+			
 			
 			if( login()) {
 			
@@ -52,8 +61,13 @@ public class Session implements Runnable {
 		}
 		finally {
 			if(terminate()) {
-				driver.close();
-				driver.quit();
+				try {
+					driver.close();
+					driver.quit();
+				} 
+				catch (NoSuchWindowException e) {
+					// Do nothing. It just means we are in headless mode.
+				}
 			}
 		}
 	}
@@ -104,6 +118,28 @@ public class Session implements Runnable {
 		if(config.isHeadless())
 			return true;
 		return terminate;
+	}
+
+	/**
+	 * Allow for enabled javascript, but do not throw exceptions.
+	 * @author wrh
+	 *
+	 */
+	public static class CustomHtmlUnitDriver extends HtmlUnitDriver {
+		public CustomHtmlUnitDriver(boolean javascriptEnabled) {
+			super(javascriptEnabled);
+		}
+		public CustomHtmlUnitDriver(DesiredCapabilities capabilities) {
+			super(capabilities);
+		}
+		public CustomHtmlUnitDriver(BrowserVersion firefox38, boolean javascriptEnabled) {
+			super(firefox38, javascriptEnabled);
+		}
+		@Override protected WebClient modifyWebClient(WebClient client) {
+			WebClient modifiedClient = super.modifyWebClient(client);
+			modifiedClient.getOptions().setThrowExceptionOnScriptError(false);
+			return modifiedClient;
+		}
 	}
 	
 	public static void main(String[] args) {

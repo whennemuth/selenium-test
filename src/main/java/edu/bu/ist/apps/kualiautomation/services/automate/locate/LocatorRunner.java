@@ -181,6 +181,9 @@ public class LocatorRunner {
 			if(Utils.isEmpty(lv.getIdentifier())) {
 				parms = new String[]{ lv.getLabel() };
 			}
+			else if(Utils.isEmpty(lv.getLabel())) {
+				parms = new String[]{ lv.getIdentifier() };
+			}
 			else {
 				parms = new String[]{ lv.getLabel(), lv.getIdentifier() };
 			}

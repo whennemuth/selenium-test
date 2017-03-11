@@ -12,6 +12,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import edu.bu.ist.apps.kualiautomation.services.automate.element.AbstractWebElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.AttributeInspector;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
@@ -57,7 +58,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 		this.labelElements.addAll(labelElements);
 	}
 	
-	public static List<WebElement> getBestInTable(
+	public static List<Element> getBestInTable(
 			WebDriver driver,
 			ElementType elementType,
 			List<Element> labelElements, 
@@ -65,12 +66,11 @@ public class LabelledElementLocator extends AbstractElementLocator {
 			List<String> parameters) {
 		
 		LabelledElementLocator locator = new LabelledElementLocator(driver);
-		locator.elementType = elementType;
 		locator.labelElements.addAll(labelElements);
 		locator.tableElements.addAll(tableElements);
-		locator.parameters = parameters;
 		locator.tableOnly = true;
-		return locator.customLocate();
+		
+		return locator.locateAll(elementType, parameters);
 	}
 	
 	/**
@@ -80,78 +80,104 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	 */
 	@Override
 	protected List<WebElement> customLocate() {
-		
-		if(!tableOnly) {
-			labelElements.clear();
-			tableElements.clear();
-			attributeValues.clear();
-		}
-		
-		List<WebElement> located = new ArrayList<WebElement>();
-		if(elementType != null && elementType.getTagname() != null) {
-			
-			String label = new String(parameters.get(0));
-			if(parameters.size() > 1) {
-				attributeValues.addAll(parameters.subList(1, parameters.size()));
-			}
-			
-			if(!tableOnly) {
-				LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext);
-				labelLocator.setIgnoreHidden(super.ignoreHidden);
-				labelLocator.setIgnoreDisabled(super.ignoreDisabled);
-				labelLocator.setLabelCanBeHyperlink(this.labelCanBeHyperlink);
-				labelElements.addAll(labelLocator.locateAll(elementType, Arrays.asList(new String[]{label})));
 				
-				located.addAll(tryLabelIsSoughtField(labelElements));
-			}
-			
-			if(located.isEmpty()) {
-				// Assume that more than one label is found and subdivide searches by each.
-				LabelledElementBatches batches1 = new LabelledElementBatches();
+		List<WebElement> located;
+		try {
+			located = new ArrayList<WebElement>();
+			if(elementType != null && elementType.getTagname() != null) {
 				
-				if(tableOnly) {
-					for(Element labelElement : labelElements) {	
-						batches1.add(labelElement, tableElements);
-					}
-				}
-				else {
-					for(Element labelElement : labelElements) {				
-						List<WebElement> flds = tryTraditionalLabelSearchMethod(labelElement.getWebElement());
-						if(flds.isEmpty()) {
-							flds = trySearchingOutwardFromLabel(labelElement.getWebElement());
-						}
-						batches1.add(labelElement, flds);
-					}
+				String label = new String(parameters.get(0));
+				if(parameters.size() > 1) {
+					attributeValues.addAll(parameters.subList(1, parameters.size()));
 				}
 				
-				batches1.loadOneToOneResultBatches(located);
+				if(!tableOnly && labelElements.isEmpty()) {
+					LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext);
+					labelLocator.setIgnoreHidden(super.ignoreHidden);
+					labelLocator.setIgnoreDisabled(super.ignoreDisabled);
+					labelLocator.setLabelCanBeHyperlink(this.labelCanBeHyperlink);
+					labelElements.addAll(labelLocator.locateAll(elementType, Arrays.asList(new String[]{label})));
+					
+					located.addAll(tryLabelIsSoughtField(labelElements));
+				}
 				
 				if(located.isEmpty()) {
-					// No label search produced a single result. Assume these labels and fields exist in a table and try to
-					// narrow down the results for each label by their relative proximity within the table to that label.
-					LabelledElementBatches batches2 = new LabelledElementBatches();
-					for(Batch batch : batches1.getBatches()) {
-						List<WebElement> tableFlds = tryTabularSearchMethod(
-								batch.getLabel().getWebElement(), 
-								batch.getBatch());
-	
-						batches2.add(batch.getLabel(), tableFlds);
+					// Assume that more than one label is found and subdivide searches by each.
+					LabelledElementBatches batches1 = new LabelledElementBatches();
+					
+					if(tableOnly) {
+						for(Element labelElement : labelElements) {	
+							filterHyperlinkCandidates(labelElement.getWebElement(), tableElements);
+							if(!tableElements.isEmpty()) {
+								batches1.add(labelElement, tableElements);
+							}
+						}
+					}
+					else {
+						for(Element labelElement : labelElements) {				
+							List<WebElement> flds = tryTraditionalLabelSearchMethod(labelElement.getWebElement());
+							if(flds.isEmpty()) {
+								flds = trySearchingOutwardFromLabel(labelElement.getWebElement());
+							}
+							//if(flds.size() > 1 && attributeValues.isEmpty()) {
+							if(flds.size() > 1) {
+								// 1 is ARBITRARY. It's a limit set to avoid additional time consuming calls to 
+								// tryTabularSearchMethod(). Doing this however locks in a state where the links are  
+								// the label and can only qualify if their innerText or additional attributes match the.
+								// the label value. A single matched link does not have to qualify as the label and can be merely "labelled".
+								filterHyperlinkCandidates(labelElement.getWebElement(), flds);
+							}
+							if(!flds.isEmpty()) {
+								batches1.add(labelElement, flds);
+							}
+						}
 					}
 					
-					batches2.loadOneToOneResultBatches(located);
+					batches1.loadOneToOneResultBatches(located);
 					
-					if(located.isEmpty()) {
-						batches2.loadSmallestResultBatches(located);
+					if(located.isEmpty() && !batches1.getBatches().isEmpty()) {
+						// No label search produced a single result. Assume these labels and fields exist in a table and try to
+						// narrow down the results for each label by their relative proximity within the table to that label.
+						LabelledElementBatches batches2 = new LabelledElementBatches();
+						for(Batch batch : batches1.getBatches()) {
+							
+							List<WebElement> tableFlds = tryTabularSearchMethod(
+									batch.getLabel().getWebElement(), 
+									batch.getBatch());
+
+							batches2.add(batch.getLabel(), tableFlds);
+							
+							batches2.loadOneToOneResultBatches(located);
+							if(!located.isEmpty()) {
+								// There may be another one-to-one match in the next batch, but we'll take the first one we can get.
+								// This minimizes calls to tryTabularSearchMethod, which will probably only get more expensive 
+								// because the batches1 list is sorted by the amount of WebElements each batch has.
+								//
+								// NOTE: The long-term solution is to speed up tryTabularSearchMethod somehow so this doesn't matter.
+								break;
+							}
+						}
+						
+						if(located.isEmpty()) {
+							batches2.loadSmallestResultBatches(located);
+						}
+						
+						if(located.isEmpty()) {
+							batches2.loadAllResultBatches(located);
+						}
+						
+						if(located.isEmpty()) {
+							batches1.loadAllResultBatches(located);
+						}
 					}
-					
-					if(located.isEmpty()) {
-						batches2.loadAllResultBatches(located);
-					}
-					
-					if(located.isEmpty()) {
-						batches1.loadAllResultBatches(located);
-					}
-				}
+				}			
+			}
+		} 
+		finally {
+			if(!tableOnly) {
+				labelElements.clear();
+				tableElements.clear();
+				attributeValues.clear();
 			}			
 		}
 		
@@ -200,7 +226,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 		if("label".equals(labelElement.getTagName())) {
 			String id = labelElement.getAttribute("for");
 			if(!Utils.isEmpty(id)) {
-				List<WebElement> temp = driver.findElements(By.id(id));
+				List<WebElement> temp = AbstractWebElement.wrap(driver.findElements(By.id(id)));
 				for(WebElement candidate : temp) {
 					if(ElementType.getInstance(candidate).equals(elementType)) {
 						flds.add(candidate);
@@ -223,13 +249,13 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	
 	private List<WebElement> trySearchingOutwardFromLabel(WebElement searchCtx, WebElement labelElement) {
 
-		List<WebElement> candidates = elementType.findAll(searchCtx);
+		List<WebElement> candidates = AbstractWebElement.wrap(elementType.findAll(searchCtx));
 
 		if(candidates.isEmpty()) {
 			// WebElement parent = getParentElement(element);
 			WebElement parent = null;
 			try {
-				parent = searchCtx.findElement(By.xpath("./.."));
+				parent = AbstractWebElement.wrap(searchCtx.findElement(By.xpath("./..")));
 			} 
 			catch (InvalidSelectorException e) {
 				// Runtime exception thrown when you are at the top of the DOM and try to select higher.
@@ -242,9 +268,6 @@ public class LabelledElementLocator extends AbstractElementLocator {
 			return candidates;
 		}
 		else {
-			if(tableOnly) {
-				filterHyperlinkCandidates(labelElement, candidates);
-			}
 			if(attributeValues.isEmpty()) {
 				return candidates;
 			}
@@ -316,17 +339,19 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	 */
 	private void filterHyperlinkCandidates(WebElement labelElement, List<WebElement> candidates) {
 		if(ElementType.HYPERLINK.equals(elementType)) {
-			outerloop:
 			for (Iterator<WebElement> iterator = candidates.iterator(); iterator.hasNext();) {
 				WebElement candidate = (WebElement) iterator.next();
-				List<WebElement> children = candidate.findElements(By.xpath(".//*"));
+				List<WebElement> children = new ArrayList<WebElement>();
+				//List<WebElement> children = AbstractWebElement.wrap(candidate.findElements(By.xpath(".//*")));
 				if(children.isEmpty()) {
-					if(!Utils.trimIgnoreCaseUnemptyEqual(candidate.getText(), labelElement.getText())) {
-						for(String attribute : attributeValues) {
-							if(Utils.trimIgnoreCaseUnemptyEqual(candidate.getText(), attribute)) {
-								continue outerloop;
-							}
-						}
+					List<WebElement> filtered = new ArrayList<WebElement>();
+					AttributeInspector inspector = new AttributeInspector(candidate);
+					if(attributeValues.isEmpty())
+						filtered = inspector.findAnyForValue(labelElement.getText());
+					else
+						filtered = inspector.findForValues(attributeValues);
+					
+					if(filtered.isEmpty()) {
 						iterator.remove();
 					}
 				}
@@ -343,7 +368,9 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	@SuppressWarnings("unused")
 	private WebElement getParentElement(WebElement childElement) {
 		JavascriptExecutor executor = (JavascriptExecutor)searchContext;
-		WebElement parentElement = (WebElement)executor.executeScript("return arguments[0].parentNode;", childElement);
+		WebElement parentElement = AbstractWebElement.wrap((WebElement)executor.executeScript(
+				"return arguments[0].parentNode;", 
+				AbstractWebElement.unwrap(childElement)));
 		return parentElement;
 	}
 	

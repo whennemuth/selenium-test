@@ -10,6 +10,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import edu.bu.ist.apps.kualiautomation.services.automate.element.AbstractWebElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
@@ -84,7 +85,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 		
 		/** 1) Search for full length match */
 		String xpath = scope + XPATH_EQUALS.replace("[INSERT-LABEL]", label);
-		List<WebElement> elements = searchContext.findElements(By.xpath(xpath));
+		List<WebElement> elements = AbstractWebElement.wrap(searchContext.findElements(By.xpath(xpath)));
 		applyFiltering(elements, label);
 		
 		/** 2) Search for full length match where the label is the value of a button
@@ -99,7 +100,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 		/** 3) Search for match that starts with the provided value */
 		if(elements.isEmpty()) {
 			xpath = scope + XPATH_STARTS_WITH.replace("[INSERT-LABEL]", cleanedLabel);
-			elements = searchContext.findElements(By.xpath(xpath));
+			elements = AbstractWebElement.wrap(searchContext.findElements(By.xpath(xpath)));
 			applyFiltering(elements, label);
 			
 			if(!elements.isEmpty()) {
@@ -123,7 +124,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 		 */
 		if(elements.isEmpty()) {
 			xpath = scope + XPATH_CONTAINS.replace("[INSERT-LABEL]", cleanedLabel);
-			elements = searchContext.findElements(By.xpath(xpath));
+			elements = AbstractWebElement.wrap(searchContext.findElements(By.xpath(xpath)));
 			applyFiltering(elements, label);
 		}
 

@@ -51,54 +51,113 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 					labels.add(we);
 			}
 			
-			// 3) If a WebElement is not an anchor tag, regard it as an element that labels an anchor tag and use the LabelledElementLocator to find it.
-			boolean foundOne = false;
-			for(@SuppressWarnings("unused") WebElement label : labels) {
-				//if(!attributeValues.isEmpty()) {
-					LabelledElementLocator labelledLocator = new LabelledElementLocator(driver, searchContext);
-					//labelledLocator.setLabelCanBeHyperlink(false);
-					List<Element> anchorTagElements = labelledLocator.locateAll(ElementType.HYPERLINK, parameters);
-					for(Element anchorTagElement : anchorTagElements) {
-						if(!anchortags.contains(anchorTagElement.getWebElement())) {
-							anchortags.add(anchorTagElement.getWebElement());
-							foundOne = true;
+			List<WebElement> finalresults = new ArrayList<WebElement>();
+					
+			if(anchortags.size() == 1 || labels.isEmpty()) {
+				finalresults.addAll(anchortags);
+			}
+			else {
+				
+				// 3) Find out if the elements found so far are in a table and we can pick one from it that best matches label.
+				List<WebElement> tabledAnchortags1 = filterByTabularLogic(labels, anchortags);
+				List<WebElement> tabledAnchortags2 = new ArrayList<WebElement>();
+				List<WebElement> tabledAnchortags3 = new ArrayList<WebElement>();
+						
+				if(tabledAnchortags1.size() == 1) {
+					finalresults.addAll(tabledAnchortags1);
+				}
+				else {
+					
+					// 4) We turned up another label in the initial search for anchor tags. Regard it as an element that 
+					// labels one or more other anchor tags and use the LabelledElementLocator to find them.
+					for(@SuppressWarnings("unused") WebElement label : labels) {
+						LabelledElementLocator labelledLocator = new LabelledElementLocator(driver, searchContext, getElements(labels));
+						labelledLocator.setLabelCanBeHyperlink(false);
+						List<Element> anchorTagElements = labelledLocator.locateAll(ElementType.HYPERLINK, parameters);
+						for(Element anchorTagElement : anchorTagElements) {
+							if(!tabledAnchortags1.contains(anchorTagElement.getWebElement())) {
+								tabledAnchortags2.add(anchorTagElement.getWebElement());
+							}
 						}
 					}
-				//}
-			}
-			if(!foundOne) {
-				// Treat the anchortags as if they exist in a table and that the label is a row or column header of that
-				// table. Reduce the list down to those that are "closest" in the table to the label.
-				List<Element> lbls = new ArrayList<Element>();
-				for(WebElement label : labels) {
-					lbls.add(new BasicElement(driver, label));
-				}
-				List<WebElement> tableBased = LabelledElementLocator.getBestInTable(
-						driver, 
-						elementType, 
-						lbls, 
-						anchortags, 
-						parameters);
-				if(!tableBased.isEmpty()) {
-					anchortags.clear();
-					anchortags.addAll(tableBased);
+					
+					// 5) Repeat the table-based search for any newly found elements
+					if(tabledAnchortags2.size() == 1) {
+						finalresults.addAll(tabledAnchortags2);
+					}
+					else {
+						tabledAnchortags3 = filterByTabularLogic(labels, tabledAnchortags2);
+						if(tabledAnchortags3.size() == 1) {
+							finalresults.addAll(tabledAnchortags3);
+						}
+						else {
+							finalresults = mergeAll(tabledAnchortags1, tabledAnchortags2, tabledAnchortags3);
+						}
+					}
 				}
 			}
 			
-			//4)  With all of the anchor tags found, remove those that do not have an attribute value for each value in attributeValues
-			AttributeInspector inspector = new AttributeInspector(searchContext, anchortags);
+			// 6)  With all of the anchor tags found, remove those that do not have an attribute value for each value in attributeValues
+			AttributeInspector inspector = new AttributeInspector(searchContext, finalresults);
 			located.addAll(inspector.findForValues(attributeValues));
 		}
 		
 		return located;
 	}
 
+	/**
+	 * Treat the anchortags as if they exist in a table and that the label is a row or column header of that
+	 * table. Reduce the list down to those that are "closest" in the table to the label.
+	 * @param labels
+	 * @param anchortags
+	 */
+	private List<WebElement> filterByTabularLogic(List<WebElement> labels, List<WebElement> anchortags) {
+		List<Element> lbls = getElements(labels);
+		return getWebElements(LabelledElementLocator.getBestInTable(
+				driver, 
+				elementType, 
+				lbls, 
+				anchortags, 
+				parameters));
+//		if(!tableBased.isEmpty()) {
+//			anchortags.clear();
+//			anchortags.addAll(getWebElements(tableBased));
+//		}
+	}
+	
+	private static List<WebElement> merge(List<WebElement> list1, List<WebElement> list2) {
+		List<WebElement> merged = new ArrayList<WebElement>();
+		for(WebElement we : list1) {
+			if(!list2.contains(we)) {
+				merged.add(we);
+			}
+		}
+		merged.addAll(list2);
+		return merged;
+	}
+
+	@SafeVarargs
+	private static final List<WebElement> mergeAll(List<WebElement> list1, List<WebElement>...others) {		
+		for(List<WebElement> other : others) {
+			list1 = merge(list1, other);
+		}
+		return list1;
+	}
+	
 	private List<WebElement> getWebElements(List<Element> elements) {
 		List<WebElement> results = new ArrayList<WebElement>();
 		for(Element e : elements) {
 			results.add(e.getWebElement());
 		}
 		return results;
+	}
+	
+	private List<Element> getElements(List<WebElement> webElements) {
+		List<Element> elements = new ArrayList<Element>();
+		for(WebElement we : webElements) {
+			elements.add(new BasicElement(driver, we));
+		}
+		return elements;
 	}
 
 	@Override

@@ -25,15 +25,15 @@ public class Attribute {
 	private StringBuilder message = new StringBuilder();
 
 	public Attribute(WebElement webElement, Set<String> attributesToCheck) {
-		this.webElement = webElement;
+		this.webElement = AbstractWebElement.wrap(webElement);
 		this.attributesToCheck.addAll(attributesToCheck);
-		this.elementType = ElementType.getInstance(webElement);
+		this.elementType = ElementType.getInstance(this.webElement);
 	}
 
 	public Attribute(WebElement webElement, String attributeToCheck) {
-		this.webElement = webElement;
+		this.webElement = AbstractWebElement.wrap(webElement);
 		this.attributesToCheck.add(attributeToCheck);
-		this.elementType = ElementType.getInstance(webElement);
+		this.elementType = ElementType.getInstance(this.webElement);
 	}
 
 	public boolean exists(String attributeName) {

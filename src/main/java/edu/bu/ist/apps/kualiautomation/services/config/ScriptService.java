@@ -29,7 +29,7 @@ public class ScriptService {
         EntityManagerFactory factory = null;
         EntityManager em = null;
         try {
-            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME + "-readonly");
             em = factory.createEntityManager();
         	Cycle cycle = em.find(Cycle.class, cycleId);
         	return cycle;
@@ -46,7 +46,7 @@ public class ScriptService {
         EntityManagerFactory factory = null;
         EntityManager em = null;
         try {
-            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME + "-readonly");
             em = factory.createEntityManager();
         	List<Cycle> cycles = new ArrayList<Cycle>();
 			TypedQuery<Cycle> query = em.createNamedQuery("Cycle.findByUserId", Cycle.class);
@@ -162,7 +162,7 @@ public class ScriptService {
         EntityManagerFactory factory = null;
         EntityManager em = null;
         try {
-            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME + "-readonly");
             em = factory.createEntityManager();
             Config config = em.find(Config.class, configId);
         	Cycle cycle = em.find(Cycle.class, cycleId);
@@ -232,7 +232,7 @@ public class ScriptService {
         EntityManagerFactory factory = null;
         EntityManager em = null;
         try {
-            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
+            factory = Persistence.createEntityManagerFactory(PERSISTENCE_NAME + "-readonly");
             em = factory.createEntityManager();
         	User user = em.find(User.class, userId);
         	return user;

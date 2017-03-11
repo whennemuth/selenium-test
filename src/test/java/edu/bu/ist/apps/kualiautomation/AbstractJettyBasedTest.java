@@ -16,6 +16,7 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 
 import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
+import edu.bu.ist.apps.kualiautomation.services.automate.Session.CustomHtmlUnitDriver;
 
 /**
  * All test classes that extend this class can access a website run by this class and whose web pages 
@@ -97,24 +98,5 @@ public abstract class AbstractJettyBasedTest {
 	@After
 	public void tearDownAfter() {
 		driver.quit();		
-	}
-
-	/**
-	 * Allow for enabled javascript, but do not throw exceptions.
-	 * @author wrh
-	 *
-	 */
-	public static class CustomHtmlUnitDriver extends HtmlUnitDriver {
-		public CustomHtmlUnitDriver(DesiredCapabilities capabilities) {
-			super(capabilities);
-		}
-		public CustomHtmlUnitDriver(BrowserVersion firefox38, boolean javascriptEnabled) {
-			super(firefox38, javascriptEnabled);
-		}
-		@Override protected WebClient modifyWebClient(WebClient client) {
-			WebClient modifiedClient = super.modifyWebClient(client);
-			modifiedClient.getOptions().setThrowExceptionOnScriptError(false);
-			return modifiedClient;
-		}
 	}
 }

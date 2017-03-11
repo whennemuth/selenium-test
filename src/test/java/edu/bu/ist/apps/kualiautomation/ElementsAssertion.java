@@ -19,6 +19,7 @@ import org.openqa.selenium.WebDriver;
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.Locator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.LocatorRunner;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
@@ -70,26 +71,27 @@ public class ElementsAssertion {
 	 */
 	public List<Element> findAndAssertElements() {
 		
-		openWebPage();
-		
-		List<Element> elements = null;
-		
-		long start = System.currentTimeMillis();
+		try {
+			openWebPage();
+			
+			List<Element> elements = null;
 
-		if(runner == null) 
-			elements = locator.locateAll(elementType, attributeValues);
-		else if(greedy)
-			elements = runner.runNonGreedy(lvs.toArray(new LabelAndValue[lvs.size()]));
-		else
-			elements = runner.runGreedy(lvs.toArray(new LabelAndValue[lvs.size()]));
-		
-		long end = System.currentTimeMillis();		
-		Long duration = (end - start) / 1000L;		
-		System.out.println("location duration is " + duration.toString() + " seconds");
-		
-		assertElements(elements);
-		
-		return elements;
+			AbstractElementLocator.printDuration = true;
+			
+			if(runner == null) 
+				elements = locator.locateAll(elementType, attributeValues);
+			else if(greedy)
+				elements = runner.runNonGreedy(lvs.toArray(new LabelAndValue[lvs.size()]));
+			else
+				elements = runner.runGreedy(lvs.toArray(new LabelAndValue[lvs.size()]));
+			
+			assertElements(elements);
+			
+			return elements;
+		} 
+		finally {
+			AbstractElementLocator.printDuration = false;
+		}
 	}
 	
 	public void assertElements(List<Element> elements) {
@@ -176,7 +178,7 @@ public class ElementsAssertion {
 			if(elementType.getTagname() != null && !elementType.equals(ElementType.HOTSPOT)) {
 				assertEquals(elementType.getTagname().toLowerCase(), element.getWebElement().getTagName().toLowerCase());
 			}
-			if(!elementType.equals(ElementType.HOTSPOT)) {
+			if(elementType.getTypeAttribute() != null) {
 				assertTrue(areEmptyOrEqual(elementType.getTypeAttribute(), element.getWebElement().getAttribute("type")));
 			}
 		}

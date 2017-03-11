@@ -47,6 +47,7 @@ public class RunLog {
 			s.append("]");
 		}
 
+		s.append("\r\n");
 		entries.add(s.toString());
 		if(systemOut)
 			System.out.println(s.toString());

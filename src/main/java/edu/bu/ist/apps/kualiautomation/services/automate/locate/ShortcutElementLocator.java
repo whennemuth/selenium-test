@@ -70,6 +70,7 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 
 	@Override
 	protected List<WebElement> customLocate() {
+				
 		List<WebElement> results = new ArrayList<WebElement>();
 		try {
 			String node = parms.getShortcut().getLabelHierarchyParts()[0];

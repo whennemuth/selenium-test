@@ -195,7 +195,7 @@ public enum ElementType {
 		boolean global = true;
 		if(ctx instanceof WebElement)
 			global = false;
-		List<WebElement> flds = ctx.findElements(By.xpath(getXpath(global)));
+		List<WebElement> flds = AbstractWebElement.wrap(ctx.findElements(By.xpath(getXpath(global))));
 		return flds;
 	}
 	
@@ -209,10 +209,12 @@ public enum ElementType {
 	
 	public static ElementType getInstance(WebElement we) {
 		String type = null;
-		if(we != null && !Utils.isEmpty(we.getTagName())) {
+		String tagname = we == null ? null : we.getTagName();
+		
+		if(!Utils.isEmpty(tagname)) {
 			type = we.getAttribute("type");
 			for(ElementType et : ElementType.values()) {
-				if(we.getTagName().equalsIgnoreCase(et.getTagname())) {
+				if(tagname != null && tagname.equalsIgnoreCase(et.getTagname())) {
 					if(Utils.isEmpty(type) && Utils.isEmpty(et.getTypeAttribute())) {
 						return et;
 					}
@@ -224,17 +226,18 @@ public enum ElementType {
 				}
 			}
 		}
-		if("select".equalsIgnoreCase(we.getTagName())) {
+		
+		if("select".equalsIgnoreCase(tagname)) {
 			if("select-one".equalsIgnoreCase(type) || "select-multiple".equalsIgnoreCase(type)){
 				return SELECT;
 			}
 		}
-		if("textarea".equalsIgnoreCase(we.getTagName())) {
+		else if("textarea".equalsIgnoreCase(tagname)) {
 			if("textarea".equalsIgnoreCase(type)) {
 				return TEXTAREA;
 			}
 		}
-		if("input".equalsIgnoreCase(we.getTagName())) {
+		else if("input".equalsIgnoreCase(tagname)) {
 			if("submit".equalsIgnoreCase(type)) {
 				return BUTTON;
 			}
@@ -245,7 +248,7 @@ public enum ElementType {
 				return TEXTBOX;	// The default type of input is text
 			}
 		}
-		if("button".equalsIgnoreCase(we.getTagName())) {
+		else if("button".equalsIgnoreCase(tagname)) {
 			return BUTTON;
 		}
 		return OTHER;

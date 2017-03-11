@@ -10,6 +10,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import edu.bu.ist.apps.kualiautomation.services.automate.element.AbstractWebElement;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**
@@ -43,7 +44,10 @@ public class TableColumnData {
 	public List<TableColumnCell> getElementsInSameColumnAsLabel() {
 		
 		List<Map<String, Object>> datamaps = (List<Map<String, Object>>) executor.executeScript(
-				javascript, "column", labelElement, webElements);	
+				javascript, 
+				"column", 
+				AbstractWebElement.unwrap(labelElement), 
+				AbstractWebElement.unwrap(webElements));	
 		
 		List<TableColumnCell> filtered = TableColumnCell.getInstances(datamaps);
 		

@@ -62,6 +62,7 @@ public class CycleRunner {
 			for(LabelAndValue lv : suite.getLabelAndValues()) {
 				LocatorRunner locator = new LocatorRunner(driver, runlog);
 				locator.setIgnoreHidden(true);
+				runlog.printMessage(lv, "Searching for:");
 				List<Element> elements = locator.runGreedy(lv);
 				if(elementLocated(lv, elements)) {
 					if(!applyElementValue(lv, elements.get(0))) {

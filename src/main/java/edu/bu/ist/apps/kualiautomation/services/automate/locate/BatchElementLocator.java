@@ -234,7 +234,7 @@ public class BatchElementLocator implements Locator {
 		if(messages.isEmpty())
 			return null;
 		StringBuilder message = new StringBuilder();
-		for (Iterator iterator = messages.iterator(); iterator.hasNext();) {
+		for (Iterator<String> iterator = messages.iterator(); iterator.hasNext();) {
 			String msg = (String) iterator.next();
 			message.append(msg);
 			if(iterator.hasNext()) {

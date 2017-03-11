@@ -12,7 +12,6 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
-import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.BasicElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.LocatorRunner;
 import edu.bu.ist.apps.kualiautomation.services.config.ConfigService;
@@ -31,11 +30,6 @@ public class KerberosLogin {
 	private Element username;
 	private String failureMessage;
 	private RunLog runlog;
-	private boolean testDrive;
-	
-	private static final String TEST_DRIVE_USERNAME_OTHER_IDENTIFIER = "login_user";
-	private static final String TEST_DRIVE_PASSWORD_OTHER_IDENTIFIER = "login_pw";
-	private static final String TEST_DRIVE_SUBMIT_BUTTON_LABEL = "login";
 	
 	public KerberosLogin(Session session, int timeout, RunLog runlog) {
 		this.loginParms = session.getCycle().getKerberosLoginParms();
@@ -46,6 +40,7 @@ public class KerberosLogin {
 			this.loginUrl = (new ConfigService()).getConfigEnvironmentById(
 					loginParms.getConfigEnvironmentId()).getUrl();
 		}
+		loginParms.setKerberosLoginFields(KerberosLoginFields.KUALI);
 		this.driver = session.getDriver();
 		this.runlog = runlog;
 		this.locatorRunner = new LocatorRunner(driver, this.runlog);
@@ -84,33 +79,12 @@ public class KerberosLogin {
 		this.locatorRunner.addLocator(BasicElementLocator.class);
 		
 		// 1) Get the password field
-		LabelAndValue lv = new LabelAndValue();
-		lv.setElementType(ElementType.PASSWORD.name());
-		lv.setLabel(loginParms.getPasswordLabel());
-		lv.setIdentifier(loginParms.getPasswordOtherIdentifier());		
-		LabelAndValue lvTstDrv = (LabelAndValue) lv.copy();
-		lvTstDrv.setIdentifier(TEST_DRIVE_PASSWORD_OTHER_IDENTIFIER);		
-		Element password = null;
-		if(testDrive) {
-			password = locatorRunner.run(lvTstDrv, false);
-		}
-		else {
-			password = locatorRunner.run(lv, false);
-		}
+		Element password = locatorRunner.run(
+			loginParms.getKerberosLoginFields().getPasswordLabelAndValue(), false);
 		
 		// 2) Get the submit button
-		lv = new LabelAndValue();
-		lv.setElementType(ElementType.BUTTON.name());
-		lv.setLabel(loginParms.getSubmitButtonLabel());
-		lvTstDrv = (LabelAndValue) lv.copy();
-		lvTstDrv.setLabel(TEST_DRIVE_SUBMIT_BUTTON_LABEL);		
-		Element submit = null;
-		if(testDrive) {
-			submit = locatorRunner.run(lvTstDrv, false);
-		}
-		else {
-			submit = locatorRunner.run(lv, false);
-		}
+		Element submit = locatorRunner.run(
+				loginParms.getKerberosLoginFields().getSubmitButtonLabelAndValue(), false);
 		
 		username.setValue(loginParms.getUsername());
 		if(password != null && password.isInteractive()) {
@@ -124,30 +98,31 @@ public class KerberosLogin {
 	private ExpectedCondition<Boolean> loginPageLoaded() {
 		ExpectedCondition<Boolean> condition = new ExpectedCondition<Boolean>() {			  
 			public Boolean apply(WebDriver drv) {
+				String label = loginParms.getKerberosLoginFields().getUserLabel();
+				String identifier = loginParms.getKerberosLoginFields().getUserIdentifier();
 				if(locatorRunner.isBusy()) {
-					System.out.println("busy finding " + loginParms.getUsernameLabel());
+					System.out.println("busy finding " + (label == null ? identifier : label));
 					return false;
 				}
 				
 				try {
-					System.out.println("Start search for " + loginParms.getUsernameLabel());
+					System.out.println("Start search for " + (label == null ? identifier : label));
 					
 					locatorRunner.setIgnoreHidden(true);
 					// Also use BasicElementLocator so that the label in LabelAndValue will also be treated as an attribute of the sought element
 					locatorRunner.addLocator(BasicElementLocator.class);
 
-					LabelAndValue lv = new LabelAndValue();
-					lv.setElementType(ElementType.TEXTBOX.name());
-					lv.setLabel(loginParms.getUsernameLabel());
-					lv.setIdentifier(loginParms.getUsernameOtherIdentifier());
-					LabelAndValue lvTstDrv = (LabelAndValue) lv.copy();
-					lvTstDrv.setIdentifier(TEST_DRIVE_USERNAME_OTHER_IDENTIFIER);
+					LabelAndValue lv = loginParms.getKerberosLoginFields().getUsernameLabelAndValue();
 					
 					username = locatorRunner.run(lv, false);
 					if(username == null) {
-						username = locatorRunner.run(lvTstDrv);
-						if(username != null) {
-							testDrive = true;
+						loginParms.setKerberosLoginFields(KerberosLoginFields.KUALI_TESTDRIVE_1);
+						lv = loginParms.getKerberosLoginFields().getUsernameLabelAndValue();
+						username = locatorRunner.run(lv);
+						if(username == null) {
+							loginParms.setKerberosLoginFields(KerberosLoginFields.KUALI_TESTDRIVE_2);
+							lv = loginParms.getKerberosLoginFields().getUsernameLabelAndValue();
+							username = locatorRunner.run(lv);							
 						}
 					}
 					
@@ -197,7 +172,9 @@ public class KerberosLogin {
 		if(located) {
 			located = username.isInteractive() && username.getElementType().acceptsKeystrokes();
 		}
-		StringBuilder s = new StringBuilder(loginParms.getUsernameLabel())
+		String label = loginParms.getKerberosLoginFields().getUserLabel();
+		String identifier = loginParms.getKerberosLoginFields().getUserIdentifier();
+		StringBuilder s = new StringBuilder(label == null ? identifier : label)
 				.append(" ");
 		if(!located)
 			s.append("NOT ");

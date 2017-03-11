@@ -8,6 +8,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import edu.bu.ist.apps.kualiautomation.services.automate.element.AbstractWebElement;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 /**
@@ -136,10 +137,10 @@ public class TableData {
 			
 			JavascriptExecutor executor = (JavascriptExecutor) driver;
 			
-			WebElement tablerow = (WebElement) executor.executeScript(
+			WebElement tablerow = AbstractWebElement.wrap((WebElement) executor.executeScript(
 					javascript, 
 					"row", 
-					webElements);
+					AbstractWebElement.unwrap(webElements)));
 			
 			return tablerow;
 		}
@@ -287,10 +288,11 @@ public class TableData {
 	 */
 	public boolean bothAreSameWebElement(WebElement webElement1, WebElement webElement2) {
 		JavascriptExecutor executor = (JavascriptExecutor) driver;
+
 		return (Boolean) executor.executeScript(
 				"return arguments[0] === arguments[1]", 
-				webElement1, 
-				webElement2);
+				AbstractWebElement.unwrap(webElement1), 
+				AbstractWebElement.unwrap(webElement2));
 	}
 	
 	/**
@@ -325,12 +327,15 @@ public class TableData {
 	public WebElement getBorderCell(WebElement cell, String direction) {
 		JavascriptExecutor executor = (JavascriptExecutor) driver;
 		if("right".equals(direction)) {
-			return (WebElement) executor.executeScript("return arguments[0].parentNode.cells[0]", cell);
+			return AbstractWebElement.wrap((WebElement) executor.executeScript(
+					"return arguments[0].parentNode.cells[0]", 
+					AbstractWebElement.unwrap(cell)));
 		}
 		else {
-			return (WebElement) executor.executeScript(
+			return AbstractWebElement.wrap((WebElement) executor.executeScript(
 					"var cells = arguments[0].parentNode.cells" +
-					"return cells[cells.length-1];", cell);
+					"return cells[cells.length-1];", 
+					AbstractWebElement.unwrap(cell)));
 		}
 	}
 	

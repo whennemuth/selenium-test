@@ -24,19 +24,20 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 	public void setupBefore() { 
 		runlog = new RunLog(true);
 		runner = new LocatorRunner(driver, runlog);
+		AbstractElementLocator.printDuration = true;	
 	}
 
 	@Override
 	public void loadHandlers(Map<String, String> handlers) {
 		handlers.put("address-book-lookup", "AddressBookLookup1.htm");
 		handlers.put("AddressBookLookup1_files", "AddressBookLookup1_files");
+		handlers.put("subaward-entry-1", "SubawardEntry.htm");
+		handlers.put("SubawardEntry_files", "SubawardEntry_files");
 	}
 	
 	@Test
 	public void assert01FindSearchButtonImage() {
 
-		AbstractElementLocator.printDuration = true;
-		
 		LabelAndValue lv = new LabelAndValue();
 		lv.setLabel("search");
 		lv.setElementType(ElementType.BUTTON.name());
@@ -55,10 +56,12 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		asserter.findAndAssertElements();
 	}
 	
+	/**
+	 * Search for links with innerText of "Return Value", labelled by a table column "Return Value".
+	 * DO NOT specify an extra attribute.
+	 */
 	@Test
 	public void assert02FindFirstOfIdenticalLinks() {
-
-		AbstractElementLocator.printDuration = true;
 		
 		LabelAndValue lv = new LabelAndValue();
 		lv.setLabel("Return Value");
@@ -67,10 +70,48 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		new ElementsAssertion(runner, true)
 		.setUrl("http://localhost:8080/address-book-lookup")
 		.addLabelAndValue(lv)
-		.addAttributeValue("return value")
 		.setNumResults(1)
 		.setTagNameAssertion("a")
 		.setTextAssertion("return value")
 		.findAndAssertElements();
 	}
+	
+	/**
+	 * Search for links with innerText of "Return Value", labelled by a table column "Return Value".
+	 * Add an extra attribute to the search criteria of "return value".
+	 */
+	@Test
+	public void assert03FindFirstOfIdenticalLinks() {
+		
+		LabelAndValue lv = new LabelAndValue();
+		lv.setLabel("Return Value");
+		lv.setIdentifier("return value");
+		lv.setElementType(ElementType.HYPERLINK.name());
+		
+		new ElementsAssertion(runner, true)
+		.setUrl("http://localhost:8080/address-book-lookup")
+		.addLabelAndValue(lv)
+		.setNumResults(1)
+		.setTagNameAssertion("a")
+		.setTextAssertion("return value")
+		.findAndAssertElements();
+	}
+	
+	@Test
+	public void assert04FindDescriptionField() {
+		
+		LabelAndValue lv = new LabelAndValue();
+		lv.setLabel("Description");
+		lv.setElementType(ElementType.TEXTBOX.name());
+		
+		new ElementsAssertion(runner, true)
+		.setUrl("http://localhost:8080/subaward-entry-1")
+		.addLabelAndValue(lv)
+		.setNumResults(1)
+		.setTagNameAssertion("input")
+		.addAttributeAssertion("title", "* Document Description")
+		.findAndAssertElements();		
+	}
+	
+	
 }

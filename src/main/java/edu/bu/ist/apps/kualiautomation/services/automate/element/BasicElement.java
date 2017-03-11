@@ -32,7 +32,7 @@ public class BasicElement implements Element {
 	}
 	
 	private void setWebElement(WebElement webElement) {
-		this.webElement = webElement;
+		this.webElement = AbstractWebElement.wrap(webElement);
 		if(this.elementType == null) {
 			this.elementType = ElementType.getInstance(webElement);
 		}

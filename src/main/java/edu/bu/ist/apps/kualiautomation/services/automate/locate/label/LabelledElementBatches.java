@@ -35,7 +35,20 @@ class LabelledElementBatches {
 		batches.clear(); 
 	}
 	
+	/**
+	 * Return the batches, but sort them so that the batch labels with the least web elements are at the top
+	 * @return
+	 */
 	public List<Batch> getBatches() {
+		//  Returns a negative integer, zero, or a positive integer as the first argument is less than, equal to, or greater than the second.
+		Collections.sort(batches, new Comparator<Batch>(){
+			@Override public int compare(Batch batch1, Batch batch2) {
+				if(batch1.getBatch().size() < batch2.getBatch().size())
+					return -1;
+				if(batch1.getBatch().size() > batch2.getBatch().size())
+					return 1;
+				return 0;
+			}});
 		return batches;
 	}
 	
@@ -136,7 +149,7 @@ class LabelledElementBatches {
 	 * @author wrh
 	 *
 	 */
-	public static class Batch {
+	public static class Batch implements Comparable {
 		private Element label;
 		private List<WebElement> batch;
 		public Batch(Element label, List<WebElement> batch) {
@@ -161,6 +174,11 @@ class LabelledElementBatches {
 		}
 		public boolean isOneToOneMatch() {
 			return size() == 1;
+		}
+		@Override
+		public int compareTo(Object o) {
+			// TODO Auto-generated method stub
+			return 0;
 		}
 	}
 }

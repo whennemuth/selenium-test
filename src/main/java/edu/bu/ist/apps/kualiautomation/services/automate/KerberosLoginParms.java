@@ -1,5 +1,7 @@
 package edu.bu.ist.apps.kualiautomation.services.automate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class KerberosLoginParms {
 	
 	private String username;
@@ -10,6 +12,7 @@ public class KerberosLoginParms {
 	private String passwordOtherIdentifier;
 	private String submitButtonLabel;
 	private Integer configEnvironmentId = -1;
+	private KerberosLoginFields kerberosLoginFields = KerberosLoginFields.KUALI;
 	
 	public String getUsername() {
 		return username;
@@ -24,35 +27,31 @@ public class KerberosLoginParms {
 		this.password = password;
 	}
 	public String getUsernameLabel() {
-		return usernameLabel == null ? "username" : usernameLabel;
+		return kerberosLoginFields.getUserLabel();
 	}
 	public void setUsernameLabel(String usernameLabel) {
 		this.usernameLabel = usernameLabel;
 	}
 	public String getPasswordLabel() {
-		return passwordLabel == null ? "password" : passwordLabel;
+		return kerberosLoginFields.getPasswordLabel();
 	}
 	public void setPasswordLabel(String passwordLabel) {
 		this.passwordLabel = passwordLabel;
 	}
 	public String getUsernameOtherIdentifier() {
-		if(usernameLabel == null)
-			return usernameOtherIdentifier == null ? "j_username" : usernameOtherIdentifier;
-		return usernameOtherIdentifier;
+		return kerberosLoginFields.getUserIdentifier();
 	}
 	public void setUsernameOtherIdentifier(String usernameOtherIdentifier) {
 		this.usernameOtherIdentifier = usernameOtherIdentifier;
 	}
 	public String getPasswordOtherIdentifier() {
-		if(passwordLabel == null)
-			return passwordOtherIdentifier == null ? "j_password" : passwordOtherIdentifier;
-		return passwordOtherIdentifier;
+		return kerberosLoginFields.getPasswordIdentifier();
 	}
 	public void setPasswordOtherIdentifier(String passwordOtherIdentifier) {
 		this.passwordOtherIdentifier = passwordOtherIdentifier;
 	}
 	public String getSubmitButtonLabel() {
-		return submitButtonLabel == null ? "continue" : submitButtonLabel;
+		return kerberosLoginFields.getSubmitButtonLabel();
 	}
 	public void setSubmitButtonLabel(String submitButtonLabel) {
 		this.submitButtonLabel = submitButtonLabel;
@@ -62,6 +61,14 @@ public class KerberosLoginParms {
 	}
 	public void setConfigEnvironmentId(Integer configEnvironmentId) {
 		this.configEnvironmentId = configEnvironmentId;
+	}
+	@JsonIgnore
+	public KerberosLoginFields getKerberosLoginFields() {
+		return kerberosLoginFields;
+	}
+	@JsonIgnore
+	public void setKerberosLoginFields(KerberosLoginFields kerberosLoginFields) {
+		this.kerberosLoginFields = kerberosLoginFields;
 	}
 	
 }

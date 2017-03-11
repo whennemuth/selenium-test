@@ -1,9 +1,7 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +52,7 @@ public class AttributeInspector {
 	 * @param attributeValue
 	 * @return
 	 */
-	public List<WebElement> findForValue(String attributeValue) {
+	private List<WebElement> findForValue(String attributeValue, boolean restrictToList) {
 		List<WebElement> results = new ArrayList<WebElement>();
 		
 		// Find any WebElements that have any attribute with attributeValue as a value.
@@ -63,7 +61,7 @@ public class AttributeInspector {
 			Attribute attribute = new Attribute(we, unfiltered.keySet());
 			List<String> found = attribute.forValue(attributeValue);
 			if(!found.isEmpty()) {
-				if(searchContext == null && results.isEmpty()) {
+				if(searchContext == null && results.isEmpty() && restrictToList) {
 					/**
 					 * Accept the attribute only if its name is foremost in the array of attributes to check
 					 * For example, for all webElements, if there are 2 id matches and 2 title matches, 
@@ -83,6 +81,13 @@ public class AttributeInspector {
 		}
 		
 		return results;
+	}
+	public List<WebElement> findForValue(String attributeValue) {
+		return findForValue(attributeValue, true);
+	}
+	
+	public List<WebElement> findAnyForValue(String attributeValue) {
+		return findForValue(attributeValue, false);
 	}
 	
 	/**
@@ -141,7 +146,8 @@ public class AttributeInspector {
 					+ "for (i = 0; i < arguments[0].attributes.length; ++i) { "
 					+ "   items[arguments[0].attributes[i].name] = arguments[0].attributes[i].value; "
 					+ "} "
-					+ "return items;", we);
+					+ "return items;", 
+					AbstractWebElement.unwrap(we));
 			
 			return attributes;
 		}

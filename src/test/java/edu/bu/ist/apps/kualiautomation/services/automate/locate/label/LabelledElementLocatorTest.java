@@ -61,6 +61,10 @@ public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 	@Test
 	public void test02FindButtonImageByNearestLabel() {
 		findButtonImageByNearestLabel("http://localhost:8080/prop-log-lookup");
+	}
+	
+	@Test
+	public void test03FindButtonImageByNearestLabel() {
 		findButtonImageByNearestLabel("http://localhost:8080/prop-log-lookup-frame");
 	}
 	private void findButtonImageByNearestLabel(String url) {
@@ -83,8 +87,12 @@ public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 	}
 	
 	@Test
-	public void test03FindButtonImageByTitle() {
+	public void test04FindButtonImageByTitle() {
 		findButtonImageByTitle("http://localhost:8080/prop-log-lookup");
+	}
+	
+	@Test
+	public void test05FindButtonImageByTitle() {
 		findButtonImageByTitle("http://localhost:8080/prop-log-lookup-frame");
 	}
 	private void findButtonImageByTitle(String url) {
@@ -106,7 +114,7 @@ public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 		.setLabel("Requisitioner Unit:")
 		.setTagNameAssertion("select")
 		.setNumResults(1)
-		.findAndAssertElements();		
+		.findAndAssertElements();	
 	}
 	
 	@Test
@@ -119,6 +127,19 @@ public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 		.setTagNameAssertion("input")
 		.addAttributeAssertion("type", "text")
 		.addAttributeAssertion("title", "Other")
+		.findAndAssertElements();		
+	}
+	
+	@Test
+	public void test06SubawardEntry() {
+		new ElementsAssertion(locator)
+		.setUrl("http://localhost:8080/subaward-entry-1")
+		.setElementType(ElementType.TEXTBOX)
+		.setLabel("Subrecipient:")
+		.setNumResults(1)
+		.setTagNameAssertion("input")
+		.addAttributeAssertion("type", "text")
+		.addAttributeAssertion("title", "* Subrecipient")
 		.findAndAssertElements();		
 	}
 

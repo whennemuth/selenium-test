@@ -11,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import edu.bu.ist.apps.kualiautomation.services.automate.element.AbstractWebElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.AttributeInspector;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
@@ -20,6 +21,7 @@ public abstract class AbstractElementLocator implements Locator {
 	protected WebDriver driver;
 	protected ElementType elementType;
 	protected List<String> parameters = new ArrayList<String>();
+	protected List<WebElement> iframes;
 	protected boolean skipParameterMatching;
 	protected boolean defaultRan;
 	/**
@@ -33,7 +35,7 @@ public abstract class AbstractElementLocator implements Locator {
 	protected boolean ignoreDisabled = true;
 	protected String message;
 	
-	public static boolean printDuration;
+	public static boolean printDuration = true;
 	
 	public AbstractElementLocator(WebDriver driver) {
 		this.driver = driver;
@@ -68,65 +70,36 @@ public abstract class AbstractElementLocator implements Locator {
 				this.elementType = elementType;
 			}
 			this.parameters = parameters;
-			final List<WebElement> webElements = new ArrayList<WebElement>();
+			
 			results = new ArrayList<Element>();
 			
-			List<WebElement> custom = customLocate();
-			
-			for(WebElement found : custom) {
-				if(ignoreHidden && !found.isDisplayed())
-					continue;
-				if(ignoreDisabled && !found.isEnabled())
-					continue;
-				webElements.add(found);
-			}
-			
-			if(webElements.isEmpty()) {
-				List<WebElement> defaults = defaultLocate();
-				webElements.addAll(defaults);
-			}
-			
-			if(webElements.isEmpty() && !skipFrameSearch) {
-				// Check for frames and search those as well
-				List<WebElement> iframes = searchContext.findElements(By.tagName("iframe"));
-				if(!iframes.isEmpty()) {
-					for(WebElement iframe : iframes) {
-						// (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOf(iframe));
-						(new WebDriverWait(driver, 5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
-						skipFrameSearch = true;
-						searchContext = driver;
-						try {
-							List<Element> frameResults = locateAll(elementType, parameters);
-							results.addAll(frameResults);
-							if(frameResults.isEmpty()) {
-								driver.switchTo().defaultContent();
-								searchContext = driver;
-							}
-							else {
-								// Don't switch back to the parent window because you will not be able to use the WebElement as it would 
-								// then belong to a frame that the WebDriver is longer focused on ( you will get a StaleElementReferenceException ).
-								// driver.switchTo().defaultContent();
-							}
-						}
-						finally {
-							skipFrameSearch = false;
-						}
-					}
+			if(framesFirst()) {
+				
+				loadFrameResults(results);
+				
+				if(results.isEmpty()) {
+					
+					loadResults(results);	
 				}
 			}
-			else {
-				for(WebElement we : webElements) {
-					results.add(getElement(driver, we));
+			else {			
+				
+				loadResults(results);
+				
+				if(results.isEmpty()) {
+					
+					loadFrameResults(results);
 				}
 			}
+			
 		} 
 		finally {
 			busy = false;
-			if(printDuration && skipFrameSearch) {
+			iframes = null;
+			if(printDuration) {
+			//if(printDuration && skipFrameSearch) {
 				long end = System.currentTimeMillis();
 				Long mils = end - start;
-				//Long duration = (end - start) / 1000L;		
-				//System.out.println(this.getClass().getName() + " ran in " + duration.toString() + " seconds for parameter(s):");
 				System.out.println(this.getClass().getName() + " found " + String.valueOf(results.size()) + " results in " + mils.toString() + " milliseconds for parameter(s):");
 				for(String p : parameters) {
 					System.out.println(p);
@@ -135,6 +108,88 @@ public abstract class AbstractElementLocator implements Locator {
 		}
 		
 		return results;
+	}
+	
+	/**
+	 * Execute the searches - custom search first, followed by the default search if no results from custom.
+	 * @param webElements
+	 */
+	private void loadResults(List<Element> results) {
+		
+		List<WebElement> webElements = new ArrayList<WebElement>();
+		
+		List<WebElement> custom = customLocate();
+		
+		for(WebElement found : custom) {
+			if(ignoreHidden && !found.isDisplayed())
+				continue;
+			if(ignoreDisabled && !found.isEnabled())
+				continue;
+			webElements.add(found);
+		}
+		
+		if(webElements.isEmpty()) {			
+			List<WebElement> defaults = defaultLocate();			
+			webElements.addAll(defaults);
+		}
+		
+		for(WebElement we : webElements) {
+			results.add(getElement(driver, we));
+		}
+	}
+	
+	/**
+	 * Search for web elements within a frame.
+	 * 
+	 * @param elementType
+	 * @param parameters
+	 * @return
+	 */
+	private void loadFrameResults(List<Element> results) {
+		
+		if(skipFrameSearch) {
+			return;
+		}
+		
+		if(!iframes.isEmpty()) {
+			for(WebElement iframe : iframes) {
+				// (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOf(iframe));
+				(new WebDriverWait(driver, 5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
+				skipFrameSearch = true;
+				searchContext = driver;
+				try {
+					List<Element> frameResults = locateAll(elementType, parameters);
+					results.addAll(frameResults);
+					if(frameResults.isEmpty()) {
+						driver.switchTo().defaultContent();
+						searchContext = driver;
+					}
+					else {
+						// Don't switch back to the parent window because you will not be able to use the WebElement as it would 
+						// then belong to a frame that the WebDriver is longer focused on ( you will get a StaleElementReferenceException ).
+						// driver.switchTo().defaultContent();
+					}
+				}
+				finally {
+					skipFrameSearch = false;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * By experience, most elements are to be found in a frame (at least for kuali). So, searching
+	 * should start inside the frame and only be conducted outside of the frame if no results are found.
+	 * However, shortcuts are usually found outside of frames as peripheral menu items.
+	 * NOTE: This is arbitrary and favors searching norms for kuali - a future enhancement might be to inject this logic.
+	 * @return
+	 */
+	private boolean framesFirst() {
+		if(iframes == null)
+			iframes = searchContext.findElements(By.tagName("iframe"));
+		if(iframes.isEmpty())
+			return false;
+		return !ElementType.SHORTCUT.equals(elementType);
 	}
 	
 	public void setDefaultRan(boolean defaultRan) {
@@ -217,10 +272,12 @@ public abstract class AbstractElementLocator implements Locator {
 		if(txt != null && !txt.trim().isEmpty())
 			return txt;
 		
-		txt = (String) ((JavascriptExecutor) driver).executeScript("return arguments[0].innerHTML", we);
+		txt = (String) ((JavascriptExecutor) driver).executeScript(
+				"return arguments[0].innerHTML", 
+				AbstractWebElement.unwrap(we));
 		return txt;
 	}
-
+	
 	@Override
 	public SearchContext getSearchContext() {
 		return searchContext;
