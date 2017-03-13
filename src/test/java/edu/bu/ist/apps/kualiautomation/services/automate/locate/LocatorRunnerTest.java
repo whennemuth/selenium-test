@@ -1,7 +1,5 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
-import static org.junit.Assert.fail;
-
 import java.util.Map;
 
 import org.junit.FixMethodOrder;
@@ -113,5 +111,20 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		.findAndAssertElements();		
 	}
 	
-	
+	@Test
+	public void assert05FindAddButton() {
+		
+		LabelAndValue lv = new LabelAndValue();
+		lv.setLabel("Actions");
+		lv.setElementType(ElementType.BUTTON.name());
+		
+		new ElementsAssertion(runner, true)
+		.setUrl("http://localhost:8080/subaward-entry-1")
+		.addLabelAndValue(lv)
+		.setNumResults(1)
+		.setTagNameAssertion("input")
+		.addAttributeAssertion("type", "image")
+		.addAttributeAssertion("name", "methodToCall.addContacts.anchorContacts")
+		.findAndAssertElements();		
+	}
 }

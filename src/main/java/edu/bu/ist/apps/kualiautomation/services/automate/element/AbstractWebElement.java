@@ -83,7 +83,10 @@ public class AbstractWebElement implements WebElement {
 	 * @return
 	 */
 	private String getCachedAttribute(String name) {
-		if(!attributes.containsKey(name)) {
+		if(!attributes.containsKey(name) 
+				|| "checked".equalsIgnoreCase(name)
+				|| "value".equalsIgnoreCase(name)
+				|| "selected".equalsIgnoreCase(name)) {
 			attributes.put(name, webElement.getAttribute(name));
 		}
 		return (String) attributes.get(name);

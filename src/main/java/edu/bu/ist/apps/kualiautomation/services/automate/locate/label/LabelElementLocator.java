@@ -156,6 +156,13 @@ public class LabelElementLocator extends AbstractElementLocator {
 		return located;
 	}
 	
+	/**
+	 * Remove from the list of located label web elements those that have a tagname that is not 
+	 * qualified or are buttons whose value does not match the value the label search was based on.
+	 * 
+	 * @param elements
+	 * @param label
+	 */
 	private void applyFiltering(List<WebElement> elements, String label) {
 		for (Iterator<WebElement> iterator = elements.iterator(); iterator.hasNext();) {
 			WebElement we = (WebElement) iterator.next();
