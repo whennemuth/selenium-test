@@ -75,13 +75,9 @@ public class ShortcutElementLocatorTest5 extends AbstractJettyBasedTest {
 		.findAndAssertElements();		
 	}
 
-// TODO: 
-//	@Test
+	// TODO: See the TODO in ShortcutElementLocator.getNestedShortcut()
+	//@Test
 	public void find02AddButton() {
-		
-//		RunLog runlog = new RunLog(true);
-//		LocatorRunner runner = new LocatorRunner(driver, runlog);		
-		
 		ConfigShortcut shortcut = new ConfigShortcut();
 		shortcut.setNavigates(true);
 		shortcut.setIdentifier(null);
@@ -97,7 +93,35 @@ public class ShortcutElementLocatorTest5 extends AbstractJettyBasedTest {
 		ShortcutElementLocator locator = new ShortcutElementLocator(driver, shortcut);
 		
 		new ElementsAssertion(locator)
-		//new ElementsAssertion(runner, true)
+		.setUrl("http://localhost:8080/subaward-entry-1")
+		.addLabelAndValue(lv)
+		.setNumResults(1)
+		.setTagNameAssertion("input")
+		.addAttributeAssertion("type", "image")
+		.addAttributeAssertion("name", "methodToCall.addContacts.anchorContacts")
+		.findAndAssertElements();		
+	}
+
+	// TODO: Get find02AddButton() working. Then, this test will still not work because use of the LocatorRunner
+	// causes a StaleReferenceException - fix this.
+	//@Test
+	public void find03AddButton() {
+		RunLog runlog = new RunLog(true);
+		LocatorRunner runner = new LocatorRunner(driver, runlog);		
+		
+		ConfigShortcut shortcut = new ConfigShortcut();
+		shortcut.setNavigates(true);
+		shortcut.setIdentifier(null);
+		shortcut.setElementType(ElementType.BUTTON.name());
+		shortcut.setLabelHierarchyParts(new String[] {
+			"Contacts", "Actions"
+		});		
+
+		LabelAndValue lv = new LabelAndValue();
+		lv.setElementType(ElementType.SHORTCUT.name());
+		lv.setConfigShortcut(shortcut);
+		
+		new ElementsAssertion(runner, true)
 		.setUrl("http://localhost:8080/subaward-entry-1")
 		.addLabelAndValue(lv)
 		.setNumResults(1)

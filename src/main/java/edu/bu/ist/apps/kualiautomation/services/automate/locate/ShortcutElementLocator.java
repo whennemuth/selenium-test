@@ -224,10 +224,16 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 	private ConfigShortcut getNestedShortcut() throws Exception {
 		String[] oldHierarchy = parms.getShortcut().getLabelHierarchyParts();
 		String[] newHierarchy = null;
-		String identifier = parms.getShortcut().getIdentifier();
+		String identifier = parms.getShortcut().getIdentifier();		
 		
 		// 1) Get a new hierarchy based on the original hierarchy array.
 		if(isHotspot() && !oldHierarchy[oldHierarchy.length-1].equals(identifier)) {
+/**
+ * RESUME NEXT:
+ * TODO: if identifier is null, then parms.isEndOfHierarchy() will evaluate to true prematurely.
+ * Try using parms.getShortcut().getElementType() as a stand-in identifier and modify this if logic to test for it.
+ * Then make sure all shortcut unit tests still work and then enable and test ShortcutElementLocatorTest5.find02AddButton()
+ */
 			// Put the shortcut identifier at the end of the hierarchy if it is not already there.
 			newHierarchy = Arrays.copyOf(oldHierarchy, oldHierarchy.length+1);
 			newHierarchy[newHierarchy.length-1] = identifier;

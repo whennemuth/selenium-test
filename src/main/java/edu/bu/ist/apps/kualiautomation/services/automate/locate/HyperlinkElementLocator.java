@@ -113,6 +113,9 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 	 * @param anchortags
 	 */
 	private List<WebElement> filterByTabularLogic(List<WebElement> labels, List<WebElement> anchortags) {
+		if(anchortags.isEmpty() || labels.isEmpty())
+			return new ArrayList<WebElement>();
+		
 		List<Element> lbls = getElements(labels);
 		return getWebElements(LabelledElementLocator.getBestInTable(
 				driver, 

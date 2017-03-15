@@ -31,6 +31,8 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		handlers.put("AddressBookLookup1_files", "AddressBookLookup1_files");
 		handlers.put("subaward-entry-1", "SubawardEntry.htm");
 		handlers.put("SubawardEntry_files", "SubawardEntry_files");
+//		handlers.put("subaward-lookup-1", "SubawardLookup.htm");
+//		handlers.put("SubawardLookup_files", "SubawardLookup_files");
 	}
 	
 	@Test
@@ -95,8 +97,29 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		.findAndAssertElements();
 	}
 	
+	/**
+	 * Search for links with innerText of "Return Value", labelled by a table column "Return Value".
+	 * Add an extra attribute to the search criteria of "return value".
+	 */
+	//@Test
+	public void assert04FindFirstOfIdenticalLinks() {
+		
+		LabelAndValue lv = new LabelAndValue();
+		lv.setLabel("Actions");
+		lv.setIdentifier("open");
+		lv.setElementType(ElementType.HYPERLINK.name());
+		
+		new ElementsAssertion(runner, true)
+		.setUrl("http://localhost:8080/subaward-lookup-1")
+		.addLabelAndValue(lv)
+		.setNumResults(1)
+		.setTagNameAssertion("a")
+		.setTextAssertion("return value")
+		.findAndAssertElements();
+	}
+	
 	@Test
-	public void assert04FindDescriptionField() {
+	public void assert05FindDescriptionField() {
 		
 		LabelAndValue lv = new LabelAndValue();
 		lv.setLabel("Description");
@@ -112,7 +135,7 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 	}
 	
 	@Test
-	public void assert05FindAddButton() {
+	public void assert06FindAddButton() {
 		
 		LabelAndValue lv = new LabelAndValue();
 		lv.setLabel("Actions");

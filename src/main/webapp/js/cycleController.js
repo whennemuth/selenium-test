@@ -323,6 +323,14 @@ var cycleCtrlFactory = function() {
 			};
 			
 			scope.launch = function(itemId, itemType) {
+				if(!scope.cycle.kerberosLoginParms.username) {
+					alert('REQUIRED: Weblogin username');
+					return;
+				}
+				if(!scope.cycle.kerberosLoginParms.password) {
+					alert('REQUIRED: Weblogin password');
+					return;
+				}
 				cycleSvc.launch(scope.config.id, itemId, itemType, scope.cycle.kerberosLoginParms).then(
 						function(serviceResponse) {
 							alert(serviceResponse.message);					
