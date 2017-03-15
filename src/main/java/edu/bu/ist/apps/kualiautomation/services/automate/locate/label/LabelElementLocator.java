@@ -14,34 +14,14 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.AbstractWebElem
 import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.XpathElementCache;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.BasicComparableLabel;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 public class LabelElementLocator extends AbstractElementLocator {
 	
-	/**
-	 * 1) First priority (NOTE: lower-case if for xpath v2.0, but firefox uses v1.0, so have to use the translate function).
-	 * Matches an element with a text value that matches the provided value, both values normalized for whitespace.
-	 */
-	private static final String XPATH_EQUALS = 
-			"//*[text()[normalize-space(translate(., "
-			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
-			+ "'abcdefghijklmnopqrstuvwxyz'))=\"[INSERT-LABEL]\"]]";
-	
-	/**
-	 * 2) Second priority
-	 * Matches for an element with a text value that starts with the provided value, both values normalized for whitespace.
-	 */
-	private static final String XPATH_STARTS_WITH = 
-			"//*[text()[starts-with(normalize-space(translate(., "
-			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
-			+ "'abcdefghijklmnopqrstuvwxyz')), \"[INSERT-LABEL]\")]]";
-	
-	/**
-	 * 3) Third priority
-	 * Matches for an element with a text value that contains the provided value, both values normalized for whitespace.
-	 */
+	// Matches for an element with a text value that contains the provided value, both values normalized for whitespace.
 	private static final String XPATH_CONTAINS = 
 			"//*[text()[contains(normalize-space(translate(., "
 			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
@@ -78,57 +58,22 @@ public class LabelElementLocator extends AbstractElementLocator {
 			scope = ".";	// current scope within element.
 		}
 		
-		/**
-		 * Search for an element that matches the provided value with xpath expressions in order of their priority.
-		 * Only proceed to the next search if no results have yet been found with the prior search(es).
-		 */
+		// 1) Some buttons are styled (CSS) to look like labels, so don't exclude these from label candidates.
+		List<WebElement> elements = ElementType.BUTTON.findAll(searchContext, super.skipFrameSearch);
 		
-		/** 1) Search for full length match */
-		String xpath = scope + XPATH_EQUALS.replace("[INSERT-LABEL]", label);
-		List<WebElement> elements = AbstractWebElement.wrap(searchContext.findElements(By.xpath(xpath)));
+		// 2) Search for any web element whose immediate inner text contains the label.
+		String xpath = scope + XPATH_CONTAINS.replace("[INSERT-LABEL]", cleanedLabel);
+		List<WebElement> cached = XpathElementCache.get(driver, xpath, super.skipFrameSearch);
+		if(cached.isEmpty()) {
+			elements.addAll(AbstractWebElement.wrap(searchContext.findElements(By.xpath(xpath))));
+			XpathElementCache.put(driver, xpath, super.skipFrameSearch, elements);
+		}
+		else {
+			elements.addAll(cached);
+		}
 		applyFiltering(elements, label);
-		
-		/** 2) Search for full length match where the label is the value of a button
-		 * <input type="[value]"> or... <button>[value]</button> 
-		 * (yes, some applications disguise buttons as hotspots or links).
-		 */
-		if(elements.isEmpty()) {
-			elements = ElementType.BUTTON.findAll(searchContext);
-			applyFiltering(elements, label);
-		}
-		
-		/** 3) Search for match that starts with the provided value */
-		if(elements.isEmpty()) {
-			xpath = scope + XPATH_STARTS_WITH.replace("[INSERT-LABEL]", cleanedLabel);
-			elements = AbstractWebElement.wrap(searchContext.findElements(By.xpath(xpath)));
-			applyFiltering(elements, label);
-			
-			if(!elements.isEmpty()) {
-				/**
-				 * The above xpath will not include text wrapped in an html block as part of the innerText
-				 * being evaluated. For this reason, results could be returned that do not appear to the
-				 * user to start with the specified value. Trim these edge cases off the list. 
-				 */
-				for (Iterator<WebElement> iterator = elements.iterator(); iterator.hasNext();) {
-					WebElement we = iterator.next();
-					String text = getText(driver, we);
-					if(!text.toLowerCase().trim().startsWith(label.toLowerCase())) {
-						iterator.remove();
-					}
-				}
-			}
-		}
-		
-		/** 4) Search for a match that would start with the provided value if garbage characters 
-		 * are trimmed from the start.
-		 */
-		if(elements.isEmpty()) {
-			xpath = scope + XPATH_CONTAINS.replace("[INSERT-LABEL]", cleanedLabel);
-			elements = AbstractWebElement.wrap(searchContext.findElements(By.xpath(xpath)));
-			applyFiltering(elements, label);
-		}
 
-		// Wrap the web elements in ComparableLabel instances for sorting so higher ranked results are on top.
+		// 3) Wrap the web elements in ComparableLabel instances for sorting so higher ranked results are on top.
 		List<ComparableLabel> labels = new ArrayList<ComparableLabel>();
 		for(WebElement elmt : elements) {
 			if(!isDisallowedHyperlink(elmt)) {
@@ -146,7 +91,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 			}
 		}
 		
-		// Unwrap the highest ranked result(s) back into a WebElement collection.
+		// 4) Unwrap the highest ranked result(s) back into a WebElement collection.
 		located.addAll(ComparableLabel.getHighestRanked(labels));
 		
 		// We are only searching for labels, but if the search fails then the upcoming default search
@@ -188,7 +133,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 					}
 					else {
 						val = val.trim();
-						if(!label.equalsIgnoreCase(val)) {
+						if(!val.toLowerCase().contains(label.toLowerCase())) {
 							iterator.remove();
 						}
 					}

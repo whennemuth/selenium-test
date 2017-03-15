@@ -114,8 +114,10 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 	@Test
 	public void assert05FindAddButton() {
 		
+		// RESUME NEXT: Replace this with shortcuts
 		LabelAndValue lv = new LabelAndValue();
-		lv.setLabel("Actions");
+		lv.setLabel("Contacts");
+//		lv.setLabel("Actions");
 		lv.setElementType(ElementType.BUTTON.name());
 		
 		new ElementsAssertion(runner, true)

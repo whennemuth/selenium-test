@@ -119,10 +119,6 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 				lbls, 
 				anchortags, 
 				parameters));
-//		if(!tableBased.isEmpty()) {
-//			anchortags.clear();
-//			anchortags.addAll(getWebElements(tableBased));
-//		}
 	}
 	
 	private static List<WebElement> merge(List<WebElement> list1, List<WebElement> list2) {

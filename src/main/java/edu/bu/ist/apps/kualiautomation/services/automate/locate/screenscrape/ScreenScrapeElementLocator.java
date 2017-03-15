@@ -9,9 +9,11 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import edu.bu.ist.apps.kualiautomation.services.automate.element.AbstractWebElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.XpathElementCache;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.ComparableLabel;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
@@ -79,7 +81,12 @@ public class ScreenScrapeElementLocator extends AbstractElementLocator {
 			else
 				xpath = xpath + XPATH_CONTAINS.replace("[INSERT-LABEL]", label);
 			
-			List<WebElement> elements = searchContext.findElements(By.xpath(xpath));
+			List<WebElement> elements = XpathElementCache.get(driver, xpath, super.skipFrameSearch);
+			if(elements.isEmpty()) {
+				elements.addAll(searchContext.findElements(By.xpath(xpath)));
+				XpathElementCache.put(driver, xpath, super.skipFrameSearch, elements);
+			}
+
 			List<ComparableLabel> scraped = new ArrayList<ComparableLabel>();
 			
 			if(!elements.isEmpty()) {

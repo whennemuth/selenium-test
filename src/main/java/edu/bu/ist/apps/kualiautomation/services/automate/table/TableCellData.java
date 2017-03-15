@@ -78,7 +78,7 @@ public class TableCellData {
 				"cell", 
 				AbstractWebElement.unwrap(childWebElement));
 		
-		if(cellsinfo.isEmpty()) {
+		if(cellsinfo == null || cellsinfo.isEmpty()) {
 			return null; // The childWebElement was not found to have a table anywhere along its element ancestry.
 		}
 		else {

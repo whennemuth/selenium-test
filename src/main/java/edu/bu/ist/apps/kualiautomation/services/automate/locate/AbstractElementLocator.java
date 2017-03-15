@@ -235,7 +235,7 @@ public abstract class AbstractElementLocator implements Locator {
 		case RADIO:
 		case HOTSPOT:
 		case OTHER:
-			candidates = elementType.findAll(searchContext);
+			candidates = elementType.findAll(searchContext, skipFrameSearch);
 			if(skipParameterMatching) {
 				results.addAll(candidates);
 			}

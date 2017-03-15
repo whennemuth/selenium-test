@@ -133,8 +133,10 @@ public class TableColumnData {
 		
 		public static List<TableColumnCell> getInstances(List<Map<String, Object>> datamaps) {
 			List<TableColumnCell> cells = new ArrayList<TableColumnCell>();
-			for(Map<String, Object> map : datamaps) {
-				cells.add(new TableColumnCell(map));
+			if(datamaps != null) {
+				for(Map<String, Object> map : datamaps) {
+					cells.add(new TableColumnCell(map));
+				}
 			}
 			return cells;
 		}

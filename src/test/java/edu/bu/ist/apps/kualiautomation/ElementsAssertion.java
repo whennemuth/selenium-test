@@ -56,11 +56,11 @@ public class ElementsAssertion {
 	
 	public ElementsAssertion(Locator locator) {
 		this.locator = locator;
-		this.greedy = greedy;
 	}
 	
 	public ElementsAssertion(LocatorRunner runner, boolean greedy) {
 		this.runner = runner;
+		this.greedy = greedy;
 	}
 	
 	/**
@@ -81,9 +81,9 @@ public class ElementsAssertion {
 			if(runner == null) 
 				elements = locator.locateAll(elementType, attributeValues);
 			else if(greedy)
-				elements = runner.runNonGreedy(lvs.toArray(new LabelAndValue[lvs.size()]));
-			else
 				elements = runner.runGreedy(lvs.toArray(new LabelAndValue[lvs.size()]));
+			else
+				elements = runner.runNonGreedy(lvs.toArray(new LabelAndValue[lvs.size()]));
 			
 			assertElements(elements);
 			
@@ -132,7 +132,6 @@ public class ElementsAssertion {
 			for (Iterator<String> iterator = anyAttributeAssertions.keySet().iterator(); iterator.hasNext();) {
 				String attribName = iterator.next();
 				String attribVal = anyAttributeAssertions.get(attribName);
-				String s = attribName + ":" +
 				failMsg.append("[").append(attribName).append(":").append(attribVal).append("]");
 				if(iterator.hasNext())
 					failMsg.append(", ");
@@ -143,7 +142,7 @@ public class ElementsAssertion {
 			for (Iterator<String> iterator = anyAttributeAssertionsFound.keySet().iterator(); iterator.hasNext();) {
 				String attribName = iterator.next();
 				String attribVal = anyAttributeAssertions.get(attribName);
-				String s = attribName + ":" +
+				//String s = attribName + ":" +
 				failMsg.append("[").append(attribName).append(":").append(attribVal).append("]");
 				if(iterator.hasNext())
 					failMsg.append(", ");

@@ -131,9 +131,9 @@ public class HotspotElementLocatorTest extends AbstractJettyBasedTest {
 		.setLabel("Financial")
 		.setElementType(ElementType.HOTSPOT)
 		.setNumResults(1)
-//		.addAttributeValue("Search")
-//		.addAttributeAssertion("title", "Search")
 		.addAttributeAssertion("type", "submit")
 		.findAndAssertElements();				
 	}
+	
+	
 }

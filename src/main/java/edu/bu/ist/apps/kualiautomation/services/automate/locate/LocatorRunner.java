@@ -13,6 +13,7 @@ import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.services.automate.RunLog;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.XpathElementCache;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.screenscrape.ScreenScrapeElementLocator;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
@@ -120,56 +121,63 @@ public class LocatorRunner {
 		Set<Class<?>> locators = new LinkedHashSet<Class<?>>();
 		boolean labelCanAlsoBeAnAttribute = true;
 		
-		switch(lv.getElementTypeEnum()) {
-		case BUTTON: case BUTTONIMAGE:
-			locators.add(LabelledElementLocator.class);
-			locators.add(BasicElementLocator.class); // the label in LabelAndValue will be treated as an attribute of the sought element
-			elements.addAll(runBatch(lv, locators, labelCanAlsoBeAnAttribute));
-			if(elements.isEmpty() && ElementType.BUTTON.equals(lv.getElementTypeEnum())) {
-				// Search for a button did not work - perhaps the user is dealing with a BUTTONIMAGE?
-				LabelAndValue imgLv = lv.copy();
-				imgLv.setElementType(ElementType.BUTTONIMAGE.name());
-				elements.addAll(runBatch(imgLv, locators, labelCanAlsoBeAnAttribute));
-			}
-			break;
-		case HYPERLINK:
-			locators.add(HyperlinkElementLocator.class);
-			elements.addAll(runBatch(lv, locators, labelCanAlsoBeAnAttribute));
-			if(elements.isEmpty()) {
-				// No hyperlinks found. Try hotspots.
-				locators.clear();
-				locators.add(HotspotElementLocator.class);
+		XpathElementCache.clear();
+		
+		try {
+			switch(lv.getElementTypeEnum()) {
+			case BUTTON: case BUTTONIMAGE:
+				locators.add(LabelledElementLocator.class);
+				locators.add(BasicElementLocator.class); // the label in LabelAndValue will be treated as an attribute of the sought element
 				elements.addAll(runBatch(lv, locators, labelCanAlsoBeAnAttribute));
+				if(elements.isEmpty() && ElementType.BUTTON.equals(lv.getElementTypeEnum())) {
+					// Search for a button did not work - perhaps the user is dealing with a BUTTONIMAGE?
+					LabelAndValue imgLv = lv.copy();
+					imgLv.setElementType(ElementType.BUTTONIMAGE.name());
+					elements.addAll(runBatch(imgLv, locators, labelCanAlsoBeAnAttribute));
+				}
+				break;
+			case HYPERLINK:
+				locators.add(HyperlinkElementLocator.class);
+				elements.addAll(runBatch(lv, locators, labelCanAlsoBeAnAttribute));
+				if(elements.isEmpty()) {
+					// No hyperlinks found. Try hotspots.
+					locators.clear();
+					locators.add(HotspotElementLocator.class);
+					elements.addAll(runBatch(lv, locators, labelCanAlsoBeAnAttribute));
+				}
+				break;
+			case TEXTBOX: case PASSWORD: case TEXTAREA: case SELECT: case RADIO: case CHECKBOX:
+				elements.addAll(locateElements(lv, new LabelledElementLocator(driver)));
+				labelCanAlsoBeAnAttribute = false;
+				break;
+			case HOTSPOT:
+				elements.addAll(locateElements(lv, new HotspotElementLocator(driver)));
+				break;
+			case SHORTCUT:
+				elements.addAll(locateElements(lv, new ShortcutElementLocator(driver, lv.getConfigShortcut())));
+				break;
+			case SCREENSCRAPE:
+				elements.addAll(locateElements(lv, new ScreenScrapeElementLocator(driver)));
+				break;
+			case OTHER:
+				locators.add(LabelledElementLocator.class);
+				locators.add(HotspotElementLocator.class);
+				if(lv.getConfigShortcut() != null) {
+					locators.add(ShortcutElementLocator.class);
+				}
+				elements.addAll(runBatch(lv, locators, labelCanAlsoBeAnAttribute));
+				break;
+			default:
+				break;
 			}
-			break;
-		case TEXTBOX: case PASSWORD: case TEXTAREA: case SELECT: case RADIO: case CHECKBOX:
-			elements.addAll(locateElements(lv, new LabelledElementLocator(driver)));
-			labelCanAlsoBeAnAttribute = false;
-			break;
-		case HOTSPOT:
-			elements.addAll(locateElements(lv, new HotspotElementLocator(driver)));
-			break;
-		case SHORTCUT:
-			elements.addAll(locateElements(lv, new ShortcutElementLocator(driver, lv.getConfigShortcut())));
-			break;
-		case SCREENSCRAPE:
-			elements.addAll(locateElements(lv, new ScreenScrapeElementLocator(driver)));
-			break;
-		case OTHER:
-			locators.add(LabelledElementLocator.class);
-			locators.add(HotspotElementLocator.class);
-			if(lv.getConfigShortcut() != null) {
-				locators.add(ShortcutElementLocator.class);
-			}
-			elements.addAll(runBatch(lv, locators, labelCanAlsoBeAnAttribute));
-			break;
-		default:
-			break;
+			
+			elements.addAll(runBatch(lv, additionalLocators, labelCanAlsoBeAnAttribute));
+			
+			return elements;
+		} 
+		finally {
+			XpathElementCache.clear();
 		}
-		
-		elements.addAll(runBatch(lv, additionalLocators, labelCanAlsoBeAnAttribute));
-		
-		return elements;
 	}
 	
 	private List<Element> locateElements(LabelAndValue lv, Locator locator) {

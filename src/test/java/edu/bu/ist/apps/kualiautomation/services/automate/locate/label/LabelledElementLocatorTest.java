@@ -2,13 +2,16 @@ package edu.bu.ist.apps.kualiautomation.services.automate.locate.label;
 
 import java.util.Map;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import edu.bu.ist.apps.kualiautomation.AbstractJettyBasedTest;
 import edu.bu.ist.apps.kualiautomation.ElementsAssertion;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledElementLocator;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 	
 	private LabelledElementLocator locator;

@@ -115,7 +115,7 @@ function cellObject(originalField) {
 	this.originalField = originalField;
 	this.cell = getCell(originalField);
 	this.sameColumn = function(othercell) {
-		if(!this.cell || !othercell)
+		if(!this.cell || !othercell || !othercell.cell)
 			return false;
 		return this.cell.cellIndex == othercell.cell.cellIndex;
 	};
@@ -459,11 +459,15 @@ Array.prototype.clone = function() {
 }
 
 function doTest() {
-	var node = document.getElementById('div1');
+	var doc = getDocumentObj(false);
+	var node = doc.evaluate("//td/h2[text()='Contacts']", doc, null, XPathResult.ANY_TYPE, null).iterateNext();
 	var nodes = [
-	    document.getElementById('txt2'),
-	    document.getElementById('txt7'),
-	    document.getElementById('txt12')
+	    doc.getElementsByName("methodToCall.headerTab.headerDispatch.save.navigateTo.subAward")[0],
+	    doc.getElementsByName("methodToCall.headerTab.headerDispatch.save.navigateTo.financial")[0],
+	    doc.getElementsByName("methodToCall.headerTab.headerDispatch.save.navigateTo.customData")[0],
+	    doc.getElementsByName("methodToCall.headerTab.headerDispatch.save.navigateTo.templateInformation")[0],
+		doc.getElementsByName("methodToCall.headerTab.headerDispatch.save.navigateTo.subAwardActions")[0],
+		doc.getElementsByName("methodToCall.headerTab.headerDispatch.save.navigateTo.medusa")[0]
 	];
 //	var results = getNodesInSameColumn(node, nodes);
 //	var s = '';
@@ -472,32 +476,59 @@ function doTest() {
 //	}
 //	alert(s);
 	
-	var results = getSameColumnNodeObjects(node, nodes);
+	var results = callOperator(['column', node, nodes]);
 	alert(results);
 }
 
-var task = arguments[0];
+function getDocumentObj(fromFrame) {
+	if(fromFrame) {
+		// This won't work in chrome because it doesn't allow frames from your hard disk to access each others' 
+		// content. Which, technically we term as Cross-origin request. Use firefox instead or put the <script>
+		// element inside the document the frame sources.
+		var frame = window.frames[0];
+		var doc = (frame.contentWindow || frame.contentDocument);
+		if(doc.document) doc = doc.document;
+		return doc;
+	}
+	return window.document;
+}
 
-if(task == 'cell') {
-	var node = arguments[1];
-	var cellInfo = getAncestorTableCells(node, [], getDepth(node));
-	cellInfo.node = node;
-	return cellInfo;
+/**
+ * This function acts as a switchboard operator to connect the "caller" (selenium JavascriptExecutor.executeScript())
+ * to the right functionality based on the arguments parameter array passed in. The JavascriptExecutor wraps the entire
+ * contents of this file in a function that it calls, passing the parameters provided in executeScript().
+ * @param args
+ * @returns
+ */
+function callOperator(args) {
+	if(!args || args.length == 0) {
+		return;
+	}
+	var task = args[0];
+	
+	if(task == 'cell') {
+		var node = args[1];
+		var cellInfo = getAncestorTableCells(node, [], getDepth(node));
+		cellInfo.node = node;
+		return cellInfo;
+	}
+	else if(task == 'row') {
+		var nodes = args[1];
+		var compareInfo = getCommonAncestorRow(nodes);
+		return compareInfo;
+	}
+	else if(task == 'ancestorcell') {
+		var cell = args[1];
+		var depth = args[2];
+		var ancestor = getAncestorCellAtDepth(cell, depth);
+		return ancestor;
+	}
+	else if(task == 'column') {
+		var node = args[1];
+		var nodes = args[2];
+		var filtered = getSameColumnNodeObjects(node, nodes);
+		return filtered;
+	}
 }
-else if(task == 'row') {
-	var nodes = arguments[1];
-	var compareInfo = getCommonAncestorRow(nodes);
-	return compareInfo;
-}
-else if(task == 'ancestorcell') {
-	var cell = arguments[1];
-	var depth = arguments[2];
-	var ancestor = getAncestorCellAtDepth(cell, depth);
-	return ancestor;
-}
-else if(task == 'column') {
-	var node = arguments[1];
-	var nodes = arguments[2];
-	var filtered = getSameColumnNodeObjects(node, nodes);
-	return filtered;
-}
+
+callOperator(arguments);

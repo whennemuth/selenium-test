@@ -55,6 +55,9 @@ public class AbstractWebElement implements WebElement {
 		if(obj != null && obj instanceof AbstractWebElement) {
 			return webElement.equals(((AbstractWebElement) obj).webElement);
 		}
+		if(webElement == null) {
+			return false;
+		}
 		return webElement.equals(obj);
 	}
 

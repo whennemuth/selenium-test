@@ -191,11 +191,19 @@ public enum ElementType {
 		return this.name().equals(name);
 	}
 	
-	public List<WebElement> findAll(SearchContext ctx) {
+	public List<WebElement> findAll(SearchContext ctx, boolean frame) {
 		boolean global = true;
 		if(ctx instanceof WebElement)
 			global = false;
-		List<WebElement> flds = AbstractWebElement.wrap(ctx.findElements(By.xpath(getXpath(global))));
+		
+		String xpath = getXpath(global);
+		
+		List<WebElement> flds = XpathElementCache.get(ctx, xpath, frame);
+		if(flds.isEmpty()) {
+			flds.addAll(AbstractWebElement.wrap(ctx.findElements(By.xpath(xpath))));
+			XpathElementCache.put(ctx, xpath, frame, flds);
+		}
+
 		return flds;
 	}
 	

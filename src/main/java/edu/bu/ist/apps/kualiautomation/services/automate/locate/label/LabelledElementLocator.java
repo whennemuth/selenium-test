@@ -249,7 +249,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	
 	private List<WebElement> trySearchingOutwardFromLabel(WebElement searchCtx, WebElement labelElement) {
 
-		List<WebElement> candidates = AbstractWebElement.wrap(elementType.findAll(searchCtx));
+		List<WebElement> candidates = AbstractWebElement.wrap(elementType.findAll(searchCtx, skipFrameSearch));
 
 		if(candidates.isEmpty()) {
 			// WebElement parent = getParentElement(element);
