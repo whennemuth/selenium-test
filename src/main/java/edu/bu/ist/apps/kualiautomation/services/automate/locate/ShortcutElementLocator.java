@@ -16,6 +16,7 @@ import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.XpathElementCache;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelElementLocator;
 
 /**
@@ -71,6 +72,7 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 	@Override
 	protected List<WebElement> customLocate() {
 				
+		XpathElementCache.clear();
 		List<WebElement> results = new ArrayList<WebElement>();
 		try {
 			String node = parms.getShortcut().getLabelHierarchyParts()[0];
@@ -226,6 +228,7 @@ public class ShortcutElementLocator extends AbstractElementLocator {
 		
 		// 1) Get a new hierarchy based on the original hierarchy array.
 		if(isHotspot() && !oldHierarchy[oldHierarchy.length-1].equals(identifier)) {
+			// Put the shortcut identifier at the end of the hierarchy if it is not already there.
 			newHierarchy = Arrays.copyOf(oldHierarchy, oldHierarchy.length+1);
 			newHierarchy[newHierarchy.length-1] = identifier;
 		}

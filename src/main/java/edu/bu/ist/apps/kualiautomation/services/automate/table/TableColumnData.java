@@ -62,15 +62,20 @@ public class TableColumnData {
 	 */
 	public List<WebElement> getFirstElementsBelowLabelInSameColumn() {
 		List<TableColumnCell> cells = getElementsInSameColumnAsLabel();
-		List<WebElement> results = new ArrayList<WebElement>();
+		List<TableColumnCell> filtered = new ArrayList<TableColumnCell>();
 		for (TableColumnCell cell : cells) {
-			if(results.isEmpty()) {
-				results.add(cell.getOriginalField());
+			if(filtered.isEmpty()) {
+				filtered.add(cell);
 				continue;
 			}
-			if(cell.compareTo(results.get(0)) != 0) {
+			if(cell.compareTo(filtered.get(0)) != 0) {
 				break;
 			}
+		}
+		
+		List<WebElement> results = new ArrayList<WebElement>();
+		for(TableColumnCell cell : filtered) {
+			results.add(cell.getOriginalField());
 		}
 		return results;
 	}

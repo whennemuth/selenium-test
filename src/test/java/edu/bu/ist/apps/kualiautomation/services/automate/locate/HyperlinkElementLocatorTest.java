@@ -1,10 +1,13 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
+import java.util.List;
 import java.util.Map;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 import edu.bu.ist.apps.kualiautomation.AbstractJettyBasedTest;
 import edu.bu.ist.apps.kualiautomation.ElementsAssertion;
@@ -35,7 +38,7 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 	@Test
 	public void assert01Links1and2() {		
 		new ElementsAssertion(locator)
-		.setUrl("http://localhost:8080/hyperlink-page")
+		.setUrl(url)
 		.setLabel("anchor tag 1")
 		.setElementType(ElementType.HYPERLINK)
 		.setNumResults(1)

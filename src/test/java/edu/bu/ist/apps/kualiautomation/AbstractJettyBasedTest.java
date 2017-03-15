@@ -13,10 +13,10 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.WebClient;
 
-import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 import edu.bu.ist.apps.kualiautomation.services.automate.Session.CustomHtmlUnitDriver;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.XpathElementCache;
+import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 
 /**
  * All test classes that extend this class can access a website run by this class and whose web pages 
@@ -72,6 +72,9 @@ public abstract class AbstractJettyBasedTest {
 	}
 	
 	private void checkServer() throws Exception {
+		
+		XpathElementCache.clear();
+
 		if(!serverRunning) {
 			headless = !Boolean.valueOf(System.getenv("showbrowser"));
 			windows = Boolean.valueOf(System.getenv("windows"));

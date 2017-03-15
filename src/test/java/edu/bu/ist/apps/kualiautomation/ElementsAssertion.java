@@ -19,6 +19,7 @@ import org.openqa.selenium.WebDriver;
 import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.XpathElementCache;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.Locator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.LocatorRunner;
@@ -153,6 +154,9 @@ public class ElementsAssertion {
 	}
 	
 	public void openWebPage() {
+		
+		XpathElementCache.clear();
+		
 		if(!webPageOpen) {
 			WebDriver driver = null;
 		

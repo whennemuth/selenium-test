@@ -114,11 +114,10 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 	@Test
 	public void assert05FindAddButton() {
 		
-		// RESUME NEXT: Replace this with shortcuts
 		LabelAndValue lv = new LabelAndValue();
-		lv.setLabel("Contacts");
-//		lv.setLabel("Actions");
+		lv.setLabel("Actions");
 		lv.setElementType(ElementType.BUTTON.name());
+		lv.setIdentifier("methodToCall.addContacts.anchorContacts");
 		
 		new ElementsAssertion(runner, true)
 		.setUrl("http://localhost:8080/subaward-entry-1")
@@ -126,7 +125,6 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		.setNumResults(1)
 		.setTagNameAssertion("input")
 		.addAttributeAssertion("type", "image")
-		.addAttributeAssertion("name", "methodToCall.addContacts.anchorContacts")
 		.findAndAssertElements();		
 	}
 }

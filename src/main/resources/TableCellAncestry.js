@@ -460,24 +460,18 @@ Array.prototype.clone = function() {
 
 function doTest() {
 	var doc = getDocumentObj(false);
-	var node = doc.evaluate("//td/h2[text()='Contacts']", doc, null, XPathResult.ANY_TYPE, null).iterateNext();
-	var nodes = [
-	    doc.getElementsByName("methodToCall.headerTab.headerDispatch.save.navigateTo.subAward")[0],
-	    doc.getElementsByName("methodToCall.headerTab.headerDispatch.save.navigateTo.financial")[0],
-	    doc.getElementsByName("methodToCall.headerTab.headerDispatch.save.navigateTo.customData")[0],
-	    doc.getElementsByName("methodToCall.headerTab.headerDispatch.save.navigateTo.templateInformation")[0],
-		doc.getElementsByName("methodToCall.headerTab.headerDispatch.save.navigateTo.subAwardActions")[0],
-		doc.getElementsByName("methodToCall.headerTab.headerDispatch.save.navigateTo.medusa")[0]
-	];
-//	var results = getNodesInSameColumn(node, nodes);
-//	var s = '';
-//	for(var i=0; i<results.length; i++) {
-//		s += (results[i].id + ', ');
-//	}
-//	alert(s);
+	var node = doc.evaluate("//th[text()='Return Value']", doc, null, XPathResult.ANY_TYPE, null).iterateNext();
+	var iter = doc.evaluate("//a[text()='return value']", doc, null, XPathResult.ANY_TYPE, null);
+	var tag = iter.iterateNext();	
+	var nodes = [];
+	while(tag) {
+		nodes[nodes.length] = tag;
+		tag = iter.iterateNext();
+	}
 	
 	var results = callOperator(['column', node, nodes]);
-	alert(results);
+	//alert(results);
+	return results;
 }
 
 function getDocumentObj(fromFrame) {
@@ -531,4 +525,8 @@ function callOperator(args) {
 	}
 }
 
-callOperator(arguments);
+if(arguments) {
+	return callOperator(arguments);
+}
+
+

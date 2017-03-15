@@ -3,6 +3,7 @@ package edu.bu.ist.apps.kualiautomation.services.automate.table;
 import java.util.List;
 import java.util.Map;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -66,8 +67,15 @@ public class TableCellData {
 		
 		cell.dataId = dataId;
 		cell.childWebElement = childWebElement;		
-		cell.javascript = Utils.getClassPathResourceContent(JavascriptResourceURL);		
+		cell.javascript = Utils.getClassPathResourceContent(JavascriptResourceURL);	
 		cell.executor = (JavascriptExecutor) searchContext;
+
+// WHY IS IT NOW TAKING SO LONG TO MAKE ONE SIMPLE JAVASCRIPT CALL? (3 SECONDS)
+//		WebElement test = searchContext.findElement(By.xpath("//a[@title='return valueAddress Book Id=9034 ']"));
+//		String childHTML = (String) cell.executor.executeScript(
+//				"return arguments[0].outerHTML;", test);
+//		System.out.println(childHTML);
+		
 		cell.childHTML = (String) cell.executor.executeScript(
 				"return arguments[0].outerHTML;", 
 				AbstractWebElement.unwrap(childWebElement));
