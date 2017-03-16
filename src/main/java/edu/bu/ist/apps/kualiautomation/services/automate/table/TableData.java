@@ -106,6 +106,9 @@ public class TableData {
 	 */
 	public boolean allWebElementsShareSameAncestorsTable() {
 		
+		if(hostCells.isEmpty())
+			return false;
+		
 		for(TableCellData cell : hostCells) {
 			TableCellData topCell = cell.getHighestAncestorCell();
 			if(topCell.getDepth() != hostCells.get(0).getDepth())

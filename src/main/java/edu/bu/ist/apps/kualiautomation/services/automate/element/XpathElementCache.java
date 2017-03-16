@@ -21,6 +21,8 @@ import org.openqa.selenium.WebElement;
  */
 public class XpathElementCache {
 	
+	public static final boolean CACHING_ENABLED = false;
+	
 	private static final Map<XpathElementCache.XpathAndContext, List<WebElement>> cache = 
 			new HashMap<XpathElementCache.XpathAndContext, List<WebElement>>();
 	

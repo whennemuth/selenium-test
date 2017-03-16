@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -17,7 +16,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelEleme
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledElementLocator;
 
 public class HyperlinkElementLocator extends AbstractElementLocator {
-
+	
 	public HyperlinkElementLocator(WebDriver driver) {
 		super(driver);
 	}
@@ -31,25 +30,54 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 		List<WebElement> located = new ArrayList<WebElement>();
 		if(elementType != null && elementType.getTagname() != null) {
 			
-			String innerText = new String(parameters.get(0));
+			String label = null;
+			String innerText = null;
 			List<String> attributeValues = new ArrayList<String>();
-			if(parameters.size() > 1) {
-				attributeValues = parameters.subList(1, parameters.size());
-			}
-			
-			// 1) A hyperlink will come up as a result of a more basic label search, so start there and filter later.
+			List<Element> candidates = null;
 			LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext);
-			List<Element> candidates = labelLocator.locateAll(null, Arrays.asList(new String[]{ innerText }));
-			List<WebElement> webElements = getWebElements(candidates);
-			
-			// 2) Separate the anchor tags from the other labels
 			List<WebElement> labels = new ArrayList<WebElement>();
 			List<WebElement> anchortags = new ArrayList<WebElement>();			
-			for(WebElement we : webElements) {
-				if("a".equalsIgnoreCase(we.getTagName()))
-					anchortags.add(we);
-				else
-					labels.add(we);
+			
+			// 1a) A hyperlink will come up as a result of a more basic label search, so start there and filter later.
+			// This assumes the hyperlinks we are looking for are NOT labelled.
+			innerText = new String(parameters.get(0));
+			if(parameters.size() > 1) {					
+				attributeValues = parameters.subList(1, parameters.size());		
+			}
+			candidates = labelLocator.locateAll(null, Arrays.asList(new String[]{ innerText }));
+			
+			for(Element candidate : candidates) {
+				if(!"a".equalsIgnoreCase(candidate.getWebElement().getTagName())) {
+					labels.add(candidate.getWebElement());
+					continue;
+				}
+				AttributeInspector inspector = new AttributeInspector(searchContext, candidate.getWebElement());
+				List<WebElement> filtered = inspector.findForValues(attributeValues);
+				if(!anchortags.addAll(filtered)) {
+					labels.add(candidate.getWebElement());
+				}
+			}
+
+			if(anchortags.isEmpty() && parameters.size() > 1) {
+			//if(labels.isEmpty() && parameters.size() > 1) {
+				// 1b) Assume the hyperlinks we are looking for ARE labelled and the first parameter is the label value.
+				label = new String(parameters.get(0));
+				innerText = new String(parameters.get(1));
+				if(parameters.size() > 2) {					
+					attributeValues = parameters.subList(2, parameters.size());		
+				}
+				List<Element> lbls = labelLocator.locateAll(null, Arrays.asList(new String[]{ label }));
+				for(Element lbl : lbls) {
+					if(!labels.contains(lbl.getWebElement()))
+						labels.add(lbl.getWebElement());
+				}				
+				LabelledElementLocator labelledLocator = new LabelledElementLocator(driver, searchContext, lbls);	
+				candidates = labelledLocator.locateAll(ElementType.HYPERLINK, parameters);
+				for(Element elmt : candidates) {
+					if("a".equalsIgnoreCase(elmt.getWebElement().getTagName())) {
+						anchortags.add(elmt.getWebElement());
+					}
+				}
 			}
 			
 			List<WebElement> finalresults = new ArrayList<WebElement>();
@@ -59,7 +87,7 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 			}
 			else {
 				
-				// 3) Find out if the elements found so far are in a table and we can pick one from it that best matches label.
+				// 2) Find out if the elements found so far are in a table and we can pick one from it that best matches label.
 				List<WebElement> tabledAnchortags1 = filterByTabularLogic(labels, anchortags);
 				List<WebElement> tabledAnchortags2 = new ArrayList<WebElement>();
 				List<WebElement> tabledAnchortags3 = new ArrayList<WebElement>();
@@ -69,10 +97,10 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 				}
 				else {
 					
-					// 4) We turned up another label in the initial search for anchor tags. Regard it as an element that 
+					// a) We turned up another label in the initial search for anchor tags. Regard it as an element that 
 					// labels one or more other anchor tags and use the LabelledElementLocator to find them.
-					for(@SuppressWarnings("unused") WebElement label : labels) {
-						LabelledElementLocator labelledLocator = new LabelledElementLocator(driver, searchContext, getElements(labels));
+					for(WebElement lbl : labels) {
+						LabelledElementLocator labelledLocator = new LabelledElementLocator(driver, searchContext, getElements(Arrays.asList(new WebElement[]{ lbl })));
 						labelledLocator.setLabelCanBeHyperlink(false);
 						List<Element> anchorTagElements = labelledLocator.locateAll(ElementType.HYPERLINK, parameters);
 						for(Element anchorTagElement : anchorTagElements) {
@@ -82,7 +110,7 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 						}
 					}
 					
-					// 5) Repeat the table-based search for any newly found elements
+					// b) Repeat the table-based search for any newly found elements
 					if(tabledAnchortags2.size() == 1) {
 						finalresults.addAll(tabledAnchortags2);
 					}
@@ -98,7 +126,7 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 				}
 			}
 			
-			// 6)  With all of the anchor tags found, remove those that do not have an attribute value for each value in attributeValues
+			// 3)  With all of the anchor tags found, remove those that do not have an attribute value for each value in attributeValues
 			AttributeInspector inspector = new AttributeInspector(searchContext, finalresults);
 			located.addAll(inspector.findForValues(attributeValues));
 		}

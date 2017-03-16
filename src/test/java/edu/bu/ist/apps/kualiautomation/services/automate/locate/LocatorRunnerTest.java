@@ -31,8 +31,8 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		handlers.put("AddressBookLookup1_files", "AddressBookLookup1_files");
 		handlers.put("subaward-entry-1", "SubawardEntry.htm");
 		handlers.put("SubawardEntry_files", "SubawardEntry_files");
-//		handlers.put("subaward-lookup-1", "SubawardLookup.htm");
-//		handlers.put("SubawardLookup_files", "SubawardLookup_files");
+		handlers.put("subaward-lookup-1", "SubawardLookup.htm");
+		handlers.put("SubawardLookup_files", "SubawardLookup_files");
 	}
 	
 	@Test
@@ -98,10 +98,10 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 	}
 	
 	/**
-	 * Search for links with innerText of "Return Value", labelled by a table column "Return Value".
-	 * Add an extra attribute to the search criteria of "return value".
+	 * Search for links with innerText of "open", labelled by a table column "Actions".
+	 * DO NOT specify an extra attribute.
 	 */
-	//@Test
+	@Test
 	public void assert04FindFirstOfIdenticalLinks() {
 		
 		LabelAndValue lv = new LabelAndValue();
@@ -114,7 +114,7 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		.addLabelAndValue(lv)
 		.setNumResults(1)
 		.setTagNameAssertion("a")
-		.setTextAssertion("return value")
+		.setTextAssertion("open")
 		.findAndAssertElements();
 	}
 	

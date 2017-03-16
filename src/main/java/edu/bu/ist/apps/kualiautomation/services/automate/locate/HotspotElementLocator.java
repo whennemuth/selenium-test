@@ -12,6 +12,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.AttributeInspec
 import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.XpathElementCache;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledElementLocator;
 
 /**

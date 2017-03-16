@@ -244,15 +244,17 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	 * @return
 	 */
 	private List<WebElement> trySearchingOutwardFromLabel(WebElement labelElement) {
-		return trySearchingOutwardFromLabel(labelElement, labelElement);
+		return trySearchingOutwardFromLabel(labelElement, labelElement, false);
 	}
-	
-	private List<WebElement> trySearchingOutwardFromLabel(WebElement searchCtx, WebElement labelElement) {
+		
+	private List<WebElement> trySearchingOutwardFromLabel(WebElement searchCtx, WebElement labelElement, boolean parentOnly) {
 
-		List<WebElement> candidates = AbstractWebElement.wrap(elementType.findAll(searchCtx, skipFrameSearch));
+		List<WebElement> candidates = new ArrayList<WebElement>();
+		if(!parentOnly) {
+			candidates.addAll(AbstractWebElement.wrap(elementType.findAll(searchCtx, skipFrameSearch)));
+		}
 
 		if(candidates.isEmpty()) {
-			// WebElement parent = getParentElement(element);
 			WebElement parent = null;
 			try {
 				parent = AbstractWebElement.wrap(searchCtx.findElement(By.xpath("./..")));
@@ -263,7 +265,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 				return candidates;
 			}
 			if(parent != null) {
-				return trySearchingOutwardFromLabel(parent, labelElement);
+				return trySearchingOutwardFromLabel(parent, labelElement, false);
 			}
 			return candidates;
 		}
@@ -275,7 +277,13 @@ public class LabelledElementLocator extends AbstractElementLocator {
 				// If parameters are present beyond the first, they are attribute values, so pick only 
 				// those webElements that have every attributeValue accounted for among their attributes.
 				AttributeInspector inspector = new AttributeInspector(candidates);
-				return inspector.findForValues(attributeValues);
+				List<WebElement> filtered = inspector.findForValues(attributeValues);
+				if(filtered.isEmpty()) {
+					return trySearchingOutwardFromLabel(searchCtx, labelElement, true);
+				}
+				else {
+					return filtered;
+				}
 			}
 		}
 	}
