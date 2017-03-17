@@ -16,7 +16,6 @@ import javax.ws.rs.core.Response.Status;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigShortcut;
-import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.entity.util.BeanPopulator;
 import edu.bu.ist.apps.kualiautomation.model.Directory;
 import edu.bu.ist.apps.kualiautomation.services.config.ConfigService;

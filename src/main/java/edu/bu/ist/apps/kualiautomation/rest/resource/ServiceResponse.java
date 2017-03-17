@@ -13,7 +13,8 @@ public class ServiceResponse {
 	private String json;
 	private String message;
 	
-	private ServiceResponse() { /* Restrict default constructor */ }
+	public  ServiceResponse() { } 
+	
 	public Object getData() {
 		return data;
 	}

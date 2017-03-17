@@ -59,7 +59,6 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 			}
 
 			if(anchortags.isEmpty() && parameters.size() > 1) {
-			//if(labels.isEmpty() && parameters.size() > 1) {
 				// 1b) Assume the hyperlinks we are looking for ARE labelled and the first parameter is the label value.
 				label = new String(parameters.get(0));
 				innerText = new String(parameters.get(1));

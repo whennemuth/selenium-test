@@ -4,17 +4,12 @@ import java.io.OutputStream;
 
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.WebClient;
 
 import edu.bu.ist.apps.kualiautomation.entity.Config;
 import edu.bu.ist.apps.kualiautomation.entity.ConfigEnvironment;
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
 import edu.bu.ist.apps.kualiautomation.services.config.ConfigDefaults;
+import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 public class Session implements Runnable {
 
@@ -38,15 +33,8 @@ public class Session implements Runnable {
 	@Override
 	public void run() {
 		
-		System.setProperty("webdriver.chrome.driver", "C:\\Users\\wrh\\Desktop\\chromedriver_win32\\chromedriver.exe");
-		
 		try {
-			if(config.isHeadless())
-				driver = new CustomHtmlUnitDriver(BrowserVersion.FIREFOX_38, true);
-			else
-				driver = new org.openqa.selenium.chrome.ChromeDriver();
-				//driver = new FirefoxDriver();
-			
+			setDriver();			
 			
 			if( login()) {
 			
@@ -72,6 +60,21 @@ public class Session implements Runnable {
 		}
 	}
 
+	private void setDriver() {
+		if(config.isHeadless()) {
+			driver = Driver.HEADLESS.getDriver();
+		}
+		else {
+			String drivername = System.getProperty(Driver.DRIVER_SYSTEM_PROPERTY);
+			if(Utils.isEmpty(drivername)) {
+				driver = Driver.DEFAULT_DRIVER.getDriver();
+			}
+			else {
+				driver = Driver.valueOf(drivername).getDriver();
+			}			
+		}
+	}
+	
 	private void work() {
 		System.out.println("Running cycle...");
 		CycleRunner runner = new CycleRunner(this, runLog);
@@ -86,6 +89,8 @@ public class Session implements Runnable {
 	}
 
 	private boolean login() throws Exception {
+		if(driver == null)
+			return false;
 		KerberosLogin kerberos = new KerberosLogin(this, 10, runLog);
 		if(kerberos.login()) {
 			return true;
@@ -120,28 +125,6 @@ public class Session implements Runnable {
 		return terminate;
 	}
 
-	/**
-	 * Allow for enabled javascript, but do not throw exceptions.
-	 * @author wrh
-	 *
-	 */
-	public static class CustomHtmlUnitDriver extends HtmlUnitDriver {
-		public CustomHtmlUnitDriver(boolean javascriptEnabled) {
-			super(javascriptEnabled);
-		}
-		public CustomHtmlUnitDriver(DesiredCapabilities capabilities) {
-			super(capabilities);
-		}
-		public CustomHtmlUnitDriver(BrowserVersion firefox38, boolean javascriptEnabled) {
-			super(firefox38, javascriptEnabled);
-		}
-		@Override protected WebClient modifyWebClient(WebClient client) {
-			WebClient modifiedClient = super.modifyWebClient(client);
-			modifiedClient.getOptions().setThrowExceptionOnScriptError(false);
-			return modifiedClient;
-		}
-	}
-	
 	public static void main(String[] args) {
 		
 		// Create a configuration and load with default values.

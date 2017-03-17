@@ -14,7 +14,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 
-import edu.bu.ist.apps.kualiautomation.services.automate.Session.CustomHtmlUnitDriver;
+import edu.bu.ist.apps.kualiautomation.services.automate.Driver;
+import edu.bu.ist.apps.kualiautomation.services.automate.Driver.CustomHtmlUnitDriver;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.XpathElementCache;
 import edu.bu.ist.apps.kualiautomation.services.config.EmbeddedJettyStaticServer;
 
@@ -53,13 +54,13 @@ public abstract class AbstractJettyBasedTest {
 				capabilities.setCapability("name", "Testing Selenium");	
 				capabilities.setJavascriptEnabled(javascriptEnabled);
 				if(javascriptIgnoreExceptions)
-					driver = new CustomHtmlUnitDriver(capabilities);
+					driver = new Driver.CustomHtmlUnitDriver(capabilities);
 				else
 					driver = new HtmlUnitDriver(capabilities);
 			}
 			else {
 				if(javascriptIgnoreExceptions)
-					driver = new CustomHtmlUnitDriver(BrowserVersion.FIREFOX_38, javascriptEnabled);
+					driver = new Driver.CustomHtmlUnitDriver(BrowserVersion.FIREFOX_38, javascriptEnabled);
 				else
 					driver = new HtmlUnitDriver(BrowserVersion.FIREFOX_38, javascriptEnabled);
 			}
