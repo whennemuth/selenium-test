@@ -39,6 +39,13 @@ div.shortcut:hover {
 	cursor: pointer;
 }
 
+table.valuerow {
+	font: normal normal 12px arial;
+}
+
+table.valuerow td {
+	padding-right: 5px;
+}
 table.shortcut {
 	padding-bottom: 15px;	
 }

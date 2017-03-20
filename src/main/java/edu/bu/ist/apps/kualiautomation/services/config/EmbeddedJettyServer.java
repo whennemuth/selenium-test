@@ -48,7 +48,17 @@ public abstract class EmbeddedJettyServer {
         
         File jarfile = getJarFile();
         if(jarfile == null) {
-        	context.setBaseResource(Resource.newClassPathResource("webapp"));
+        	String webappDirLocation = "src/main/resources/webapp/";
+        	context.setDescriptor(webappDirLocation + "/WEB-INF/web.xml");
+        	context.setResourceBase(webappDirLocation);
+        	//
+        	// or...
+        	//
+        	// context.setBaseResource(Resource.newClassPathResource("webapp"));
+        	//
+        	// However, if using this second method, javascript source files will not refresh even if you wipe out the browsers cache.
+        	// This is probably because jetty is not properly changing header info to indicate the javascript source is newer and the 
+        	// browser still has some remnant it can reuse (even though cache is cleared).
         }
         else {
         	File webapp = unpackWebAppDir();
@@ -63,7 +73,7 @@ public abstract class EmbeddedJettyServer {
         context.setParentLoaderPriority(true);
         server.setHandler(context);
 	}
-
+	
 	public File unpackWebAppDir() {
 		
 		File rootdir = null;
@@ -142,7 +152,6 @@ public abstract class EmbeddedJettyServer {
 		return new File("webapp");		
 	}
 
-	// jersey-media-json-jackson-2.22.jar
 	private void writeZipEntry(ZipEntry ze, ZipInputStream zin, File rootdir, String pathstart) throws Exception {
 		if(ze.isDirectory()) {
 			String dirspec = rootdir.getAbsolutePath() + File.separator + ze.getName();
@@ -203,6 +212,9 @@ public abstract class EmbeddedJettyServer {
         server.start();
         server.dumpStdErr();
         server.join();
+  context.getServletContext().setInitParameter("cacheControl", "private, no-cache, no-store, proxy-revalidate, no-transform");
+  context.getServletContext().setInitParameter("Pragma", "no-cache");
+  context.getServletContext().setInitParameter("Expires", "0");
 	}
 	
 	public void stop() throws Exception {

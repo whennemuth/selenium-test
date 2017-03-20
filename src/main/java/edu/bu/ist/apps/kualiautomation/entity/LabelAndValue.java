@@ -72,6 +72,15 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 	@Transient
 	private String screenScrapeValue;
 	
+	@Column(name="date_units", nullable=true)
+	private Integer dateUnits;
+	
+	@Column(name="date_type", nullable=true, length=25)
+	private String dateType;
+	
+	@Column(name="date_format", nullable=true, length=25)
+	private String dateFormat;
+	
 	// uni-directional one-to-one association to ConfigShortcut (ConfigShortcut cannot "see" LabelAndValue). 
 	// NOTE: Don't use CascadeType.REMOVE as removals of this entity will try to cascade the removal of the ConfigShortcut
 	//       entity from the database, which we don't want because it's a configuration setting and we want it available
@@ -161,6 +170,30 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public Integer getDateUnits() {
+		return dateUnits;
+	}
+
+	public void setDateUnits(Integer dateUnits) {
+		this.dateUnits = dateUnits;
+	}
+
+	public String getDateType() {
+		return dateType;
+	}
+
+	public void setDateType(String dateType) {
+		this.dateType = dateType;
+	}
+
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
 	}
 
 	public String getElementType() {

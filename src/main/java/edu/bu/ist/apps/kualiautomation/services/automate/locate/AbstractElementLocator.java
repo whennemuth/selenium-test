@@ -1,6 +1,7 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -120,17 +121,17 @@ public abstract class AbstractElementLocator implements Locator {
 		
 		List<WebElement> custom = customLocate();
 		
-		for(WebElement found : custom) {
-			if(ignoreHidden && !found.isDisplayed())
-				continue;
-			if(ignoreDisabled && !found.isEnabled())
-				continue;
-			webElements.add(found);
-		}
+		webElements.addAll(
+				removeHidden(
+						removeDisabled(
+								removeDuplicates(custom))));
 		
 		if(webElements.isEmpty()) {			
 			List<WebElement> defaults = defaultLocate();			
-			webElements.addAll(defaults);
+			webElements.addAll(
+					removeHidden(
+							removeDisabled(
+									removeDuplicates(defaults))));
 		}
 		
 		for(WebElement we : webElements) {
@@ -190,6 +191,46 @@ public abstract class AbstractElementLocator implements Locator {
 		if(iframes.isEmpty())
 			return false;
 		return !ElementType.SHORTCUT.equals(elementType);
+	}
+	
+	private List<WebElement> removeDuplicates(List<WebElement> results) {
+		List<WebElement> set = new ArrayList<WebElement>();
+		outerloop:
+		for (Iterator<WebElement> iterator = results.iterator(); iterator.hasNext();) {
+			WebElement candidate = iterator.next();
+			for(WebElement unique : set) {
+				if(candidate.equals(unique))
+					continue outerloop;				
+			}
+			set.add(candidate);
+		}
+		return set;
+	}
+
+	private List<WebElement> removeHidden(List<WebElement> results) {
+		List<WebElement> webElements = new ArrayList<WebElement>();
+		
+		for(WebElement found : results) {
+			if(ignoreHidden && !found.isDisplayed())
+				continue;
+			if("0".equals(found.getAttribute("width")))
+				continue;
+			if("0".equals(found.getAttribute("length")))
+				continue;
+			webElements.add(found);
+		}
+		return webElements;
+	}
+
+	private List<WebElement> removeDisabled(List<WebElement> results) {
+		List<WebElement> webElements = new ArrayList<WebElement>();
+		
+		for(WebElement found : results) {
+			if(ignoreDisabled && !found.isEnabled())
+				continue;
+			webElements.add(found);
+		}
+		return webElements;
 	}
 	
 	public void setDefaultRan(boolean defaultRan) {

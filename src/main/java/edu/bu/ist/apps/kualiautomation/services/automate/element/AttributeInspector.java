@@ -9,6 +9,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
+import edu.bu.ist.apps.kualiautomation.util.Utils;
+
 /**
  * Given one or more WebElement instances, this class is used to return those that satisfy a search
  * against their attributes. To satisfy this search, each of a specified list of attribute values 
@@ -103,6 +105,8 @@ public class AttributeInspector {
 		outerloop:
 		for(WebElement we : webElements) {			 
 			for(String attributeValue : attributeValues) {
+				if(Utils.trimIgnoreCaseEqual("null", attributeValue))
+					continue;
 				Map<String, String> unfiltered = getAttributes(we);
 				Attribute attribute = new Attribute(we, unfiltered.keySet());
 				List<String> found = attribute.forValue(attributeValue);

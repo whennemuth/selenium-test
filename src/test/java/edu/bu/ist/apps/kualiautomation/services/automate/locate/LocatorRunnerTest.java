@@ -150,4 +150,53 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		.addAttributeAssertion("type", "image")
 		.findAndAssertElements();		
 	}
+	
+	@Test
+	public void assert07FindSubmitButton() {
+		
+		LabelAndValue lv = new LabelAndValue();
+		lv.setLabel(null);
+		lv.setElementType(ElementType.BUTTON.name());
+		lv.setIdentifier("methodToCall.save");
+		
+		new ElementsAssertion(runner, true)
+		.setUrl("http://localhost:8080/subaward-entry-1")
+		.addLabelAndValue(lv)
+		.setNumResults(1)
+		.setTagNameAssertion("input")
+		.addAttributeAssertion("type", "image")
+		.findAndAssertElements();		
+	}
+	
+	@Test
+	public void assert08FindSubawardIdTextbox() {
+		
+		LabelAndValue lv = new LabelAndValue();
+		lv.setLabel("Subaward ID");
+		lv.setElementType(ElementType.TEXTBOX.name());
+		
+		new ElementsAssertion(runner, true)
+		.setUrl("http://localhost:8080/subaward-lookup-1")
+		.addLabelAndValue(lv)
+		.setNumResults(1)
+		.setTagNameAssertion("input")
+		.addAttributeAssertion("type", "text")
+		.findAndAssertElements();		
+	}
+	
+	@Test
+	public void assert09FindSearchButton() {
+		
+		LabelAndValue lv = new LabelAndValue();
+		lv.setElementType(ElementType.BUTTON.name());
+		lv.setIdentifier("methodToCall.search");
+		
+		new ElementsAssertion(runner, true)
+		.setUrl("http://localhost:8080/subaward-lookup-1")
+		.addLabelAndValue(lv)
+		.setNumResults(1)
+		.setTagNameAssertion("input")
+		.addAttributeAssertion("type", "image")
+		.findAndAssertElements();		
+	}
 }

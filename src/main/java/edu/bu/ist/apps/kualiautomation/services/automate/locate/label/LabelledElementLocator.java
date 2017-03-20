@@ -87,6 +87,10 @@ public class LabelledElementLocator extends AbstractElementLocator {
 			if(elementType != null && elementType.getTagname() != null) {
 				
 				String label = new String(parameters.get(0));
+				if("null".equalsIgnoreCase(label) || Utils.isEmpty(label)) {
+					return new ArrayList<WebElement>();
+				}
+				
 				if(parameters.size() > 1) {
 					attributeValues.addAll(parameters.subList(1, parameters.size()));
 				}

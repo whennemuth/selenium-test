@@ -141,11 +141,36 @@
 										</div>
 									
 										<div ng-show="lvShow(lv, 'value')" style="padding-top:5px;">
-											value<br>
-											<input type="text" value="{{lv.value}}" ng-model="lv.value" ng-disabled="lv.screenScrapeId > 0">
-											<select ng-model="lv.screenScrapeId" ng-change="lv.value = ''"
-												ng-options="ss.id as getScreenScrapeInfo(ss) for ss in screenscrapes | filter:filterScreenScrapes(suite, lv)">
-											</select>											
+											<table cellpadding=0; cellspacing=0 border=0 class="valuerow">
+												<tr>
+													<td>value</td>
+													<td>type</td>
+													<td><div ng-show="lv.screenScrapeId == -1">quantity</div></td>
+													<td><div ng-show="lv.screenScrapeId == -1">units</div></td>
+													<td><div ng-show="lv.screenScrapeId == -1">format</div></td>
+												</tr>
+												<tr>
+													<td>
+														<input type="text" value="{{lv.value}}" ng-model="lv.value" ng-disabled="lv.screenScrapeId != 0">
+													</td>
+													<td>
+														<select ng-model="lv.screenScrapeId" ng-change="lv.value = ''"
+															ng-options="ss.id as getScreenScrapeInfo(ss) for ss in screenscrapes | filter:filterScreenScrapes(suite, lv)">
+														</select>											
+													</td>
+													<td><div ng-show="lv.screenScrapeId == -1">
+														<input type="text" ng-model="lv.dateUnits" onkeypress="return /\d/.test(String.fromCharCode(event.keyCode));" maxlength=3 style="width:60px;">											
+													</div></td>
+													<td><div ng-show="lv.screenScrapeId == -1">
+														<select ng-model="lv.dateType" >	
+														</select>										
+													</div></td>
+													<td><div ng-show="lv.screenScrapeId == -1">
+														<select ng-model="lv.dateFormat" >	
+														</select>										
+													</div></td>
+												</tr>
+											</table>
 										</div>
 									
 										<div ng-show="lvShow(lv, 'navigates')" style="padding-top:5px;">

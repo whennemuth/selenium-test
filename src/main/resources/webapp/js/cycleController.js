@@ -170,15 +170,23 @@ var cycleCtrlFactory = function() {
 			 */
 			scope.refreshScreenScrapes = function() {
 				scope.screenscrapes.length = 0; // clears the array without rereferencing it.
-				// Add a default entry to the top of the array indicating it refers to a non-screenscrape value entry.
+				// Add 2 default entries to the top of the array indicating non-screenscrape value entries.
 				scope.screenscrapes[0] = {
-					id:0, 
-					label:'Manual Entry', 
-					sequence:0,
-					suiteId:0,
-					suiteName:'',
-					suiteSequence:0
-				}
+						id:0, 
+						label:'Manual Entry', 
+						sequence:0,
+						suiteId:0,
+						suiteName:'',
+						suiteSequence:0
+					}
+				scope.screenscrapes[1] = {
+						id:-1, 
+						label:'Date Entry', 
+						sequence:0,
+						suiteId:0,
+						suiteName:'',
+						suiteSequence:0
+					}
 				for(x=0; x<scope.cycle.suites.length; x++) {
 					var suite = scope.cycle.suites[x];
 					for(var i=0; i<suite.labelAndValues.length; i++) {
@@ -205,7 +213,7 @@ var cycleCtrlFactory = function() {
 			 * Get a string that will be displayed as a single picklist entry for screen scrapes.
 			 */
 			scope.getScreenScrapeInfo = function(ss) {
-				if(ss.id == 0) {
+				if(ss.id <= 0) {
 					return ss.label;
 				}
 				else {
@@ -234,6 +242,10 @@ var cycleCtrlFactory = function() {
 					}
 					return true;					
 				}
+			};
+			
+			scope.screenScrapeChange = function(lv) {
+				
 			};
 			
 			scope.resequence = function(items) {

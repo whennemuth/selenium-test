@@ -99,11 +99,16 @@ public class BatchElementLocator implements Locator {
 						setter.invoke(locator, this.ignoreDisabled);
 					}
 					
-					Element result = runLocator(locator, elementType, attributes);
+					List<Element> moreResults = runLocator(locator, elementType, attributes);
 					
-					if(addUniqueResult(results, result) && !greedy) {
-						break;
+					boolean foundResult = false;
+					for(Element result : moreResults) {
+						if(addUniqueResult(results, result) && !greedy) {
+							foundResult = true;
+						}
 					}
+					if(foundResult)
+						break;
 				} 
 				catch (Exception e) {
 					e.printStackTrace();
@@ -146,14 +151,14 @@ public class BatchElementLocator implements Locator {
 	 * @param parameters
 	 * @return
 	 */
-	private Element runLocator(Locator locator, ElementType elementType, List<String> parameters) {
+	private List<Element> runLocator(Locator locator, ElementType elementType, List<String> parameters) {
 		if(defaultRan) {
 			if(locator instanceof AbstractElementLocator) {
 				((AbstractElementLocator) locator).setDefaultRan(true);
 			}
 		}
 		
-		Element result = locator.locateFirst(elementType, parameters);
+		List<Element> results = locator.locateAll(elementType, parameters);
 		if(locator.getMessage() != null) {
 			messages.add(locator.getMessage());
 		}
@@ -164,7 +169,7 @@ public class BatchElementLocator implements Locator {
 			}
 		}
 		
-		return result;
+		return results;
 	}
 	
 	private Map<Class<?>, List<String>> parseParms(List<String> parms) {
