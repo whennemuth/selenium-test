@@ -213,15 +213,41 @@ public abstract class AbstractElementLocator implements Locator {
 		for(WebElement found : results) {
 			if(ignoreHidden && !found.isDisplayed())
 				continue;
-			if("0".equals(found.getAttribute("width")))
-				continue;
-			if("0".equals(found.getAttribute("length")))
-				continue;
+			if("0".equals(found.getAttribute("width")) || "0".equals(found.getAttribute("length"))) {
+				// The firefox webdriver lies about width and height attributes - sometimes having neither, 
+				// getAttribute("width") still returns "0". Therefore verify by looking at the outerhtml. 
+				// NOTE: the javascript call takes time, so don't use this method if it will be repeated many times during a cycle.
+				if(hiddenByAttribute(found)) {
+					continue;
+				}
+			}
 			webElements.add(found);
 		}
 		return webElements;
 	}
 
+	/**
+	 * Find out if a web element has a width or height attribute with a zero value by looking at its outerHTML.
+	 * NOTE: This can suck up time if it is used repeatedly (can be 2 seconds for each execution).
+	 * @param we
+	 * @return
+	 */
+	private boolean hiddenByAttribute(WebElement we) {
+		long start = System.currentTimeMillis();
+		boolean hidden = false;
+		String html = (String) ((JavascriptExecutor) driver).executeScript(
+				"return arguments[0].outerHTML", AbstractWebElement.unwrap(we));
+		html = html.split(">")[0];
+		if(html.matches(".*width\\s*=\\s*[\"']?[^\"'1-9][\"']?.*")) {
+			hidden = true;
+		}
+		if(html.matches(".*height\\s*=\\s*[\"']?[^\"'1-9][\"']?.*")) {
+			hidden = true;
+		}
+		System.out.println(System.currentTimeMillis() - start);
+		return hidden;
+	}
+	
 	private List<WebElement> removeDisabled(List<WebElement> results) {
 		List<WebElement> webElements = new ArrayList<WebElement>();
 		
