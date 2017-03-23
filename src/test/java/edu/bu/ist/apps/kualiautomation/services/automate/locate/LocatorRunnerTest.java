@@ -33,6 +33,8 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		handlers.put("SubawardEntry_files", "SubawardEntry_files");
 		handlers.put("subaward-lookup-1", "SubawardLookup.htm");
 		handlers.put("SubawardLookup_files", "SubawardLookup_files");
+		handlers.put("subaward-actions-1", "SubawardActions.htm");
+		handlers.put("SubawardActions_files", "SubawardActions_files");
 	}
 	
 	@Test
@@ -198,5 +200,21 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		.setTagNameAssertion("input")
 		.addAttributeAssertion("type", "image")
 		.findAndAssertElements();		
+	}
+	
+	@Test
+	public void assert10FindSubmitButton() {
+		
+		LabelAndValue lv = new LabelAndValue();
+		lv.setElementType(ElementType.HOTSPOT.name());
+		lv.setIdentifier("methodToCall.route");
+		
+		new ElementsAssertion(runner, true)
+		.setUrl("http://localhost:8080/subaward-actions-1")
+		.addLabelAndValue(lv)
+		.setNumResults(1)
+		.setTagNameAssertion("input")
+		.addAttributeAssertion("type", "image")
+		.findAndAssertElements();				
 	}
 }

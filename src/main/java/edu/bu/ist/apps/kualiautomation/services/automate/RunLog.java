@@ -1,7 +1,12 @@
 package edu.bu.ist.apps.kualiautomation.services.automate;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -118,6 +123,28 @@ public class RunLog {
 	
 	private long getDuration() {
 		return (stop.getTime() - start.getTime())/1000;
+	}
+	
+	public String getResults() {
+		ByteArrayOutputStream bytes = null;
+		BufferedOutputStream buf = null;
+		try {
+			bytes = new ByteArrayOutputStream();
+			buf = new BufferedOutputStream(bytes);
+			printResults(buf);
+			return bytes.toString();
+		} 
+		finally {
+			try {
+				if(bytes != null)
+					bytes.close();
+				if(buf != null)
+					buf.close();
+			} 
+			catch (IOException e) {
+				// Do nothing.
+			}
+		}
 	}
 	
 	public void printResults(OutputStream out) {

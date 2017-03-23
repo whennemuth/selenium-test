@@ -16,6 +16,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.AbstractWebElem
 import edu.bu.ist.apps.kualiautomation.services.automate.element.AttributeInspector;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.services.automate.element.XpathElementCache;
 
 public abstract class AbstractElementLocator implements Locator {
 	protected SearchContext searchContext;
@@ -117,25 +118,32 @@ public abstract class AbstractElementLocator implements Locator {
 	 */
 	private void loadResults(List<Element> results) {
 		
-		List<WebElement> webElements = new ArrayList<WebElement>();
 		
-		List<WebElement> custom = customLocate();
-		
-		webElements.addAll(
-				removeHidden(
-						removeDisabled(
-								removeDuplicates(custom))));
-		
-		if(webElements.isEmpty()) {			
-			List<WebElement> defaults = defaultLocate();			
+		try {
+			List<WebElement> webElements = new ArrayList<WebElement>();
+			
+			List<WebElement> custom = customLocate();
+			
 			webElements.addAll(
 					removeHidden(
-							removeDisabled(
-									removeDuplicates(defaults))));
-		}
-		
-		for(WebElement we : webElements) {
-			results.add(getElement(driver, we));
+					removeDisabled(
+					removeDuplicates(custom))));
+			
+			if(webElements.isEmpty()) {			
+				List<WebElement> defaults = defaultLocate();			
+				webElements.addAll(
+						removeHidden(
+						removeDisabled(
+						removeDuplicates(defaults))));
+			}
+			
+			for(WebElement we : webElements) {
+				results.add(getElement(driver, we));
+			}
+		} 
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -154,6 +162,7 @@ public abstract class AbstractElementLocator implements Locator {
 		
 		if(!iframes.isEmpty()) {
 			for(WebElement iframe : iframes) {
+				XpathElementCache.clear();
 				// (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOf(iframe));
 				(new WebDriverWait(driver, 5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
 				skipFrameSearch = true;
@@ -167,7 +176,7 @@ public abstract class AbstractElementLocator implements Locator {
 					}
 					else {
 						// Don't switch back to the parent window because you will not be able to use the WebElement as it would 
-						// then belong to a frame that the WebDriver is longer focused on ( you will get a StaleElementReferenceException ).
+						// then belong to a frame that the WebDriver is no longer focused on ( you will get a StaleElementReferenceException ).
 						// driver.switchTo().defaultContent();
 					}
 				}

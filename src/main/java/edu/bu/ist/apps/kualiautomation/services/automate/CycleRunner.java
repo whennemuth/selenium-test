@@ -25,6 +25,7 @@ import edu.bu.ist.apps.kualiautomation.services.config.ConfigTestingDefaults;
  */
 public class CycleRunner {
 
+	private Window window;
 	private WebDriver driver;
 	private Cycle cycle;
 	private RunLog runlog;
@@ -37,6 +38,7 @@ public class CycleRunner {
 	}
 	
 	public CycleRunner(WebDriver driver, Cycle cycle, RunLog runlog) {
+		this.window = new Window(driver);
 		this.driver = driver;
 		this.cycle = cycle;
 		this.runlog = runlog;
@@ -66,15 +68,18 @@ public class CycleRunner {
 				List<Element> elements = locator.runGreedy(lv);
 				if(elementLocated(lv, elements)) {
 					if(!applyElementValue(lv, elements.get(0))) {
-						driver.switchTo().defaultContent();
+						window.focus();
+						//driver.switchTo().defaultContent();
 						break outerloop;
 					}
 				}
 				else {
-					driver.switchTo().defaultContent();
+					window.focus();
+					//driver.switchTo().defaultContent();
 					break outerloop;
 				}
-				driver.switchTo().defaultContent();
+				window.focus();
+				//driver.switchTo().defaultContent();
 			}
 		}
 		
