@@ -24,7 +24,7 @@ public class HyperlinkElementLocatorTest extends AbstractJettyBasedTest {
 	
 	@Override
 	public void setupBefore() { 
-		locator = new HyperlinkElementLocator(driver);
+		locator = new HyperlinkElementLocator(driver, null);
 	}
 
 	@Override

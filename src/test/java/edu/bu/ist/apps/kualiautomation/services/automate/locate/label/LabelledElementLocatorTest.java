@@ -24,7 +24,7 @@ public class LabelledElementLocatorTest extends AbstractJettyBasedTest {
 	
 	@Override
 	public void setupBefore() {
-		locator = new LabelledElementLocator(driver);
+		locator = new LabelledElementLocator(driver, null);
 	}
 
 	@Override

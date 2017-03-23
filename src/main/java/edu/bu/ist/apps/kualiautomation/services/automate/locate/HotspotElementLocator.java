@@ -27,12 +27,12 @@ import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledEl
  */
 public class HotspotElementLocator extends AbstractElementLocator {
 
-	public HotspotElementLocator(WebDriver driver) {
-		super(driver);
+	public HotspotElementLocator(WebDriver driver, Locator parent) {
+		super(driver, parent);
 	}
 
-	public HotspotElementLocator(WebDriver driver, SearchContext searchContext) {
-		super(driver, searchContext);
+	public HotspotElementLocator(WebDriver driver, SearchContext searchContext, Locator parent) {
+		super(driver, searchContext, parent);
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class HotspotElementLocator extends AbstractElementLocator {
 			
 			List<Element> elements = new ArrayList<Element>();
 			
-			LabelledElementLocator locator1 = new LabelledElementLocator(driver, searchContext);
+			LabelledElementLocator locator1 = new LabelledElementLocator(driver, searchContext, this);
 			locator1.setLabelCanBeHyperlink(false);
 			elements.addAll(locator1.locateAll(ElementType.BUTTONIMAGE, parameters));
 			
@@ -51,7 +51,7 @@ public class HotspotElementLocator extends AbstractElementLocator {
 				// The labels themselves are the search results (rare case for buttons that look like labels).
 			}			
 			else if(elements.isEmpty() || !attributeMatched(elements)) {
-				HyperlinkElementLocator locator2 = new HyperlinkElementLocator(driver, searchContext);
+				HyperlinkElementLocator locator2 = new HyperlinkElementLocator(driver, searchContext, this);
 				List<Element> hyperlinks = locator2.locateAll(ElementType.HYPERLINK, parameters);
 				if(elements.isEmpty()) {
 					elements.addAll(hyperlinks);

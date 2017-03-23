@@ -25,7 +25,7 @@ public class ScreenScrapeElementLocatorTest extends AbstractJettyBasedTest {
 	
 	@Override
 	public void setupBefore() { 
-		locator = new ScreenScrapeElementLocator(driver);
+		locator = new ScreenScrapeElementLocator(driver, null);
 	}
 
 	@Override

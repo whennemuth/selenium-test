@@ -17,7 +17,7 @@ public class HotspotElementLocatorTest extends AbstractJettyBasedTest {
 	
 	@Override
 	public void setupBefore() { 
-		locator = new HotspotElementLocator(driver);
+		locator = new HotspotElementLocator(driver, null);
 	}
 
 	@Override

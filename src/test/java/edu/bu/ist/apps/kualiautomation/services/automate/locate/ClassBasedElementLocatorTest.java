@@ -153,7 +153,7 @@ public class ClassBasedElementLocatorTest {
 				else
 					return new ArrayList<WebElement>();
 			}});
-		locator = new ClassBasedElementLocator(driver, ctx);
+		locator = new ClassBasedElementLocator(driver, ctx, null);
 		List<Element> results = locator.locateAll(ElementType.OTHER, parameters1);
 		assertTrue(results.isEmpty());	
 		
@@ -172,7 +172,7 @@ public class ClassBasedElementLocatorTest {
 				else
 					return new ArrayList<WebElement>();
 			}});
-		locator = new ClassBasedElementLocator(driver, ctx);
+		locator = new ClassBasedElementLocator(driver, ctx, null);
 		List<Element> results = locator.locateAll(ElementType.OTHER, parameters1);
 		assertFalse(results.isEmpty());		
 		assertEquals(1, results.size());
@@ -189,7 +189,7 @@ public class ClassBasedElementLocatorTest {
 				else
 					return new ArrayList<WebElement>();
 			}});
-		locator = new ClassBasedElementLocator(driver, ctx);
+		locator = new ClassBasedElementLocator(driver, ctx, null);
 		List<Element> results = locator.locateAll(ElementType.OTHER, parameters1);
 		assertFalse(results.isEmpty());		
 		assertEquals(1, results.size());
@@ -206,7 +206,7 @@ public class ClassBasedElementLocatorTest {
 				else
 					return new ArrayList<WebElement>();
 			}});
-		locator = new ClassBasedElementLocator(driver, ctx);
+		locator = new ClassBasedElementLocator(driver, ctx, null);
 		List<Element> results = locator.locateAll(ElementType.OTHER, parameters1);
 		assertFalse(results.isEmpty());		
 		assertEquals(2, results.size());
@@ -222,7 +222,7 @@ public class ClassBasedElementLocatorTest {
 				else
 					return new ArrayList<WebElement>();
 			}});
-		locator = new ClassBasedElementLocator(driver, ctx);
+		locator = new ClassBasedElementLocator(driver, ctx, null);
 		List<Element> results = locator.locateAll(ElementType.OTHER, parameters1);
 		assertFalse(results.isEmpty());		
 		assertEquals(1, results.size());
@@ -239,7 +239,7 @@ public class ClassBasedElementLocatorTest {
 				else
 					return new ArrayList<WebElement>();
 			}});
-		locator = new ClassBasedElementLocator(driver, ctx);
+		locator = new ClassBasedElementLocator(driver, ctx, null);
 		
 		List<Element> results = locator.locateAll(ElementType.OTHER, parameters4);
 		assertFalse(results.isEmpty());		

@@ -21,6 +21,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.XpathElementCac
 public abstract class AbstractElementLocator implements Locator {
 	protected SearchContext searchContext;
 	protected WebDriver driver;
+	protected Locator parent;
 	protected ElementType elementType;
 	protected List<String> parameters = new ArrayList<String>();
 	protected List<WebElement> iframes;
@@ -39,14 +40,16 @@ public abstract class AbstractElementLocator implements Locator {
 	
 	public static boolean printDuration = true;
 	
-	public AbstractElementLocator(WebDriver driver) {
+	public AbstractElementLocator(WebDriver driver, Locator parent) {
 		this.driver = driver;
 		this.searchContext = driver;
+		this.parent = parent;
 	}
 	
-	public AbstractElementLocator(WebDriver driver, SearchContext searchContext) {
+	public AbstractElementLocator(WebDriver driver, SearchContext searchContext, Locator parent) {
 		this.driver = driver;
 		this.searchContext = searchContext;
+		this.parent = parent;
 	}
 	
 	@Override
@@ -117,33 +120,26 @@ public abstract class AbstractElementLocator implements Locator {
 	 * @param webElements
 	 */
 	private void loadResults(List<Element> results) {
+
+		List<WebElement> webElements = new ArrayList<WebElement>();
 		
+		List<WebElement> custom = customLocate();
 		
-		try {
-			List<WebElement> webElements = new ArrayList<WebElement>();
-			
-			List<WebElement> custom = customLocate();
-			
+		webElements.addAll(
+				removeHidden(
+				removeDisabled(
+				removeDuplicates(custom))));
+		
+		if(webElements.isEmpty()) {			
+			List<WebElement> defaults = defaultLocate();			
 			webElements.addAll(
 					removeHidden(
 					removeDisabled(
-					removeDuplicates(custom))));
-			
-			if(webElements.isEmpty()) {			
-				List<WebElement> defaults = defaultLocate();			
-				webElements.addAll(
-						removeHidden(
-						removeDisabled(
-						removeDuplicates(defaults))));
-			}
-			
-			for(WebElement we : webElements) {
-				results.add(getElement(driver, we));
-			}
-		} 
-		catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+					removeDuplicates(defaults))));
+		}
+		
+		for(WebElement we : webElements) {
+			results.add(getElement(driver, we));
 		}
 	}
 	
@@ -164,13 +160,15 @@ public abstract class AbstractElementLocator implements Locator {
 			for(WebElement iframe : iframes) {
 				XpathElementCache.clear();
 				// (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOf(iframe));
-				(new WebDriverWait(driver, 5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
+				if(parent == null) {
+					(new WebDriverWait(driver, 5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
+				}
 				skipFrameSearch = true;
 				searchContext = driver;
 				try {
 					List<Element> frameResults = locateAll(elementType, parameters);
 					results.addAll(frameResults);
-					if(frameResults.isEmpty()) {
+					if(frameResults.isEmpty() && parent == null) {
 						driver.switchTo().defaultContent();
 						searchContext = driver;
 					}

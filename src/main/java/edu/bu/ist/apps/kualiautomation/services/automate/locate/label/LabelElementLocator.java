@@ -17,6 +17,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.XpathElementCache;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.BasicComparableLabel;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.Locator;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 public class LabelElementLocator extends AbstractElementLocator {
@@ -34,13 +35,13 @@ public class LabelElementLocator extends AbstractElementLocator {
 	};
 	
 	private LabelElementLocator() {
-		super(null); // Restrict the default constructor
+		super(null, null); // Restrict the default constructor
 	}
-	public LabelElementLocator(WebDriver driver){
-		super(driver);
+	public LabelElementLocator(WebDriver driver, Locator parent){
+		super(driver, parent);
 	}
-	public LabelElementLocator(WebDriver driver, SearchContext searchContext){
-		super(driver, searchContext);
+	public LabelElementLocator(WebDriver driver, SearchContext searchContext, Locator parent){
+		super(driver, searchContext, parent);
 	}
 	
 	public Element locate(String label) {

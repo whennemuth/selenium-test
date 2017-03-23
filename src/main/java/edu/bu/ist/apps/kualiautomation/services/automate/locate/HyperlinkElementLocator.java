@@ -17,12 +17,12 @@ import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledEl
 
 public class HyperlinkElementLocator extends AbstractElementLocator {
 	
-	public HyperlinkElementLocator(WebDriver driver) {
-		super(driver);
+	public HyperlinkElementLocator(WebDriver driver, Locator parent) {
+		super(driver, parent);
 	}
 
-	public HyperlinkElementLocator(WebDriver driver, SearchContext searchContext) {
-		super(driver, searchContext);
+	public HyperlinkElementLocator(WebDriver driver, SearchContext searchContext, Locator parent) {
+		super(driver, searchContext, parent);
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 			String innerText = null;
 			List<String> attributeValues = new ArrayList<String>();
 			List<Element> candidates = null;
-			LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext);
+			LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext, this);
 			List<WebElement> labels = new ArrayList<WebElement>();
 			List<WebElement> anchortags = new ArrayList<WebElement>();			
 			
@@ -70,7 +70,7 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 					if(!labels.contains(lbl.getWebElement()))
 						labels.add(lbl.getWebElement());
 				}				
-				LabelledElementLocator labelledLocator = new LabelledElementLocator(driver, searchContext, lbls);	
+				LabelledElementLocator labelledLocator = new LabelledElementLocator(driver, searchContext, lbls, this);	
 				candidates = labelledLocator.locateAll(ElementType.HYPERLINK, parameters);
 				for(Element elmt : candidates) {
 					if("a".equalsIgnoreCase(elmt.getWebElement().getTagName())) {
@@ -99,7 +99,7 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 					// a) We turned up another label in the initial search for anchor tags. Regard it as an element that 
 					// labels one or more other anchor tags and use the LabelledElementLocator to find them.
 					for(WebElement lbl : labels) {
-						LabelledElementLocator labelledLocator = new LabelledElementLocator(driver, searchContext, getElements(Arrays.asList(new WebElement[]{ lbl })));
+						LabelledElementLocator labelledLocator = new LabelledElementLocator(driver, searchContext, getElements(Arrays.asList(new WebElement[]{ lbl })), this);
 						labelledLocator.setLabelCanBeHyperlink(false);
 						List<Element> anchorTagElements = labelledLocator.locateAll(ElementType.HYPERLINK, parameters);
 						for(Element anchorTagElement : anchorTagElements) {
@@ -149,7 +149,8 @@ public class HyperlinkElementLocator extends AbstractElementLocator {
 				elementType, 
 				lbls, 
 				anchortags, 
-				parameters));
+				parameters,
+				this));
 	}
 	
 	private static List<WebElement> merge(List<WebElement> list1, List<WebElement> list2) {

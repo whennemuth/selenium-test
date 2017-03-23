@@ -15,6 +15,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.XpathElementCache;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.Locator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.ComparableLabel;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
@@ -51,15 +52,15 @@ public class ScreenScrapeElementLocator extends AbstractElementLocator {
 	
 	private boolean ignorecase = true;
 	
-	public ScreenScrapeElementLocator(WebDriver driver) {
-		super(driver);
+	public ScreenScrapeElementLocator(WebDriver driver, Locator parent) {
+		super(driver, parent);
 	}
-	public ScreenScrapeElementLocator(WebDriver driver, boolean ignorecase) {
-		super(driver);
+	public ScreenScrapeElementLocator(WebDriver driver, boolean ignorecase, Locator parent) {
+		super(driver, parent);
 		this.ignorecase = ignorecase;
 	}
-	public ScreenScrapeElementLocator(WebDriver driver, SearchContext searchContext, boolean ignorecase){
-		super(driver, searchContext);
+	public ScreenScrapeElementLocator(WebDriver driver, SearchContext searchContext, boolean ignorecase, Locator parent){
+		super(driver, searchContext, parent);
 		this.ignorecase = ignorecase;
 	}
 

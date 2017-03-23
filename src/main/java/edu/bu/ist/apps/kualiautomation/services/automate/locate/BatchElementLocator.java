@@ -85,9 +85,9 @@ public class BatchElementLocator implements Locator {
 			busy = true;
 			for(Class<?> clazz : parms.keySet()) {
 				try {
-					Constructor<?> ctr = clazz.getConstructor(WebDriver.class, SearchContext.class);
+					Constructor<?> ctr = clazz.getConstructor(WebDriver.class, SearchContext.class, Locator.class);
 					List<String> attributes = parms.get(clazz);
-					Locator locator = (Locator) ctr.newInstance(driver, searchContext);
+					Locator locator = (Locator) ctr.newInstance(driver, searchContext, null);
 					
 					Method setter = clazz.getMethod("setIgnoreHidden", boolean.class);
 					if(setter != null) {

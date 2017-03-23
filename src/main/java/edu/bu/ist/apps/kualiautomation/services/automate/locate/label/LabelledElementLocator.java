@@ -18,6 +18,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.BasicElement;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.Locator;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.label.LabelledElementBatches.Batch;
 import edu.bu.ist.apps.kualiautomation.services.automate.table.TableCellData;
 import edu.bu.ist.apps.kualiautomation.services.automate.table.TableColumnData;
@@ -45,16 +46,16 @@ public class LabelledElementLocator extends AbstractElementLocator {
 	private List<WebElement> tableElements = new ArrayList<WebElement>();
 	private boolean tableOnly;
 
-	public LabelledElementLocator(WebDriver driver){
-		this(driver, driver);
+	public LabelledElementLocator(WebDriver driver, Locator parent){
+		this(driver, driver, parent);
 	}
 	
-	public LabelledElementLocator(WebDriver driver, SearchContext searchContext){
-		super(driver, searchContext);
+	public LabelledElementLocator(WebDriver driver, SearchContext searchContext, Locator parent){
+		super(driver, searchContext, parent);
 	}
 	
-	public LabelledElementLocator(WebDriver driver, SearchContext searchContext, List<Element> labelElements){
-		this(driver, searchContext);
+	public LabelledElementLocator(WebDriver driver, SearchContext searchContext, List<Element> labelElements, Locator parent){
+		this(driver, searchContext, parent);
 		this.labelElements.addAll(labelElements);
 	}
 	
@@ -63,9 +64,10 @@ public class LabelledElementLocator extends AbstractElementLocator {
 			ElementType elementType,
 			List<Element> labelElements, 
 			List<WebElement> tableElements,
-			List<String> parameters) {
+			List<String> parameters,
+			Locator parent) {
 		
-		LabelledElementLocator locator = new LabelledElementLocator(driver);
+		LabelledElementLocator locator = new LabelledElementLocator(driver, parent);
 		locator.labelElements.addAll(labelElements);
 		locator.tableElements.addAll(tableElements);
 		locator.tableOnly = true;
@@ -96,7 +98,7 @@ public class LabelledElementLocator extends AbstractElementLocator {
 				}
 				
 				if(!tableOnly && labelElements.isEmpty()) {
-					LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext);
+					LabelElementLocator labelLocator = new LabelElementLocator(driver, searchContext, this);
 					labelLocator.setIgnoreHidden(super.ignoreHidden);
 					labelLocator.setIgnoreDisabled(super.ignoreDisabled);
 					labelLocator.setLabelCanBeHyperlink(this.labelCanBeHyperlink);

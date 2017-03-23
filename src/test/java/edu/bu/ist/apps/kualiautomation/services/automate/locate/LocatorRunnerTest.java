@@ -217,4 +217,20 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		.addAttributeAssertion("type", "image")
 		.findAndAssertElements();				
 	}
+	
+	@Test
+	public void assert11FindSubmitButton() {
+		
+		LabelAndValue lv = new LabelAndValue();
+		lv.setElementType(ElementType.BUTTON.name());
+		lv.setIdentifier("Subaward Actions");
+		
+		new ElementsAssertion(runner, true)
+		.setUrl("http://localhost:8080/subaward-actions-1")
+		.addLabelAndValue(lv)
+		.setNumResults(1)
+		.setTagNameAssertion("input")
+		.addAttributeAssertion("type", "submit")
+		.findAndAssertElements();				
+	}
 }

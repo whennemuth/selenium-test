@@ -147,17 +147,17 @@ public class LocatorRunner {
 				}
 				break;
 			case TEXTBOX: case PASSWORD: case TEXTAREA: case SELECT: case RADIO: case CHECKBOX:
-				elements.addAll(locateElements(lv, new LabelledElementLocator(driver)));
+				elements.addAll(locateElements(lv, new LabelledElementLocator(driver, null)));
 				labelCanAlsoBeAnAttribute = false;
 				break;
 			case HOTSPOT:
-				elements.addAll(locateElements(lv, new HotspotElementLocator(driver)));
+				elements.addAll(locateElements(lv, new HotspotElementLocator(driver, null)));
 				break;
 			case SHORTCUT:
-				elements.addAll(locateElements(lv, new ShortcutElementLocator(driver, lv.getConfigShortcut())));
+				elements.addAll(locateElements(lv, new ShortcutElementLocator(driver, lv.getConfigShortcut(), null)));
 				break;
 			case SCREENSCRAPE:
-				elements.addAll(locateElements(lv, new ScreenScrapeElementLocator(driver)));
+				elements.addAll(locateElements(lv, new ScreenScrapeElementLocator(driver, null)));
 				break;
 			case OTHER:
 				locators.add(LabelledElementLocator.class);

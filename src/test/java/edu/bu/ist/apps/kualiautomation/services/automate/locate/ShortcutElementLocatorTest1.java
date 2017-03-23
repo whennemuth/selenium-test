@@ -48,7 +48,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingA 1", "headingA 2", "headingA 3", "target 1"
 		});		
-		locator = new ShortcutElementLocator(driver, shortcut);
+		locator = new ShortcutElementLocator(driver, shortcut, null);
 		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/shortcut-page1");
 		asserter.setElementType(ElementType.HYPERLINK);
@@ -64,7 +64,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingA 1", "headingA 2", "headingA 3"
 		});		
-		locator = new ShortcutElementLocator(driver, shortcut);
+		locator = new ShortcutElementLocator(driver, shortcut, null);
 		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/shortcut-page1");
 		asserter.setElementType(ElementType.HOTSPOT);
@@ -80,7 +80,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingA 1", "headingA 2", "headingA 3"
 		});		
-		locator = new ShortcutElementLocator(driver, shortcut);
+		locator = new ShortcutElementLocator(driver, shortcut, null);
 		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/shortcut-page1");
 		asserter.setElementType(ElementType.HOTSPOT);
@@ -96,7 +96,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingA 1", "headingA 2", "headingA 3"
 		});		
-		locator = new ShortcutElementLocator(driver, shortcut);
+		locator = new ShortcutElementLocator(driver, shortcut, null);
 		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/shortcut-page1");
 		asserter.setElementType(ElementType.HOTSPOT);
@@ -119,7 +119,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingB 1", "headingB 2", "headingB 3", "target 2"
 		});		
-		locator = new ShortcutElementLocator(driver, shortcut);
+		locator = new ShortcutElementLocator(driver, shortcut, null);
 		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/shortcut-page1");
 		asserter.setElementType(ElementType.BUTTON);
@@ -135,7 +135,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingB 1", "headingB 2", "headingB 3", "icon-plus"
 		});		
-		locator = new ShortcutElementLocator(driver, shortcut);
+		locator = new ShortcutElementLocator(driver, shortcut, null);
 		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/shortcut-page1");
 		asserter.setElementType(ElementType.BUTTON);
@@ -151,7 +151,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingB 1", "headingB 2", "headingB 3", "u10mjulv"
 		});		
-		locator = new ShortcutElementLocator(driver, shortcut);
+		locator = new ShortcutElementLocator(driver, shortcut, null);
 		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/shortcut-page1");
 		asserter.setElementType(ElementType.BUTTON);
@@ -174,7 +174,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingC 1", "headingC 2", "headingC 3", "target 3"
 		});		
-		locator = new ShortcutElementLocator(driver, shortcut);
+		locator = new ShortcutElementLocator(driver, shortcut, null);
 		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/shortcut-page1");
 		asserter.setElementType(ElementType.HYPERLINK);
@@ -189,7 +189,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingC 1", "headingC 2", "headingC 3"
 		});		
-		locator = new ShortcutElementLocator(driver, shortcut);
+		locator = new ShortcutElementLocator(driver, shortcut, null);
 		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/shortcut-page1");
 		asserter.setElementType(ElementType.HOTSPOT);
@@ -211,7 +211,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingD 1", "headingD 2", "headingD 3", "target 4"
 		});	
-		locator = new ShortcutElementLocator(driver, shortcut);
+		locator = new ShortcutElementLocator(driver, shortcut, null);
 		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/shortcut-page1");
 		asserter.setElementType(ElementType.BUTTON);
@@ -226,7 +226,7 @@ public class ShortcutElementLocatorTest1 extends AbstractJettyBasedTest {
 		shortcut.setLabelHierarchyParts(new String[] {
 			"headingD 1", "headingD 2", "headingD 3"
 		});	
-		locator = new ShortcutElementLocator(driver, shortcut);
+		locator = new ShortcutElementLocator(driver, shortcut, null);
 		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/shortcut-page1");
 		asserter.setElementType(ElementType.HOTSPOT);

@@ -26,12 +26,12 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
  */
 public class ClassBasedElementLocator extends AbstractElementLocator implements Locator {
 
-	public ClassBasedElementLocator(WebDriver driver) {
-		super(driver);
+	public ClassBasedElementLocator(WebDriver driver, Locator parent) {
+		super(driver, parent);
 	}
 
-	public ClassBasedElementLocator(WebDriver driver, SearchContext searchContext) {
-		super(driver, searchContext);
+	public ClassBasedElementLocator(WebDriver driver, SearchContext searchContext, Locator parent) {
+		super(driver, searchContext, parent);
 	}
 
 	@Override

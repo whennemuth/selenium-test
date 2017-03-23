@@ -90,7 +90,7 @@ public class ShortcutElementLocatorTest5 extends AbstractJettyBasedTest {
 		lv.setElementType(ElementType.SHORTCUT.name());
 		lv.setConfigShortcut(shortcut);
 		
-		ShortcutElementLocator locator = new ShortcutElementLocator(driver, shortcut);
+		ShortcutElementLocator locator = new ShortcutElementLocator(driver, shortcut, null);
 		
 		new ElementsAssertion(locator)
 		.setUrl("http://localhost:8080/subaward-entry-1")

@@ -47,7 +47,7 @@ public class ClickableInputElementTest1 extends AbstractJettyBasedTest {
 	private Element findAndAssertElement(String page, int index, ElementType etype) {		
 		List<Element> results = null;
 		ElementsAssertion asserter = null;
-		LabelledElementLocator locator = new LabelledElementLocator(driver);
+		LabelledElementLocator locator = new LabelledElementLocator(driver, null);
 		asserter = new ElementsAssertion(locator);
 		asserter.setUrl("http://localhost:8080/" + page);
 		asserter.setElementType(etype);

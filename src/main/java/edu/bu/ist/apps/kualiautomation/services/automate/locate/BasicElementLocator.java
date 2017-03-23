@@ -20,16 +20,16 @@ public class BasicElementLocator extends AbstractElementLocator {
 
 	private ElementType elementType;
 	
-	public BasicElementLocator(WebDriver driver) {
-		super(driver);
+	public BasicElementLocator(WebDriver driver, Locator parent) {
+		super(driver, parent);
 	}
 	
-	public BasicElementLocator(WebDriver driver, SearchContext searchContext) {
-		super(driver, searchContext);
+	public BasicElementLocator(WebDriver driver, SearchContext searchContext, Locator parent) {
+		super(driver, searchContext, parent);
 	}
 	
-	public BasicElementLocator(ElementType elementType, WebDriver driver, SearchContext searchContext) {
-		super(driver, searchContext);
+	public BasicElementLocator(ElementType elementType, WebDriver driver, SearchContext searchContext, Locator parent) {
+		super(driver, searchContext, parent);
 		this.elementType = elementType;
 	}
 
