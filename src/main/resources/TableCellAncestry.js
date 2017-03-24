@@ -109,7 +109,7 @@ function getCommonAncestorRow(nodes) {
 }
 
 /**
- * Object that represents a table column that is a parent, grandparent, etc. to a web element (originalField)
+ * Object that represents a cell in a table column that is a parent, grandparent, etc. to a web element (originalField)
  */
 function cellObject(originalField) {
 	this.originalField = originalField;
@@ -238,6 +238,7 @@ function getSameColumnNodeObjects(label, nodes) {
 	var filtered2 = cloneCellObjectArray(filtered1);
 	var labelLevelCells = getCellsInSharedColumn([label].concat(filtered1));
 	var otherLevelCells = getCellsInSharedColumn(filtered2);
+	var labelCell = new cellObject(label);
 	
 	for(var i=0; i<otherLevelCells.length; i++) {
 		var cellinfo = otherLevelCells[i];
@@ -245,12 +246,15 @@ function getSameColumnNodeObjects(label, nodes) {
 			originalField: otherLevelCells[i].originalField,
 			commonColumnIndex: otherLevelCells[i].cell.cellIndex,
 			rowIndex: otherLevelCells[i].cell.parentNode.rowIndex,
-			label: labelLevelCells[0].cell,
-			labelColumnIndex: labelLevelCells[0].cell.cellIndex,
-			labelRowIndex: labelLevelCells[i+1].cell.parentNode.rowIndex
+			labelColumnIndex: labelCell.cell.cellIndex,
+			labelRowIndex: labelCell.cell.parentNode.rowIndex,
+			labelLevelCell: labelLevelCells[0].cell,
+			labelLevelColumnIndex: labelLevelCells[0].cell.cellIndex,
+			labelLevelRowIndex: labelLevelCells[i+1].cell.parentNode.rowIndex,
+			isLabel: false
 		};
 	}
-
+	
 	return objects;
 }
 

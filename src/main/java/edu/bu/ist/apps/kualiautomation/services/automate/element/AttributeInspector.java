@@ -105,7 +105,7 @@ public class AttributeInspector {
 		outerloop:
 		for(WebElement we : webElements) {			 
 			for(String attributeValue : attributeValues) {
-				if(Utils.trimIgnoreCaseEqual("null", attributeValue))
+				if(Utils.trimIgnoreCaseEqual("null", attributeValue) || Utils.isEmpty(attributeValue))
 					continue;
 				Map<String, String> unfiltered = getAttributes(we);
 				Attribute attribute = new Attribute(we, unfiltered.keySet());

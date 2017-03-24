@@ -1,8 +1,10 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.locate;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -25,8 +27,10 @@ public abstract class AbstractElementLocator implements Locator {
 	protected ElementType elementType;
 	protected List<String> parameters = new ArrayList<String>();
 	protected List<WebElement> iframes;
+	protected String currentFrameSrc = TOP_LEVEL_WINDOW;
 	protected boolean skipParameterMatching;
 	protected boolean defaultRan;
+	protected Set<String> defaultRanFor = new HashSet<String>();
 	/**
 	 * busy variable is queried to prevent repeated calls in case locator inside a WebDriverWait.until() method.
 	 * The find methods of the WebDriver will no longer return immediately with results but will instead inherit
@@ -39,6 +43,7 @@ public abstract class AbstractElementLocator implements Locator {
 	protected String message;
 	
 	public static boolean printDuration = true;
+	public static final String TOP_LEVEL_WINDOW = "top level window";
 	
 	public AbstractElementLocator(WebDriver driver, Locator parent) {
 		this.driver = driver;
@@ -161,6 +166,7 @@ public abstract class AbstractElementLocator implements Locator {
 				XpathElementCache.clear();
 				// (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOf(iframe));
 				if(parent == null) {
+					currentFrameSrc = iframe.getAttribute("src");
 					(new WebDriverWait(driver, 5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
 				}
 				skipFrameSearch = true;
@@ -171,6 +177,7 @@ public abstract class AbstractElementLocator implements Locator {
 					if(frameResults.isEmpty() && parent == null) {
 						driver.switchTo().defaultContent();
 						searchContext = driver;
+						currentFrameSrc = TOP_LEVEL_WINDOW;
 					}
 					else {
 						// Don't switch back to the parent window because you will not be able to use the WebElement as it would 
@@ -267,11 +274,13 @@ public abstract class AbstractElementLocator implements Locator {
 	}
 	
 	public void setDefaultRan(boolean defaultRan) {
-		this.defaultRan = defaultRan;
+//		this.defaultRan = defaultRan;
+		this.defaultRanFor.add(TOP_LEVEL_WINDOW);
 	}
 	
 	public boolean isDefaultRan() {
-		return defaultRan;
+//		return defaultRan;
+		return defaultRanFor.contains(TOP_LEVEL_WINDOW);
 	}
 	
 	@Override
@@ -294,8 +303,11 @@ public abstract class AbstractElementLocator implements Locator {
 		List<WebElement> results = new ArrayList<WebElement>();
 		List<WebElement> candidates = new ArrayList<WebElement>();
 		
-		if(defaultRan || parameters.isEmpty() || elementType == null)
+		if(defaultRanFor.contains(currentFrameSrc) || parameters.isEmpty() || elementType == null) 
 			return results;
+		
+//		if(defaultRan || parameters.isEmpty() || elementType == null)
+//			return results;
 		
 		switch(elementType) {
 		case BUTTON:
@@ -325,6 +337,8 @@ public abstract class AbstractElementLocator implements Locator {
 		}
 		
 		defaultRan = true;
+		
+		defaultRanFor.add(currentFrameSrc);
 		
 		return results;
 	}

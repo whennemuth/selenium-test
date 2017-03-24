@@ -16,17 +16,35 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.Element;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.XpathElementCache;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.AbstractElementLocator;
-import edu.bu.ist.apps.kualiautomation.services.automate.locate.BasicComparableLabel;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.Locator;
 import edu.bu.ist.apps.kualiautomation.util.Utils;
 
 public class LabelElementLocator extends AbstractElementLocator {
 	
 	// Matches for an element with a text value that contains the provided value, both values normalized for whitespace.
+//	private static final String XPATH_CONTAINS = 
+//			"//*[text()[contains(normalize-space(translate(., "
+//			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
+//			+ "'abcdefghijklmnopqrstuvwxyz')), \"[INSERT-LABEL]\")]]";
+	
+	/**
+	 * Matches any element hierarchy of depth less than 2 (contains zero to one child, but no grandchildren).
+	 * From there, the hierarchy is flattened with respect to its text (string() function) and matches if the
+	 * result is normalized for whitespace and still is equal (ignoring case) to the specified value.
+	 * 
+	 * This allows us to find web elements that display a certain text value to the user where some of the
+	 * words in that text may be bolded with <b> tags, or formatted with <font> or <span> tags. You could allow for
+	 * a deeper hierarchy, but that would just return even more flattened ancestor results that would just have to be 
+	 * filtered of later. However, this may be necessary if we find that label searches succeed this way to infrequently.
+	 * 
+	 * NOTE: Using of unicode matching to identify non-printing backspaces (&nbsp;), which are not caught by the
+	 * normalize-space function.
+	 */
 	private static final String XPATH_CONTAINS = 
-			"//*[text()[contains(normalize-space(translate(., "
-			+ "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
-			+ "'abcdefghijklmnopqrstuvwxyz')), \"[INSERT-LABEL]\")]]";
+			"//*[(not(./*) or not(./*/*))]"
+			+ "[contains(normalize-space(translate("
+			+ "translate(string(.), '\u00a0', ' '), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"
+			+ "), \"[INSERT-LABEL]\")]";
 	
 	private boolean labelCanBeHyperlink = true;
 	
@@ -95,9 +113,26 @@ public class LabelElementLocator extends AbstractElementLocator {
 		// 4) Unwrap the highest ranked result(s) back into a WebElement collection.
 		located.addAll(ComparableLabel.getHighestRanked(labels));
 		
+		// 5) In case of a draw, favor labels that are direct child nodes of others.
+		if(located.size() > 1) {
+			located.clear();
+			labels = HierarchyBasedComparableLabel.getInstances(labels);
+			located.addAll(ComparableLabel.getHighestRanked(labels));
+			
+			if(located.size() > 1) {
+				List<ComparableLabel> retries = new ArrayList<ComparableLabel>();
+				for(WebElement lbl : located) {
+					retries.add(new BasicComparableLabel(lbl, label, lbl.getText()));
+				}
+				located.clear();
+				located.addAll(ComparableLabel.getHighestRanked(retries));
+			}
+		}
+		
 		// We are only searching for labels, but if the search fails then the upcoming default search
 		// will try to find fields. Prevent this by indicating the default search has already run.
-		defaultRan = true;
+		//defaultRan = true;
+		defaultRanFor.add(currentFrameSrc);
 		
 		return located;
 	}

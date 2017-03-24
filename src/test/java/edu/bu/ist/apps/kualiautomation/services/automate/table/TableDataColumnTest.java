@@ -19,6 +19,7 @@ import edu.bu.ist.apps.kualiautomation.services.automate.table.TableColumnData.T
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TableDataColumnTest extends AbstractJettyBasedTest {
 
+	String url = "http://localhost:8080/table-test-page3";
 	@Override
 	public void setupBefore() {
 	}
@@ -30,7 +31,7 @@ public class TableDataColumnTest extends AbstractJettyBasedTest {
 	
 	@Test
 	public void test01() {
-		driver.get("http://localhost:8080/table-test-page3");
+		driver.get(url);
 		
 		WebElement label = driver.findElement(By.id("div3"));
 		List<WebElement> elements = Arrays.asList((new WebElement[]{
@@ -47,7 +48,7 @@ public class TableDataColumnTest extends AbstractJettyBasedTest {
 	
 	@Test
 	public void test02() {
-		driver.get("http://localhost:8080/table-test-page3");
+		driver.get(url);
 		
 		WebElement label = driver.findElement(By.id("div9"));
 		List<WebElement> elements = Arrays.asList((new WebElement[]{
@@ -64,7 +65,7 @@ public class TableDataColumnTest extends AbstractJettyBasedTest {
 	
 	@Test
 	public void test03() {
-		driver.get("http://localhost:8080/table-test-page3");
+		driver.get(url);
 		
 		WebElement label = driver.findElement(By.id("div1"));
 		List<WebElement> elements = Arrays.asList((new WebElement[]{
@@ -80,7 +81,7 @@ public class TableDataColumnTest extends AbstractJettyBasedTest {
 	
 	@Test
 	public void test04() {
-		driver.get("http://localhost:8080/table-test-page3");
+		driver.get(url);
 		
 		WebElement label = driver.findElement(By.id("div8"));
 		List<WebElement> elements = Arrays.asList((new WebElement[]{
@@ -94,6 +95,28 @@ public class TableDataColumnTest extends AbstractJettyBasedTest {
 		TableColumnData data = new TableColumnData(driver, label, elements, "TableCellAncestry.js");
 		List<TableColumnCell> cells = data.getElementsInSameColumnAsLabel();
 		assertOrderOfResults(new String[]{"txt8", "txt11"}, cells);
+	}
+	
+	@Test
+	public void test05() {
+		driver.get(url);
+		
+		WebElement label = driver.findElement(By.id("div20"));
+		List<WebElement> elements = Arrays.asList((new WebElement[]{
+				driver.findElement(By.id("txt19")),
+				driver.findElement(By.id("txt20")),
+				driver.findElement(By.id("txt21")),
+				driver.findElement(By.id("txt22")),
+				driver.findElement(By.id("txt23")),
+				driver.findElement(By.id("txt24")),
+				driver.findElement(By.id("txt25")),
+				driver.findElement(By.id("txt26")),
+				driver.findElement(By.id("txt27")),
+		}));
+		
+		TableColumnData data = new TableColumnData(driver, label, elements, "TableCellAncestry.js");
+		List<TableColumnCell> cells = data.getElementsInSameColumnAsLabel();
+		assertOrderOfResults(new String[]{"txt23", "txt26", "txt20"}, cells);
 	}
 	
 	

@@ -27,14 +27,21 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 
 	@Override
 	public void loadHandlers(Map<String, String> handlers) {
+		
 		handlers.put("address-book-lookup", "AddressBookLookup1.htm");
 		handlers.put("AddressBookLookup1_files", "AddressBookLookup1_files");
+		
 		handlers.put("subaward-entry-1", "SubawardEntry.htm");
 		handlers.put("SubawardEntry_files", "SubawardEntry_files");
+		
 		handlers.put("subaward-lookup-1", "SubawardLookup.htm");
 		handlers.put("SubawardLookup_files", "SubawardLookup_files");
+		
 		handlers.put("subaward-actions-1", "SubawardActions.htm");
 		handlers.put("SubawardActions_files", "SubawardActions_files");
+		
+		handlers.put("subaward-financial-1", "SubawardFinancial.htm");
+		handlers.put("SubawardFinancial_files", "SubawardFinancial_files");
 	}
 	
 	@Test
@@ -231,6 +238,39 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 		.setNumResults(1)
 		.setTagNameAssertion("input")
 		.addAttributeAssertion("type", "submit")
+		.findAndAssertElements();				
+	}
+	
+	@Test
+	public void assert12FindSubmitButton() {
+		
+		LabelAndValue lv = new LabelAndValue();
+		lv.setElementType(ElementType.TEXTBOX.name());
+		lv.setLabel("* Effective Date:");
+		
+		new ElementsAssertion(runner, true)
+		.setUrl("http://localhost:8080/subaward-financial-1")
+		.addLabelAndValue(lv)
+		.setNumResults(1)
+		.setTagNameAssertion("input")
+		.addAttributeAssertion("type", "text")
+		.findAndAssertElements();				
+	}
+	
+	@Test
+	public void assert13FindBudgetStartDateTextbox() {
+		
+		LabelAndValue lv = new LabelAndValue();
+		lv.setElementType(ElementType.TEXTBOX.name());
+		lv.setLabel("* Budget Start Date:");
+		
+		new ElementsAssertion(runner, true)
+		.setUrl("http://localhost:8080/subaward-financial-1")
+		.addLabelAndValue(lv)
+		.setNumResults(1)
+		.setTagNameAssertion("input")
+		.addAttributeAssertion("type", "text")
+		.addAttributeAssertion("title", "* Budget Start Date")
 		.findAndAssertElements();				
 	}
 }

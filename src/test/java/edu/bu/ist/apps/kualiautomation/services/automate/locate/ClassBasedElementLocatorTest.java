@@ -157,6 +157,7 @@ public class ClassBasedElementLocatorTest {
 		List<Element> results = locator.locateAll(ElementType.OTHER, parameters1);
 		assertTrue(results.isEmpty());	
 		
+		locator = new ClassBasedElementLocator(driver, ctx, null);
 		results = locator.locateAll(ElementType.OTHER, parameters4);
 		assertFalse(results.isEmpty());			
 		assertEquals(2, results.size());
@@ -245,6 +246,7 @@ public class ClassBasedElementLocatorTest {
 		assertFalse(results.isEmpty());		
 		assertEquals(6, results.size());
 		
+		locator = new ClassBasedElementLocator(driver, ctx, null);
 		results = locator.locateAll(ElementType.OTHER, parameters3);
 		assertFalse(results.isEmpty());		
 		assertEquals(2, results.size());
@@ -257,11 +259,13 @@ public class ClassBasedElementLocatorTest {
 				||
 				"apples oranges".equals(results.get(1).getWebElement().getAttribute("class")));
 		
+		locator = new ClassBasedElementLocator(driver, ctx, null);
 		results = locator.locateAll(ElementType.OTHER, parameters2);
 		assertFalse(results.isEmpty());		
 		assertEquals(1, results.size());
 		assertEquals("apples oranges pears bannanas", results.get(0).getWebElement().getAttribute("class"));
-				
+		
+		locator = new ClassBasedElementLocator(driver, ctx, null);
 		results = locator.locateAll(ElementType.OTHER, parameters1);
 		assertFalse(results.isEmpty());		
 		assertEquals(1, results.size());

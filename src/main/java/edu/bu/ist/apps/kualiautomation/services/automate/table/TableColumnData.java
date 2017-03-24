@@ -46,8 +46,8 @@ public class TableColumnData {
 		List<Map<String, Object>> datamaps = (List<Map<String, Object>>) executor.executeScript(
 				javascript, 
 				"column", 
-				AbstractWebElement.unwrap(labelElement), 
-				AbstractWebElement.unwrap(webElements));	
+				AbstractWebElement.unwrap(labelElement),
+				AbstractWebElement.unwrap(webElements));
 		
 		List<TableColumnCell> filtered = TableColumnCell.getInstances(datamaps);
 		
@@ -86,22 +86,26 @@ public class TableColumnData {
 	 * @author wrh
 	 *
 	 */
-	public static class TableColumnCell implements Comparable {
+	public static class TableColumnCell implements Comparable<Object> {
 
 		private WebElement originalField;
 		private Integer rowIndex;
 		private Integer commonColumnIndex;
-		private WebElement label;
-		private Integer labelRowIndex;
 		private Integer labelColumnIndex;
+		private Integer labelRowIndex;
+		private WebElement labelLevelCell;
+		private Integer labelLevelRowIndex;
+		private Integer labelLevelColumnIndex;
 		
 		public TableColumnCell(Map<String, Object> data) {
 			originalField = (WebElement) data.get("originalField");
 			commonColumnIndex = getInteger("commonColumnIndex", data);
 			rowIndex = getInteger("rowIndex", data);
-			label = (WebElement) data.get("label");
 			labelColumnIndex = getInteger("labelColumnIndex", data);
 			labelRowIndex = getInteger("labelRowIndex", data);
+			labelLevelCell = (WebElement) data.get("labelLevelCell");
+			labelLevelColumnIndex = getInteger("labelLevelColumnIndex", data);
+			labelLevelRowIndex = getInteger("labelLevelRowIndex", data);
 		}
 		
 		public WebElement getOriginalField() {
@@ -113,14 +117,20 @@ public class TableColumnData {
 		public Integer getCommonColumnIndex() {
 			return commonColumnIndex;
 		}
-		public WebElement getLabel() {
-			return label;
+		public Integer getLabelColumnIndex() {
+			return labelColumnIndex;
 		}
 		public Integer getLabelRowIndex() {
 			return labelRowIndex;
 		}
-		public Integer getLabelColumnIndex() {
-			return labelColumnIndex;
+		public WebElement getLabelLevelCell() {
+			return labelLevelCell;
+		}
+		public Integer getLabelLevelRowIndex() {
+			return labelLevelRowIndex;
+		}
+		public Integer getLabelLevelColumnIndex() {
+			return labelLevelColumnIndex;
 		}
 		private Integer getInteger(String fieldname, Map<String, Object> data) {
 			Object val = data.get(fieldname);
@@ -146,6 +156,25 @@ public class TableColumnData {
 			return cells;
 		}
 
+		public boolean inSameRowAs(TableColumnCell othercell) {
+			return this.getRowIndex() == othercell.getRowIndex();
+		}		
+		public boolean inHigherRowThan(TableColumnCell othercell) {
+			return this.getRowIndex() < othercell.getRowIndex();
+		}
+		public boolean inHigherLabelLevelRowThan(TableColumnCell othercell) {
+			return this.getLabelLevelRowIndex() < othercell.getLabelLevelRowIndex();
+		}		
+		public boolean inLabelLevelColumnToTheLeftOf(TableColumnCell othercell) {
+			return this.getCommonColumnIndex() < othercell.getCommonColumnIndex();
+		}
+		public boolean isBelowLabel() {
+			return this.getLabelLevelRowIndex() > this.getLabelRowIndex();
+		}
+		public boolean isAboveLabel() {
+			return !isBelowLabel();
+		}
+		
 		@Override
 		public int compareTo(Object other) {
 			// Returns a negative integer, zero, or a positive integer as 
@@ -154,22 +183,32 @@ public class TableColumnData {
 				return -1;
 			}
 			TableColumnCell othercell = (TableColumnCell) other;
-			if(this.getLabelRowIndex() < othercell.getLabelRowIndex()) {
+			
+			// Sometimes the row the label is in is not the top row, so check for this first.
+			if(this.isBelowLabel() && othercell.isAboveLabel()) {
 				return -1;
 			}
-			if(this.getLabelRowIndex() > othercell.getLabelRowIndex()) {
+			if(othercell.isBelowLabel() && this.isAboveLabel()) {
 				return 1;
 			}
-			if(this.getCommonColumnIndex() < othercell.getCommonColumnIndex()) {
+			
+			// The label should be in the top row of the table	
+			if(this.inHigherLabelLevelRowThan(othercell)) {
 				return -1;
 			}
-			if(this.getCommonColumnIndex() > othercell.getCommonColumnIndex()) {
+			if(othercell.inHigherLabelLevelRowThan(this)) {
 				return 1;
 			}
-			if(this.getRowIndex() == othercell.getRowIndex()) {
+			if(this.inLabelLevelColumnToTheLeftOf(othercell)) {
+				return -1;
+			}
+			if(othercell.inLabelLevelColumnToTheLeftOf(this)) {
+				return 1;
+			}
+			if(this.inSameRowAs(othercell)) {
 				return 0;
 			}
-			return this.getRowIndex() < othercell.getRowIndex() ? -1 : 1;
+			return this.inHigherRowThan(othercell) ? -1 : 1;
 		}
 	};
 }

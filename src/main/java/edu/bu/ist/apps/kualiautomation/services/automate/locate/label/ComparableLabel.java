@@ -153,6 +153,7 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 	 */
 	@Override
 	public int compareTo(ComparableLabel o) {
+		
 		int compared = requiredCompareTo(o);
 		
 		if(this.disqualified && o.disqualified)
