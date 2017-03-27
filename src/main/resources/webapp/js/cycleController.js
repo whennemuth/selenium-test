@@ -9,10 +9,16 @@ var cycleCtrlFactory = function() {
 			// Load in ScreenScrape Types
 			cycleSvc.getScreenScrapeTypes();
 			
+			// Load in DateFormat options
+			cycleSvc.getDateFormats();
+			
+			// Load in DateParts options
+			cycleSvc.getDateParts();
+			
 			// Add an event handler to query if the service has intialized yet.
 			scope.isInitialized = function() {
 				return cycleSvc.isInitialized();
-			}
+			};
 			
 			scope.getElementTypes = function() {
 				var types = cycleSvc.getElementTypes();
@@ -31,6 +37,25 @@ var cycleCtrlFactory = function() {
 			
 			scope.getShortcuts = function() {
 				return scope.config.configShortcuts;
+			};
+			
+			scope.getDateFormats = function() {
+				return cycleSvc.getDateFormats();
+			};
+			
+			scope.getDateFormat = function(lv, callback) {
+				return cycleSvc.getDateFormat(lv, callback);
+			}
+			
+			scope.getDateParts = function() {
+				var formats = cycleSvc.getDateParts();
+				var filtered = {};
+				for(var f in formats) {
+					if(/(MONTH)|(DAY)|(YEAR)/.test(f.toUpperCase())) {
+						filtered[f] = formats[f];
+					}
+				}
+				return filtered;
 			};
 			
 			scope.getShortcut = function(id) {
@@ -98,6 +123,7 @@ var cycleCtrlFactory = function() {
 							lv.configShortcut = null;
 						}
 						lv.screenScrapeType = null;
+						scope.blankOutDateEntry(lv);
 						break;
 					case 'CHECKBOX': case 'RADIO': 
 						lv.value = lv.booleanValue;
@@ -106,6 +132,7 @@ var cycleCtrlFactory = function() {
 							lv.configShortcut = null;
 						}
 						lv.screenScrapeType = null;
+						scope.blankOutDateEntry(lv);
 						break;
 					case 'SELECT': case 'TEXTAREA': case 'TEXTBOX': case 'PASSWORD': case 'OTHER':
 						lv.booleanValue = false;
@@ -117,7 +144,8 @@ var cycleCtrlFactory = function() {
 						if(lv.configShortcut) {
 							lv.configShortcut = null;
 						}
-						lv.screenScrapeType = null;
+						lv.screenScrapeType = null;						
+						scope.blankOutDateEntry(lv);
 						break;
 					case 'SHORTCUT':
 						lv.identifier = null;
@@ -128,6 +156,7 @@ var cycleCtrlFactory = function() {
 							lv.navigates = (lv.navigates || scope.getShortcut(lv.configShortcut.id).navigates);
 						}
 						lv.screenScrapeType = null;
+						scope.blankOutDateEntry(lv);
 						break;
 					case 'SCREENSCRAPE':
 						lv.screenScrapeType = scope.getScreenScrapeTypes()[0].id; // default to the first one
@@ -138,6 +167,7 @@ var cycleCtrlFactory = function() {
 						if(lv.configShortcut) {
 							lv.configShortcut = null;
 						}
+						scope.blankOutDateEntry(lv);
 						break;
 					default:
 						lv.identifier = null;
@@ -148,8 +178,88 @@ var cycleCtrlFactory = function() {
 						if(lv.configShortcut) {
 							lv.configShortcut = null;
 						}
+						scope.blankOutDateEntry(lv);
 						break;
 				}
+			};
+			
+			scope.screenScrapeIdChange = function(lv) {
+				lv.value = '';
+				lv.dateUnits = null;
+				if(lv.screenScrapeId == -1) {
+					lv.dateUnits = 0;
+					for(var part in scope.getDateParts()) {
+						lv.datePart = part;
+						break; // break after first iteration because we are defaulting to the first item in the list
+					}
+					for(var format in scope.getDateFormats()) {
+						lv.dateFormatChoice = format;
+						lv.dateFormat = format;
+						break; // break after first iteration because we are defaulting to the first item in the list
+					}
+					scope.dateBlur(lv);
+				}
+				else {
+					scope.blankOutDateEntry(lv);
+				}
+			};
+			
+			scope.dateFormatChange = function(lv) {
+				if(lv.dateFormatChoice == 'CUSTOM') { 
+					lv.dateFormat = null; 
+				} 
+				else { 
+					lv.dateFormat = lv.dateFormatChoice; 
+				}
+				scope.dateBlur(lv);
+			};
+			
+			scope.dateBlur = function(lv) {
+				var datespan = document.getElementById('computedDate' + lv.sequence);
+				if(!lv.dateFormat)
+					datespan.innerHTML = "<font color='red'>invalid/missing format!</font>";
+				else if(!/^\-?\d+$/.test(lv.dateUnits))
+					datespan.innerHTML = "<font color='red'>invalid/missing quantity!</font>";
+				else if(!lv.datePart)
+					datespan.innerHTML = "<font color='red'>invalid/missing units!</font>";
+				else {
+					scope.getDateFormat(lv, function(retval) {
+						document.getElementById('computedDate' + lv.sequence).innerHTML = "<font color='green'>if run today: " + retval + "</font>";
+					});
+				}				
+			};
+			
+			scope.blankOutDateEntry = function(lv) {
+				lv.screenScrapeId = 0;
+				lv.dateUnits = null;
+				lv.datePart = null;
+				lv.dateFormatChoice = null;
+				lv.dateFormat = null;
+				document.getElementById('computedDate').innerHTML = '';
+			};
+			
+			scope.plusMinusIntegersOnly = function($event, val) {
+				var char = String.fromCharCode($event.keyCode);
+				var retval = /\d/.test(char) || (/\-/.test(char) && !val);
+				if(retval && !/^\-/.test(val) && val && val.length == 3)
+					retval = false;
+				if(retval)
+					return;
+				
+                $event.stopImmediatePropagation();
+                $event.preventDefault();
+                $event.stopPropagation();
+                return false;
+			};
+			
+			scope.dateFormatCharsOnly = function($event) {
+				if(/[mdy\-\/,\.]/i.test(String.fromCharCode($event.keyCode)))
+					return;
+				
+                $event.stopImmediatePropagation();
+                $event.preventDefault();
+                $event.stopPropagation();
+                return false;
 			};
 			
 			scope.isScreenScrapeType = function(id) {
@@ -159,7 +269,7 @@ var cycleCtrlFactory = function() {
 					}
 				}
 				return false;
-			}
+			};
 			
 			/** An array used to bind to screenscrape picklists */
 			scope.screenscrapes = [];
@@ -242,10 +352,6 @@ var cycleCtrlFactory = function() {
 					}
 					return true;					
 				}
-			};
-			
-			scope.screenScrapeChange = function(lv) {
-				
 			};
 			
 			scope.resequence = function(items) {
@@ -422,10 +528,14 @@ var cycleCtrlFactory = function() {
 					s += lv.label ? lv.label : '?';
 				}
 				else {
+					var val = lv.value;
+					if(!val && lv.screenScrapeId == -1 && lv.dateUnits && lv.datePart) {
+						val = lv.dateUnits + ' ' + lv.datePart.toLowerCase() + (/^\-/.test(lv.dateUnits) ? 's ago' : 's from now');
+					}
 					s += ', label:';
 					s += lv.label ? lv.label : '?';
 					s += ', value:';
-					s += lv.value ? lv.value : '?';
+					s += lv.value ? lv.value : (val ? val : '?');
 					s += ', other identifier:';
 					s += lv.identifier ? lv.identifier : '?';
 				}

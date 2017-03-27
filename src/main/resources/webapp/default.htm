@@ -143,31 +143,55 @@
 										<div ng-show="lvShow(lv, 'value')" style="padding-top:5px;">
 											<table cellpadding=0; cellspacing=0 border=0 class="valuerow">
 												<tr>
-													<td>value</td>
+													<td>value <span ng-show="lv.screenScrapeId == -1" id="computedDate{{lv.sequence}}"></span></td>
 													<td>type</td>
 													<td><div ng-show="lv.screenScrapeId == -1">quantity</div></td>
 													<td><div ng-show="lv.screenScrapeId == -1">units</div></td>
 													<td><div ng-show="lv.screenScrapeId == -1">format</div></td>
+													<td><div ng-show="lv.screenScrapeId == -1 && lv.dateFormatChoice == 'CUSTOM'">(MDY-/., only)</div></td>
 												</tr>
 												<tr>
 													<td>
 														<input type="text" value="{{lv.value}}" ng-model="lv.value" ng-disabled="lv.screenScrapeId != 0">
 													</td>
 													<td>
-														<select ng-model="lv.screenScrapeId" ng-change="lv.value = ''"
+														<select 
+															ng-model="lv.screenScrapeId" 
+															ng-change="screenScrapeIdChange(lv);"
 															ng-options="ss.id as getScreenScrapeInfo(ss) for ss in screenscrapes | filter:filterScreenScrapes(suite, lv)">
 														</select>											
 													</td>
 													<td><div ng-show="lv.screenScrapeId == -1">
-														<input type="text" ng-model="lv.dateUnits" onkeypress="return /\d/.test(String.fromCharCode(event.keyCode));" maxlength=3 style="width:60px;">											
+														<input 
+															type="text" 
+															ng-model="lv.dateUnits" 
+															ng-blur="dateBlur(lv);" 
+															ng-keypress="plusMinusIntegersOnly($event, lv.dateUnits);"  
+															maxlength=4 
+															style="width:60px;">											
 													</div></td>
 													<td><div ng-show="lv.screenScrapeId == -1">
-														<select ng-model="lv.dateType" >	
+														<select ng-model="lv.datePart" ng-change="dateBlur(lv);">
+															<option 
+																value="{{part}}" 
+																title="{{desc}}" 
+																ng-repeat="(part, desc) in getDateParts();">{{desc}}</option>	
 														</select>										
 													</div></td>
 													<td><div ng-show="lv.screenScrapeId == -1">
-														<select ng-model="lv.dateFormat" >	
+														<select 
+															ng-model="lv.dateFormatChoice" 
+															ng-change="dateFormatChange(lv);">
+															<option value="{{format}}" title="{{desc}}" ng-repeat="(format, desc) in getDateFormats()">{{desc}}</option>	
 														</select>										
+													</div></td>
+													<td><div ng-show="lv.screenScrapeId == -1 && lv.dateFormatChoice == 'CUSTOM'">
+														<input 
+															type="text" 
+															ng-model="lv.dateFormat" 
+															ng-blur="dateBlur(lv);" 
+															ng-keypress="dateFormatCharsOnly($event)"
+															style="width:100px;">	
 													</div></td>
 												</tr>
 											</table>

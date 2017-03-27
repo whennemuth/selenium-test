@@ -14,6 +14,8 @@ import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementValue;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.LocatorRunner;
 import edu.bu.ist.apps.kualiautomation.services.config.ConfigTestingDefaults;
+import edu.bu.ist.apps.kualiautomation.util.DateOffset;
+import edu.bu.ist.apps.kualiautomation.util.DateOffset.DatePart;
 
 /**
  * This class processes a cycle. Every suite, module, and tab is processed in order involving navigating to the
@@ -133,9 +135,24 @@ public class CycleRunner {
 			 */
 			valueString = getScreenScrapeValue(lv.getScreenScrapeId());
 		}
+		else if(lv.getScreenScrapeId() == -1) {
+			/**
+			 * SCENARIO C:
+			 * Date offset entry. Compute the date and then apply the resulting value.
+			 */
+			int dateUnits = Integer.valueOf(lv.getDateUnits());
+			DatePart datePart = DatePart.valueOf(lv.getDatePart());
+			DateOffset offset = DateOffset.valueOf(lv.getDateFormatChoice());
+			if(DateOffset.CUSTOM.equals(offset)) {
+				valueString = offset.getOffsetDate(lv.getDateFormat(), datePart, dateUnits);
+			}
+			else {
+				valueString = offset.getOffsetDate(datePart, dateUnits);
+			}
+		}
 		else {
 			/**
-			 * SCENARIO C: 
+			 * SCENARIO D: 
 			 * Not screenscrape-related. Apply a value directly.
 			 */
 			valueString = lv.getValue();

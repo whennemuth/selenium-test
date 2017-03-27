@@ -7,6 +7,9 @@ var SAVE_CYCLE_URL = '/rest/cycle/save';
 var GET_ELEMENT_TYPES_URL = '/rest/cycle/element/types';
 var GET_SCREENSCRAPE_TYPES_URL = '/rest/cycle/element/types/screenscrape';
 var GET_SHORTCUTS_URL = '/rest/cycle/shortcut/types';
+var GET_DATE_FORMAT_URL = '/rest/cycle/element/date/format';
+var GET_DATE_FORMATS_URL = '/rest/cycle/element/date/format/choices';
+var GET_DATE_PARTS_URL = '/rest/cycle/element/date/part';
 var LAUNCH_CYCLE_URL = '/rest/cycle/launch/cycle';
 var LAUNCH_SUITE_URL = '/rest/cycle/launch/suite';
 
@@ -15,12 +18,14 @@ var cycleSvcFactory = function($http, $q) {
 	var emptyCycleJson;
 	var elementTypes;
 	var screenScrapeTypes;
+	var dateFormats;
+	var dateParts;
 	var cyclesCache;	
 	
 	return {
 		isInitialized : function() {
 			// Once these objects have been obtained and cached from the corresponding web services, we are initialized.
-			return emptyCycleJson && elementTypes && screenScrapeTypes;
+			return emptyCycleJson && elementTypes && screenScrapeTypes && dateFormats && dateParts;
 		},
 		getEmptyCycle : function(userId) {
 			if(emptyCycleJson) {
@@ -171,6 +176,61 @@ var cycleSvcFactory = function($http, $q) {
 					.success(function(response) {
 						//screenScrapeTypes = angular.toJson(response.data);
 						screenScrapeTypes = response.data;
+						deferred.resolve(response.data);
+						
+					}).error(function(response){
+						deferred.reject(response);
+					});
+				return deferred.promise;
+			}
+		},
+		getDateFormat : function(lv, callback) {
+			var deferred = $q.defer();
+			$http({
+				method: 'POST',
+				url: GET_DATE_FORMAT_URL,
+				data: lv
+			})
+				.success(function(response) {
+					callback(response.data);
+					deferred.resolve(response.data);
+					
+				}).error(function(response){
+					deferred.reject(response);
+				});
+			return deferred.promise;
+			
+		},
+		getDateFormats : function() {
+			if(dateFormats) {
+				return dateFormats;
+			}
+			else {
+				// First load must come from the web service call (is a promise)
+				var deferred = $q.defer();
+				$http.get(GET_DATE_FORMATS_URL)
+					.success(function(response) {
+						//dateFormats = angular.toJson(response.data);
+						dateFormats = response.data;
+						deferred.resolve(response.data);
+						
+					}).error(function(response){
+						deferred.reject(response);
+					});
+				return deferred.promise;
+			}
+		},
+		getDateParts : function() {
+			if(dateParts) {
+				return dateParts;
+			}
+			else {
+				// First load must come from the web service call (is a promise)
+				var deferred = $q.defer();
+				$http.get(GET_DATE_PARTS_URL)
+					.success(function(response) {
+						//dateParts = angular.toJson(response.data);
+						dateParts = response.data;
 						deferred.resolve(response.data);
 						
 					}).error(function(response){

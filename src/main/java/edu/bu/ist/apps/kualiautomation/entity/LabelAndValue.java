@@ -28,6 +28,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import edu.bu.ist.apps.kualiautomation.entity.util.CustomJsonSerializer;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
+import edu.bu.ist.apps.kualiautomation.util.DateOffset;
+import edu.bu.ist.apps.kualiautomation.util.DateOffset.DatePart;
 
 
 /**
@@ -72,11 +74,14 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 	@Transient
 	private String screenScrapeValue;
 	
+	@Transient
+	private String dateFormatChoice;
+	
 	@Column(name="date_units", nullable=true)
 	private Integer dateUnits;
 	
-	@Column(name="date_type", nullable=true, length=25)
-	private String dateType;
+	@Column(name="date_part", nullable=true, length=25)
+	private String datePart;
 	
 	@Column(name="date_format", nullable=true, length=25)
 	private String dateFormat;
@@ -165,6 +170,9 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 		if(ElementType.SCREENSCRAPE.is(elementType) && value == null) {
 			this.value = screenScrapeType;
 		}
+		else if(ElementType.TEXTBOX.is(elementType) && value == null && dateFormat != null) {
+			this.value = DateOffset.valueOf(dateFormat).getOffsetDate(DatePart.valueOf(datePart), dateUnits);
+		}
 		return this.value;
 	}
 
@@ -180,12 +188,12 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 		this.dateUnits = dateUnits;
 	}
 
-	public String getDateType() {
-		return dateType;
+	public String getDatePart() {
+		return datePart;
 	}
 
-	public void setDateType(String dateType) {
-		this.dateType = dateType;
+	public void setDatePart(String datePart) {
+		this.datePart = datePart;
 	}
 
 	public String getDateFormat() {
@@ -196,6 +204,24 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 		this.dateFormat = dateFormat;
 	}
 
+	@Transient
+	public String getDateFormatChoice() {
+		if(dateFormatChoice != null)
+			return dateFormatChoice;
+		if(dateFormat == null)
+			return null;
+		DateOffset format = DateOffset.valueOfOrNull(dateFormat);
+		if(format == null)
+			return DateOffset.CUSTOM.name();
+		else 
+			return format.name();
+	}
+	
+	@Transient
+	public void setDateFormatChoice(String dateFormatChoice) {
+		this.dateFormatChoice = dateFormatChoice;
+	}
+	
 	public String getElementType() {
 		return elementType;
 	}

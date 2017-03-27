@@ -15,10 +15,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import edu.bu.ist.apps.kualiautomation.entity.Cycle;
+import edu.bu.ist.apps.kualiautomation.entity.LabelAndValue;
 import edu.bu.ist.apps.kualiautomation.services.automate.KerberosLoginParms;
 import edu.bu.ist.apps.kualiautomation.services.automate.element.ElementType;
 import edu.bu.ist.apps.kualiautomation.services.automate.locate.screenscrape.ScreenScrapeComparePattern;
 import edu.bu.ist.apps.kualiautomation.services.config.ScriptService;
+import edu.bu.ist.apps.kualiautomation.util.DateOffset;
+import edu.bu.ist.apps.kualiautomation.util.DateOffset.DatePart;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -34,16 +37,47 @@ public class ScriptResource {
 
 	@GET
 	@Path("/cycle/element/types")
-	public Response getElementTypes(@PathParam("userId") Integer userId) throws Exception {		
+	public Response getElementTypes() throws Exception {		
 		Response response = ServiceResponse.getResponse(ElementType.toJson(), Status.OK);
 		return response;		
 	}
 
 	@GET
 	@Path("/cycle/element/types/screenscrape")
-	public Response getScreenScrapeTypes(@PathParam("userId") Integer userId) throws Exception {		
+	public Response getScreenScrapeTypes() throws Exception {		
 		Response response = ServiceResponse.getResponse(ScreenScrapeComparePattern.toJson(), Status.OK);
 		return response;		
+	}
+	
+	@POST
+	@Path("/cycle/element/date/format")
+	public Response getDateFormat(LabelAndValue lv) {
+		int dateUnits = Integer.valueOf(lv.getDateUnits());
+		DatePart datePart = DatePart.valueOf(lv.getDatePart());
+		DateOffset offset = DateOffset.valueOf(lv.getDateFormatChoice());
+		String retval = null;
+		if(DateOffset.CUSTOM.equals(offset)) {
+			retval = offset.getOffsetDate(lv.getDateFormat(), datePart, dateUnits);
+		}
+		else {
+			retval = offset.getOffsetDate(datePart, dateUnits);
+		}
+		Response response = ServiceResponse.getResponse(retval, Status.OK);
+		return response;
+	}
+	
+	@GET
+	@Path("/cycle/element/date/format/choices")
+	public Response getDateOffsetTypes() {
+		Response response = ServiceResponse.getResponse(DateOffset.toJson(), Status.OK);
+		return response;
+	}
+	
+	@GET
+	@Path("/cycle/element/date/part")
+	public Response getDatePart() {
+		Response response = ServiceResponse.getResponse(DatePart.toJson(), Status.OK);
+		return response;
 	}
 	
 	@GET
