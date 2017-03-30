@@ -42,6 +42,7 @@ public class ElementsAssertion {
 	private Map<String, String> anyAttributeAssertions;
 	private Map<String, String> anyAttributeAssertionsFound;
 	private String tagNameAssertion;
+	private String valueAssertion;
 	private String textAssertion;
 	private HashSet<String> anyTextAssertions;
 	private HashSet<String> anyTextFound;
@@ -188,6 +189,12 @@ public class ElementsAssertion {
 		if(tagNameAssertion != null) {
 			assertTrue(tagNameAssertion.equalsIgnoreCase(element.getWebElement().getTagName()));
 		}
+		if(valueAssertion != null) {
+			if(element.getValue() == null) {
+				fail("Expected value = \"" + valueAssertion + "\", but was null");
+			}
+			assertEquals(valueAssertion.trim(), element.getValue().trim());			
+		}
 		if(textAssertion != null) {
 			if(element.getWebElement().getText() == null) {
 				fail("Expected text = \"" + textAssertion + "\", but was null");
@@ -304,6 +311,13 @@ public class ElementsAssertion {
 	}
 	public ElementsAssertion setTextAssertion(String text) {
 		this.textAssertion = text;
+		return this;
+	}
+	public String getValueAssertion() {
+		return valueAssertion;
+	}
+	public ElementsAssertion setValueAssertion(String value) {
+		this.valueAssertion = value;
 		return this;
 	}
 	public ElementsAssertion setAnyTextAssertions(String[] anyText) {

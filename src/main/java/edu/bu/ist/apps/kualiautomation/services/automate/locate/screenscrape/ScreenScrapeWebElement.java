@@ -41,8 +41,7 @@ public class ScreenScrapeWebElement extends AbstractWebElement {
 	}
 
 	@Override
-	public String getText() {
-		
+	public String getText() {		
 		if(candidates.isEmpty())
 			return screenscrape.getRawText(); // This wont' be what we are looking for (maybe should return null?)
 		else
@@ -50,6 +49,42 @@ public class ScreenScrapeWebElement extends AbstractWebElement {
 			return candidates.toArray(new String[candidates.size()])[0];
 	}
 	
+	
+	@Override
+	public boolean isEnabled() {
+		if(super.webElement == null)
+			return true;
+		return super.isEnabled();
+	}
+
+	@Override
+	public boolean isDisplayed() {
+		if(super.webElement == null)
+			return true;
+		return super.isDisplayed();
+	}
+
+	@Override
+	public String getAttribute(String name) {
+		if(super.webElement == null) {
+			if("width".equalsIgnoreCase(name) || "length".equalsIgnoreCase(name)) {
+				return "1";
+			}
+			if("type".equalsIgnoreCase(name)) {
+				return "screenscrape";
+			}
+		}
+		return super.getAttribute(name);
+	}
+
+	@Override
+	public String getTagName() {
+		if(super.webElement == null) {
+			return "screenscrape";
+		}
+		return super.getTagName();
+	}
+
 	/**
 	 * @return True if more than one screen scrape value was matched.
 	 */
@@ -59,5 +94,21 @@ public class ScreenScrapeWebElement extends AbstractWebElement {
 	
 	public List<String> getCandidates() {
 		return Arrays.asList(candidates.toArray(new String[candidates.size()]));
+	}
+	
+	public static boolean areEqual(Object obj1, Object obj2) {
+		if(obj1 instanceof ScreenScrapeWebElement) {
+			if(obj2 != null && obj2 instanceof ScreenScrapeWebElement) {
+				String thisText = ((ScreenScrapeWebElement) obj1).getText();
+				String otherText = ((ScreenScrapeWebElement) obj2).getText();
+				if(thisText == null && otherText == null)
+					return true;
+				else if(thisText != null) 
+					return thisText.equals(otherText);
+				else
+					return otherText.equals(thisText);
+			}
+		}
+		return false;
 	}
 }

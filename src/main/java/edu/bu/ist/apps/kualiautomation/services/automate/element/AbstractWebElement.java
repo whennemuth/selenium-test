@@ -13,6 +13,8 @@ import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
+import edu.bu.ist.apps.kualiautomation.services.automate.locate.screenscrape.ScreenScrapeWebElement;
+
 /**
  * This class wraps the {@link org.openqa.selenium.WebElement} in an abstract class of the same type
  * so as to allow subclasses to override methods and to that degree effect the Adapter design pattern.
@@ -22,7 +24,7 @@ import org.openqa.selenium.WebElement;
  */
 public class AbstractWebElement implements WebElement {
 
-	private WebElement webElement;
+	protected WebElement webElement;
 	private String tagname;
 	private String text;
 	private Map<String, Object> attributes = new HashMap<String, Object>();
@@ -52,11 +54,11 @@ public class AbstractWebElement implements WebElement {
 	
 	@Override
 	public boolean equals(Object obj) {
+		if(webElement == null) {
+			return ScreenScrapeWebElement.areEqual(this, obj);
+		}
 		if(obj != null && obj instanceof AbstractWebElement) {
 			return webElement.equals(((AbstractWebElement) obj).webElement);
-		}
-		if(webElement == null) {
-			return false;
 		}
 		return webElement.equals(obj);
 	}

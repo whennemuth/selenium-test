@@ -138,7 +138,7 @@ public class ComparableScreenScrape extends ComparableLabel {
 	}
 	
 	/**
-	 * Determine if the label match qualifies with the a sufficiently matching value string immediately to its right. 
+	 * Determine if the label match qualifies with a sufficiently matching value string immediately to its right. 
 	 */
 	private void qualify() {
 		
@@ -161,6 +161,15 @@ public class ComparableScreenScrape extends ComparableLabel {
 			return;
 		}
 		
+		scrape();		
+		
+		other.qualify();
+	}
+
+	/**
+	 * "Scrape" the labelled value away from the label.
+	 */
+	public void scrape() {
 		// Up to now we know the screenScrape was a match because the label was found by xpath.
 		// However if the characters that immediately follow it do not match what is expected, then disqualify.
 		matches = pattern.getMatches(cleantext, cleanlabel, false);
@@ -175,10 +184,8 @@ public class ComparableScreenScrape extends ComparableLabel {
 		else {
 			caseMatch = true;
 		}		
-		
-		other.qualify();
 	}
-
+	
 	/**
 	 * Replace in a string all multiple consecutive occurrences of spaces and tabs with a single space, but not returns.
 	 * 

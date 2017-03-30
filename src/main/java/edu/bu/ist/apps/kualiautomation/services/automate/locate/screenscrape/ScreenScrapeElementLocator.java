@@ -3,8 +3,10 @@ package edu.bu.ist.apps.kualiautomation.services.automate.locate.screenscrape;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -69,48 +71,109 @@ public class ScreenScrapeElementLocator extends AbstractElementLocator {
 		List<WebElement> located = new ArrayList<WebElement>();
 		if(validParameters()) {
 			
-			String scope = "";	// global
-			if(searchContext instanceof WebElement) {
-				scope = ".";	// current scope within element.
+			located.addAll(method1());
+			
+			if(located.isEmpty()) {
+				located.addAll(method2());
 			}
+		}
+		
+		return located;
+	}
+	
+	private List<WebElement> method1() {
+		List<WebElement> located = new ArrayList<WebElement>();
+		if(validParameters()) {
+			String tagname = "body";
+			JavascriptExecutor executor = (JavascriptExecutor) searchContext;
+			String body = (String) executor.executeScript(""
+					+ "try { "
+					+ "   var elmts = document.getElementsByTagName(arguments[0]); "
+					+ "   if(elmts == null || elmts.length == 0) { "
+					+ "      return null; "
+					+ "   } "
+					+ "   else { "
+					+ "      var text = elmts[0].textContent || elmts[0].innerText;"
+					+ "      return text; "
+					+ "   } "
+					+ "}"
+					+ "catch(e) { "
+					+ "   return 'ERROR: ' + e; "
+					+ "}", 
+					tagname);
 			
-			String label = new String(parameters.get(0)).trim().replaceAll("\\s+", " ");
-			String sPattern = parameters.get(1);
-			String xpath = new String(scope);
-			if(ignorecase)
-				xpath = xpath + XPATH_CONTAINS_IGNORECASE.replace("[INSERT-LABEL]", label.toLowerCase());
-			else
-				xpath = xpath + XPATH_CONTAINS.replace("[INSERT-LABEL]", label);
-			
-			List<WebElement> elements = XpathElementCache.get(driver, xpath, super.skipFrameSearch);
-			if(elements.isEmpty()) {
-				elements.addAll(searchContext.findElements(By.xpath(xpath)));
-				XpathElementCache.put(driver, xpath, super.skipFrameSearch, elements);
+			if(Utils.isEmpty(body)) {
+				System.out.println("Cannot find " + tagname + " element!");
 			}
-
-			List<ComparableLabel> scraped = new ArrayList<ComparableLabel>();
-			
-			if(!elements.isEmpty()) {
-				for (Iterator<WebElement> iterator = elements.iterator(); iterator.hasNext();) {
-					
-					WebElement we = iterator.next();
+			else if(body.startsWith("ERROR: ")) {
+				System.out.println("JAVASCRIPT " + body);
+			}
+			else {
+				String label = new String(parameters.get(0)).trim().replaceAll("\\s+", " ");
+				String sPattern = parameters.get(1);
+				ScreenScrapeComparePattern pattern = ScreenScrapeComparePattern.valueOf(sPattern);
+				body = body.replaceAll("\\r", "").replaceAll("\\n", "");
+				List<String> matches = pattern.getMatches(body, label, ignorecase);
+				for(String text : matches) {
 					
 					ComparableParameters parms = new ComparableParameters()
 							.setPattern(ScreenScrapeComparePattern.valueOf(sPattern))
 							.setLabel(label)
-							.setText(we.getText())
-							.setWebElement(we)
-							.setIgnorecase(false) // caseless match will be invoke only if case match fails
+							.setText(text)
+							.setWebElement(null)
+							.setIgnorecase(false) // caseless match will be invoked only if case match fails
 							.setUseDefaultMethodIfIndeterminate(false);
 							
-					scraped.add(new ComparableScreenScrape(parms));
+					ComparableScreenScrape screenscrape = new ComparableScreenScrape(parms);
+					screenscrape.scrape();
+					located.add(screenscrape.getWebElement());
 				}
 			}
-			
-			located.addAll(ComparableLabel.getHighestRanked(scraped));
 		}
 		
-		return located;
+		return located;		
+	}
+	
+	private List<WebElement> method2() {
+		String scope = "";	// global
+		if(searchContext instanceof WebElement) {
+			scope = ".";	// current scope within element.
+		}
+		
+		String label = new String(parameters.get(0)).trim().replaceAll("\\s+", " ");
+		String sPattern = parameters.get(1);
+		String xpath = new String(scope);
+		if(ignorecase)
+			xpath = xpath + XPATH_CONTAINS_IGNORECASE.replace("[INSERT-LABEL]", label.toLowerCase());
+		else
+			xpath = xpath + XPATH_CONTAINS.replace("[INSERT-LABEL]", label);
+		
+		List<WebElement> elements = XpathElementCache.get(driver, xpath, super.skipFrameSearch);
+		if(elements.isEmpty()) {
+			elements.addAll(searchContext.findElements(By.xpath(xpath)));
+			XpathElementCache.put(driver, xpath, super.skipFrameSearch, elements);
+		}
+
+		List<ComparableLabel> scraped = new ArrayList<ComparableLabel>();
+
+		if(!elements.isEmpty()) {
+			for (Iterator<WebElement> iterator = elements.iterator(); iterator.hasNext();) {
+				
+				WebElement we = iterator.next();
+				
+				ComparableParameters parms = new ComparableParameters()
+						.setPattern(ScreenScrapeComparePattern.valueOf(sPattern))
+						.setLabel(label)
+						.setText(we.getText())
+						.setWebElement(we)
+						.setIgnorecase(false) // caseless match will be invoke only if case match fails
+						.setUseDefaultMethodIfIndeterminate(false);
+						
+				scraped.add(new ComparableScreenScrape(parms));
+			}
+		}
+		
+		return ComparableLabel.getHighestRanked(scraped);		
 	}
 	
 	private boolean validParameters() {

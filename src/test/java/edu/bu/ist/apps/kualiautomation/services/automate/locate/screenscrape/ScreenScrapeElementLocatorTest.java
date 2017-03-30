@@ -18,7 +18,8 @@ import edu.bu.ist.apps.kualiautomation.services.automate.locate.screenscrape.Scr
 public class ScreenScrapeElementLocatorTest extends AbstractJettyBasedTest {
 
 	static {
-		javascriptEnabled = false;
+		javascriptIgnoreExceptions = true;
+//		javascriptEnabled = false;
 	}
 
 	private ScreenScrapeElementLocator locator;
@@ -121,29 +122,39 @@ public class ScreenScrapeElementLocatorTest extends AbstractJettyBasedTest {
 		List<Element> elements = (new ElementsAssertion(locator)
 				.setUrl(url)
 				.setElementType(ElementType.SCREENSCRAPE)
-				.setLabel("Document ID:Status:")
+				.setLabel("Subaward ID")
 				.addAttributeValue(ScreenScrapeComparePattern.LABELLED_NUMBER.name())
 				.setNumResults(1)
-				.setTextAssertion("10828"))
+				.setTextAssertion("89")
+				.setValueAssertion("89"))
 			.findAndAssertElements();
 		
-		elements = (new ElementsAssertion(locator)
-					.setUrl(url)
-					.setElementType(ElementType.SCREENSCRAPE)
-					.setLabel("Requisitioner Unit:")
-					.addAttributeValue(ScreenScrapeComparePattern.LABELLED_WORD.name())
-					.setNumResults(1)
-					.setTextAssertion("University"))
-				.findAndAssertElements();
-		
-		elements = (new ElementsAssertion(locator)
-					.setUrl(url)
-					.setElementType(ElementType.SCREENSCRAPE)
-					.setLabel("Document")
-					.addAttributeValue(ScreenScrapeComparePattern.LABELLED_WORD.name())
-					.setNumResults(14)
-					.setAnyTextAssertions(new String[]{"Overview", "Number", "was", "ID"}))
-				.findAndAssertElements();
+//		elements = (new ElementsAssertion(locator)
+//				.setUrl(url)
+//				.setElementType(ElementType.SCREENSCRAPE)
+//				.setLabel("Document ID:Status:")
+//				.addAttributeValue(ScreenScrapeComparePattern.LABELLED_NUMBER.name())
+//				.setNumResults(1)
+//				.setTextAssertion("10828"))
+//			.findAndAssertElements();		
+//		
+//		elements = (new ElementsAssertion(locator)
+//					.setUrl(url)
+//					.setElementType(ElementType.SCREENSCRAPE)
+//					.setLabel("Requisitioner Unit:")
+//					.addAttributeValue(ScreenScrapeComparePattern.LABELLED_WORD.name())
+//					.setNumResults(1)
+//					.setTextAssertion("University"))
+//				.findAndAssertElements();
+//		
+//		elements = (new ElementsAssertion(locator)
+//					.setUrl(url)
+//					.setElementType(ElementType.SCREENSCRAPE)
+//					.setLabel("Document")
+//					.addAttributeValue(ScreenScrapeComparePattern.LABELLED_WORD.name())
+//					.setNumResults(14)
+//					.setAnyTextAssertions(new String[]{"Overview", "Number", "was", "ID"}))
+//				.findAndAssertElements();
 
 	}
 }

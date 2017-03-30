@@ -200,7 +200,7 @@ var cycleCtrlFactory = function() {
 					scope.dateBlur(lv);
 				}
 				else {
-					scope.blankOutDateEntry(lv);
+					scope.blankOutDateEntry(lv, lv.screenScrapeId);
 				}
 			};
 			
@@ -229,13 +229,16 @@ var cycleCtrlFactory = function() {
 				}				
 			};
 			
-			scope.blankOutDateEntry = function(lv) {
-				lv.screenScrapeId = 0;
+			scope.blankOutDateEntry = function(lv, screenScrapeId) {
+				if(screenScrapeId)
+					lv.screenScrapeId = screenScrapeId;
+				else
+					lv.screenScrapeId = 0;
 				lv.dateUnits = null;
 				lv.datePart = null;
 				lv.dateFormatChoice = null;
 				lv.dateFormat = null;
-				document.getElementById('computedDate').innerHTML = '';
+				document.getElementById('computedDate' + lv.sequence).innerHTML = '';
 			};
 			
 			scope.plusMinusIntegersOnly = function($event, val) {

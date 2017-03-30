@@ -40,7 +40,7 @@ public class LabelElementLocator extends AbstractElementLocator {
 	 * NOTE: Using of unicode matching to identify non-printing backspaces (&nbsp;), which are not caught by the
 	 * normalize-space function.
 	 */
-	private static final String XPATH_CONTAINS = 
+	public static final String XPATH_CONTAINS = 
 			"//*[(not(./*) or not(./*/*))]"
 			+ "[contains(normalize-space(translate("
 			+ "translate(string(.), '\u00a0', ' '), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"
