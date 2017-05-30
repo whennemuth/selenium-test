@@ -119,15 +119,15 @@ public class LabelAndValue extends AbstractEntity implements Serializable, Clone
 	}
 	
 	@Transient
-	public boolean isBooleanValue() {
+	public String getBooleanValue() {
 		if(elementType == null)
-			return false;
+			return "false";
 		if(value == null)
-			return false;
-		return value.trim().equalsIgnoreCase("true");
+			return "false";
+		return value.trim().equalsIgnoreCase("true") ? "true" : "false";
 	}
 	@Transient
-	public void setBooleanValue(boolean bool) {
+	public void setBooleanValue(String bool) {
 		/* do nothing */
 	}
 

@@ -226,6 +226,23 @@ public class LocatorRunnerTest extends AbstractJettyBasedTest {
 	}
 	
 	@Test
+	public void assert10aFindLookupContactButton() {
+		
+		LabelAndValue lv = new LabelAndValue();
+		lv.setElementType(ElementType.HOTSPOT.name());
+		lv.setLabel("Non-employee ID");
+		lv.setIdentifier("search");
+		
+		new ElementsAssertion(runner, true)
+		.setUrl("http://localhost:8080/subaward-entry-1")
+		.addLabelAndValue(lv)
+		.setNumResults(1)
+		.setTagNameAssertion("input")
+		.addAttributeAssertion("type", "image")
+		.findAndAssertElements();				
+	}
+	
+	@Test
 	public void assert11FindSubmitButton() {
 		
 		LabelAndValue lv = new LabelAndValue();

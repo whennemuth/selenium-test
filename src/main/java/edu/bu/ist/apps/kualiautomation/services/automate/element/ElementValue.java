@@ -29,6 +29,7 @@ public class ElementValue {
 		
 		switch(element.getElementType()) {
 		case TEXTBOX: case TEXTAREA: case PASSWORD:
+			element.getWebElement().clear();
 			element.getWebElement().sendKeys(value);
 			break;
 		case CHECKBOX: case RADIO:

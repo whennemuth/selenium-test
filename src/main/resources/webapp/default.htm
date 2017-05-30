@@ -124,7 +124,7 @@
 									
 										<div ng-show="lvShow(lv, 'screenscrape')" style="padding-top:5px;">
 											What are you scraping?<br> 
-											<select ng-model="lv.screenScrapeType" ng-change="lvChange(lv)">
+											<select ng-model="lv.screenScrapeType">
 												<option value="{{ss.id}}" title="{{ss.description}}" 
 													ng-repeat="ss in getScreenScrapeTypes()">{{ss.name}}</option>
 											</select>
