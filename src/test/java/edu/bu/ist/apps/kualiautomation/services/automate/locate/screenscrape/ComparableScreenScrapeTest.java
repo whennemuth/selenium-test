@@ -165,22 +165,55 @@ public class ComparableScreenScrapeTest {
 		ComparableScreenScrape scrape2 = scrape1.changeText("chaff mylabel myvalue2 chaff");
 		ComparableScreenScrape scrape3 = scrape1.changeText("chaff mylabelmyvalue3 chaff");
 		ComparableScreenScrape scrape4 = scrape1.changeText("chaff mylabel - myvalue4a chaff mylabel myvalue4b chaff");
+		ComparableScreenScrape scrape5 = scrape1.changeText("chaff mylabel -myvalue4a chaff mylabel myvalue4b: chaff");
+		ComparableScreenScrape scrape6 = scrape1.changeText("chaff mylabel myvalue4a- chaff mylabel :myvalue4b chaff");
+		ComparableScreenScrape scrape7 = scrape1.changeText("chaff mylabel :myva&lue4a- chaff mylabel :myva-lue4b$ chaff");
 		
 		// making sure each instance is processed in a compareTo method call. 
 		// It does not matter what instance is compared to which other, along as they are all included.
 		scrape1.compareTo(scrape2);
 		scrape1.compareTo(scrape3);
 		scrape3.compareTo(scrape4);
+		scrape4.compareTo(scrape5);
+		scrape5.compareTo(scrape6);
+		scrape6.compareTo(scrape7);
 		
-		assertEquals(1, scrape1.getScrapedValues().size());
-		assertEquals("myvalue1", scrape1.getScrapedValues().get(0));
+		assertEquals(0, scrape1.getScrapedValues().size());
 		assertEquals(1, scrape2.getScrapedValues().size());
 		assertEquals("myvalue2", scrape2.getScrapedValues().get(0));		
 		assertEquals(1, scrape3.getScrapedValues().size());
 		assertEquals("myvalue3", scrape3.getScrapedValues().get(0));
+		assertEquals(1, scrape4.getScrapedValues().size());
+		assertEquals("myvalue4b", scrape4.getScrapedValues().get(0));
+		assertEquals(2, scrape5.getScrapedValues().size());
+		assertEquals("myvalue4a", scrape5.getScrapedValues().get(0));
+		assertEquals("myvalue4b", scrape5.getScrapedValues().get(1));
+		assertEquals(2, scrape6.getScrapedValues().size());
+		assertEquals("myvalue4a", scrape6.getScrapedValues().get(0));
+		assertEquals("myvalue4b", scrape6.getScrapedValues().get(1));
+		assertEquals(2, scrape7.getScrapedValues().size());
+		assertEquals("myva&lue4a", scrape7.getScrapedValues().get(0));
+		assertEquals("myva-lue4b", scrape7.getScrapedValues().get(1));
+		
+		
+		scrape1 = scrape1.setPattern(ScreenScrapeComparePattern.LABELLED_WORD).changeText("chaff mylabel: myvalue chaff");
+		scrape2 = scrape2.setPattern(ScreenScrapeComparePattern.LABELLED_WORD).changeText("chaff mylabel myvalue chaff");
+		scrape3 = scrape3.setPattern(ScreenScrapeComparePattern.LABELLED_WORD).changeText("chaff mylabelmyvalue chaff");
+		scrape4 = scrape4.setPattern(ScreenScrapeComparePattern.LABELLED_WORD).changeText("chaff mylabel - myvalueA chaff mylabel myvalueB chaff");
+		scrape1.compareTo(scrape2);
+		scrape1.compareTo(scrape3);
+		scrape3.compareTo(scrape4);
+		
+		assertEquals(1, scrape1.getScrapedValues().size());
+		assertEquals("myvalue", scrape1.getScrapedValues().get(0));
+		assertEquals(1, scrape2.getScrapedValues().size());
+		assertEquals("myvalue", scrape2.getScrapedValues().get(0));		
+		assertEquals(1, scrape3.getScrapedValues().size());
+		assertEquals("myvalue", scrape3.getScrapedValues().get(0));
 		assertEquals(2, scrape4.getScrapedValues().size());
-		assertEquals("myvalue4a", scrape4.getScrapedValues().get(0));
-		assertEquals("myvalue4b", scrape4.getScrapedValues().get(1));
+		assertEquals("myvalueA", scrape4.getScrapedValues().get(0));
+		assertEquals("myvalueB", scrape4.getScrapedValues().get(1));
+		
 	}
 	
 	/**

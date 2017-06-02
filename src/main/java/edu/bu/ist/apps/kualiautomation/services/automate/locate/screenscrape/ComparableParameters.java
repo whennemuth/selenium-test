@@ -24,8 +24,12 @@ public class ComparableParameters {
 	 */
 	private boolean useDefaultMethodIfIndeterminate;
 	/** Ignore case when comparing */
-	private boolean ignorecase = false;
-	
+	private boolean ignorecase;
+	/**
+	 * Keep all characters (except whitespace) of the scraped value once the label portion is removed
+	 * and don't remove anything like colons, hyphens, etc.
+	 */
+	private boolean acceptRawValue;
 	public WebElement getWebElement() {
 		return webElement;
 	}
@@ -67,5 +71,5 @@ public class ComparableParameters {
 	public ComparableParameters setIgnorecase(boolean ignorecase) {
 		this.ignorecase = ignorecase;
 		return this;
-	}
+	}	
 }

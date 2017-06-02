@@ -14,14 +14,13 @@ public enum ScreenScrapeComparePattern {
 	LABELLED_WORD(
 			"[A-Za-z]+",
 			"Labelled Word", 
-			"The best matching label value, followed by a single word (all alpha, no spaces), "
-			+ "",
+			"The best matching label value, followed by a single word (all alpha, no spaces)",
 			"Alpha ID: ABCdef"),
 	LABELLED_BLOCK(
-			"[\\dA-Za-z]+",
+			"\\S+",
 			"Labelled Block",
-			"The best matching label value, followed by the first block of characters (all alpha-numeric, no spaces)",
-			"AlphaNum ID: T3490LF");
+			"The best matching label value, followed by the first block of non-whitespace characters",
+			"AlphaNum ID: T:349-0LF");
 
 	private String valueRegex;
 	private String shortname;
@@ -34,7 +33,6 @@ public enum ScreenScrapeComparePattern {
 		this.description = description;
 		this.example = example;
 	}
-	
 	public String getDescription() {
 		return description;
 	}		

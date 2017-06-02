@@ -213,6 +213,18 @@ public class ComparableScreenScrape extends ComparableLabel {
 		);
 	}
 
+	public ComparableScreenScrape setPattern(ScreenScrapeComparePattern pattern) {
+		return new ComparableScreenScrape(
+				new ComparableParameters()
+					.setLabel(getRawLabel())
+					.setPattern(pattern)
+					.setText(getText())
+					.setUseDefaultMethodIfIndeterminate(useDefaultMethodIfIndeterminate)
+					.setWebElement(webElement)
+					.setIgnorecase(ignorecase)
+			);
+	}
+
 	public List<String> getMatches() {
 		return matches;
 	}
@@ -225,12 +237,38 @@ public class ComparableScreenScrape extends ComparableLabel {
 		if(scrapedValues == null && matches != null && !matches.isEmpty())
 			getScrapedValues();
 		
-		if(scrapedValues == null)
-			return webElement;
+		if(scrapedValues == null || scrapedValues.isEmpty())
+			return null;
+//			return webElement;
 		else
 			return new ScreenScrapeWebElement(webElement, this);
 	}
 
+	public boolean hasWebElement() {
+		return webElement != null;
+	}
+	
+	/**
+	 * Remove all non-alpha-numeric characters from both edges of a string.
+	 * @param s
+	 * @return
+	 */
+	private String trimNonAlphaNumFromEdges(String s) {
+		if(s != null && !s.isEmpty()) {
+			String first = s.substring(0, 1);
+			if(first.matches("[^\\dA-Za-z]")) {
+				return trimNonAlphaNumFromEdges(s.substring(1));
+			}
+			else {
+				String last = s.substring(s.length()-1);
+				if(last.matches("[^\\dA-Za-z]")) {
+					return trimNonAlphaNumFromEdges(s.substring(0, s.length()-1));
+				}
+			}
+		}
+		return s;
+	}
+	
 	/**
 	 * The "scraped" value we are trying to screen scrape for is found in this list. 
 	 * The list should have only one entry, though there may be more if the criteria for finding it within the 
@@ -245,9 +283,16 @@ public class ComparableScreenScrape extends ComparableLabel {
 		scrapedValues = new ArrayList<String>(matches.size());
 		for(String match : matches) {
 			int idx = match.indexOf(getRawLabel()) + getRawLabel().length();
-			String value = match.substring(idx);
-			value = value.replaceAll("[\\:\\-\\s]", ""); 
-			scrapedValues.add(value);
+			String value = match.substring(idx).trim();
+			if(ScreenScrapeComparePattern.LABELLED_BLOCK.equals(pattern)) {
+				value = value.split("\\s+")[0].replaceAll("[\\s]", "");
+				value = trimNonAlphaNumFromEdges(value);
+			}
+			else {
+				value = value.replaceAll("[\\:\\-\\s]", ""); 
+			}
+			if(!value.isEmpty())
+				scrapedValues.add(value);
 		}
 		return scrapedValues;
 	}

@@ -53,7 +53,7 @@ public class ScreenScrapeComparePatternTest {
 				+ "(?<!\\w)"
 				+ "\\[ \\] \\. \\$ mylabel \\^ \\( \\) \\* \\\\ \\{ \\} \\- \\?"
 				+ "\\s*[:\\-]?\\s*"
-				+ "[\\dA-Za-z]+"
+				+ "\\S+"
 				+ "(?!\\w)";
 		assertEquals(expectedRegex, regex);
 		found = getMatches(m);

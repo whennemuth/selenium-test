@@ -57,6 +57,14 @@ public class ScreenScrapeElementLocatorTest extends AbstractJettyBasedTest {
 		elements = (new ElementsAssertion(locator)
 				.setUrl(url)
 				.setElementType(ElementType.SCREENSCRAPE)
+				.setLabel("pears")
+				.addAttributeValue(ScreenScrapeComparePattern.LABELLED_BLOCK.name())
+				.setNumResults(0))
+			.findAndAssertElements();
+		
+		elements = (new ElementsAssertion(locator)
+				.setUrl(url)
+				.setElementType(ElementType.SCREENSCRAPE)
 				.setLabel("apples")
 				.addAttributeValue(ScreenScrapeComparePattern.LABELLED_BLOCK.name())
 				.setNumResults(1)

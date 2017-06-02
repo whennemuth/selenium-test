@@ -126,7 +126,10 @@ public class ScreenScrapeElementLocator extends AbstractElementLocator {
 							
 					ComparableScreenScrape screenscrape = new ComparableScreenScrape(parms);
 					screenscrape.scrape();
-					located.add(screenscrape.getWebElement());
+					
+					if(screenscrape.hasWebElement()) {
+						located.add(screenscrape.getWebElement());
+					}
 				}
 			}
 		}

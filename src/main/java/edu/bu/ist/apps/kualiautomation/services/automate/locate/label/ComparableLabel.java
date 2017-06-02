@@ -272,7 +272,7 @@ public abstract class ComparableLabel implements Comparable<ComparableLabel> {
 		}
 		
 		for(ComparableLabel lbl : labels) {
-			if(!lbl.isDemoted() && !lbl.isDisqualified()) {
+			if(!lbl.isDemoted() && !lbl.isDisqualified() && lbl.getWebElement() != null) {
 				highest.add(lbl.getWebElement());
 			}
 		}
