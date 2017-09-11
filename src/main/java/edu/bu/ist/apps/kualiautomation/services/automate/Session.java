@@ -60,7 +60,7 @@ public class Session implements Runnable {
 		}
 	}
 
-	private void setDriver() {
+	private void setDriver() throws Exception {
 		if(config.isHeadless()) {
 			driver = Driver.HEADLESS.getDriver();
 		}

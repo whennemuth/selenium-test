@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -143,6 +144,7 @@ public class ScriptResource {
 			@QueryParam("cycleId") Integer cycleId, 
 			@QueryParam("cfgId") Integer configId, 
 			@QueryParam("terminate") boolean terminate) {
+			//@DefaultValue("true") @QueryParam("terminate") boolean terminate) {
 		try {
 			ScriptService svc = new ScriptService();
 			String message = svc.launchCycle(configId, parms, cycleId, terminate);

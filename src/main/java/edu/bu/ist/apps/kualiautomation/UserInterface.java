@@ -70,6 +70,9 @@ public class UserInterface {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		for(Object key : System.getProperties().keySet()) {
+			System.out.println(key.toString() + " = " + System.getProperty(key.toString()));
+		}
 		if(	args.length > 0 && 
 			Utils.isEmpty(args[0]) == false && 
 			Utils.trimIgnoreCaseEqual(args[0], "desktop")) {

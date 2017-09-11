@@ -1,6 +1,7 @@
 package edu.bu.ist.apps.kualiautomation.services.automate.element;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -19,7 +20,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import edu.bu.ist.apps.kualiautomation.AbstractJettyBasedTest;
-import edu.bu.ist.apps.kualiautomation.ElementsAssertion;
 
 @RunWith(MockitoJUnitRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

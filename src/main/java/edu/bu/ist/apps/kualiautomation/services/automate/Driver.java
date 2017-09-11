@@ -2,13 +2,18 @@ package edu.bu.ist.apps.kualiautomation.services.automate;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -24,11 +29,47 @@ import edu.bu.ist.apps.kualiautomation.util.Utils;
  */
 public enum Driver {
 
-	FIREFOX(null, org.openqa.selenium.firefox.FirefoxDriver.class), 
-	CHROME("webdriver.chrome.driver", org.openqa.selenium.chrome.ChromeDriver.class), 
-	IE("", null), 
-	SAFARI("", null), 
-	HEADLESS("", CustomHtmlUnitDriver.class);
+	// Firefox gecko driver can be obtained from https://github.com/mozilla/geckodriver/releases
+	FIREFOX(
+			"webdriver.gecko.driver", 
+			org.openqa.selenium.firefox.FirefoxDriver.class, 
+			DesiredCapabilities.firefox(),
+			new String[]{ "firefox", "gecko", "marrionette"}),
+	FIREFOX_OLD(
+			null, 
+			org.openqa.selenium.firefox.FirefoxDriver.class,
+			DesiredCapabilities.firefox(),
+			"firefox"), 
+	CHROME(
+			"webdriver.chrome.driver", 
+			org.openqa.selenium.chrome.ChromeDriver.class,
+			DesiredCapabilities.chrome(),
+			"chrome"), 
+	IE(
+			"", 
+			null, 
+			DesiredCapabilities.internetExplorer(),
+			new String[] { "ie", "explorer"}), 
+	EDGE(
+			"",
+			null,
+			DesiredCapabilities.edge(),
+			"edge"),
+	SAFARI(
+			"", 
+			null, 
+			DesiredCapabilities.safari(),
+			"safari"), 
+	OPERA(
+			"",
+			null,
+			DesiredCapabilities.operaBlink(),
+			"opera"),
+	HEADLESS(
+			"", 
+			CustomHtmlUnitDriver.class, 
+			DesiredCapabilities.htmlUnit(), 
+			"headless");
 
 	public static final String DRIVER_SYSTEM_PROPERTY = "automation.app.browser.driver";
 	public static final Driver DEFAULT_DRIVER = FIREFOX;
@@ -37,61 +78,59 @@ public enum Driver {
 	private Class<? extends WebDriver> driverClass;	
 	private File root = null;
 	private File driverFile = null;
+	private DesiredCapabilities desiredCapabilities;
+	private String[] identifiers;
 		
-	private Driver(String systemProperty, Class<? extends WebDriver> driverClass) {
+	private Driver(String systemProperty, Class<? extends WebDriver> driverClass, DesiredCapabilities desiredCapabilities, String...identifiers ) {
 		this.systemProperty = systemProperty;
 		this.driverClass = driverClass;
+		this.desiredCapabilities = desiredCapabilities;
+		this.identifiers = identifiers;
+		
+		if(findDriver()) {			
+			setDriverFile();
+		}
 	}
 	
 	/**
 	 * @return An instance of the selected web driver as an implementation of WebDriver.
+	 * @throws Exception 
 	 */
-	public WebDriver getDriver() {
-		
-		if(findDriver()) {			
-			driverFile = getDriverFile();
-		}
-
-		WebDriver driver = null;
-		try {
-			switch(this) {
-			case FIREFOX:
-				driver = new FirefoxDriver(); // Selenium bundles a firefox driver in its own library.
-				break;
-			case HEADLESS:
-				driver = new Driver.CustomHtmlUnitDriver(BrowserVersion.FIREFOX_38, true);
-				break;
-			default:
-				if(driverClass != null && driverFile != null) {
-					driver = (WebDriver) driverClass.newInstance();
-				}
-				break;			
-			}
-		} catch (InstantiationException e) {
-			e.printStackTrace(System.out);
-		} catch (IllegalAccessException e) {
-			e.printStackTrace(System.out);
-		}
-		
-		return driver;
+	public WebDriver getDriver(boolean enableJavascript) throws Exception {		
+		return ReusableWebDriver.getInstance(this, enableJavascript, false);
+	}
+	
+	public WebDriver getDriver() throws Exception {
+		return getDriver(true);
+	}
+	
+	public File getDriverFile() {
+		if(driverFile == null)
+			setDriverFile();
+		return driverFile;
 	}
 	
 	/**
 	 * @return The driver exe file if it exists.
 	 */
-	private File getDriverFile() {
-		File f = null;
+	public void setDriverFile() {
+		
 		try {
 			root = Utils.getRootDirectory();
 			File[] drivers = root.listFiles(new FilenameFilter() {
 				@Override public boolean accept(File dir, String name) {
-					if(name.toUpperCase().contains(name()) && name.endsWith(".exe")) 
-						return true;
+					if(name.endsWith(".exe")) {
+						for(String id : identifiers) {
+							if(name.toLowerCase().contains(id.toLowerCase())) {
+								return true;
+							}
+						}
+					}
 					return false;
 				}
 			});
 			if(drivers.length == 0) {
-				System.out.println("Cannot find any web drivers at for " + name() + " at: " + root.getAbsolutePath());
+				System.out.println("Cannot find any web drivers for " + name() + " at: " + root.getAbsolutePath());
 			}
 			else {
 				if(drivers.length > 1) {
@@ -101,22 +140,21 @@ public enum Driver {
 					}
 				}
 				System.out.println("Using web driver: " + drivers[0].getAbsolutePath());
-				f = drivers[0];
+				driverFile = drivers[0];
 				
-				System.setProperty(systemProperty, f.getAbsolutePath());
+				System.setProperty(systemProperty, driverFile.getAbsolutePath());
 			}
 		} 
 		catch (Exception e) {
 			if(root == null)
 				System.out.println("Problem finding web driver directory");
-			else if(f == null)
+			else if(driverFile == null)
 				System.out.println("Problem finding web driver at: " + root.getAbsolutePath());
 			else
-				System.out.println("Problem loading web driver: " + f.getAbsolutePath());
+				System.out.println("Problem loading web driver: " + driverFile.getAbsolutePath());
 			
 			e.printStackTrace(System.out);
 		}
-		return f;
 	}
 	
 	/**
@@ -130,7 +168,7 @@ public enum Driver {
 		List<Driver> drivers = new ArrayList<Driver>();
 		for(Driver driver : Driver.values()) {
 			switch(driver) {
-			case FIREFOX:
+			case FIREFOX_OLD:
 				drivers.add(driver);
 				break;
 			case HEADLESS:
@@ -145,6 +183,14 @@ public enum Driver {
 		return drivers;
 	}
 	
+	public Class<? extends WebDriver> getDriverClass() {
+		return driverClass;
+	}
+
+	public DesiredCapabilities getDesiredCapabilities() {
+		return desiredCapabilities;
+	}
+
 	/**
 	 * Allow for enabled javascript, but do not throw exceptions.
 	 * @author wrh
