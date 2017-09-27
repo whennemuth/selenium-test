@@ -15,10 +15,11 @@ public class Session implements Runnable {
 
 	private Cycle cycle;
 	private Config config;
-	private WebDriver driver;
+	private WebDriver webdriver;
 	private boolean terminate;
 	private RunLog runLog;
 	private OutputStream logOutput;
+	private Driver driver;
 	
 	@SuppressWarnings("unused")
 	private Session() { /* Restrict private constructor */ }
@@ -34,7 +35,7 @@ public class Session implements Runnable {
 	public void run() {
 		
 		try {
-			setDriver();			
+			setWebDriver();			
 			
 			if( login()) {
 			
@@ -50,8 +51,8 @@ public class Session implements Runnable {
 		finally {
 			if(terminate()) {
 				try {
-					driver.close();
-					driver.quit();
+					webdriver.close();
+					webdriver.quit();
 				} 
 				catch (NoSuchWindowException e) {
 					// Do nothing. It just means we are in headless mode.
@@ -60,19 +61,19 @@ public class Session implements Runnable {
 		}
 	}
 
-	private void setDriver() throws Exception {
+	private void setWebDriver() throws Exception {
 		if(config.isHeadless()) {
-			driver = Driver.HEADLESS.getDriver();
+			driver = Driver.HEADLESS;
 		}
 		else {
 			String drivername = System.getProperty(Driver.DRIVER_SYSTEM_PROPERTY);
-			if(Utils.isEmpty(drivername)) {
-				driver = Driver.DEFAULT_DRIVER.getDriver();
-			}
-			else {
-				driver = Driver.valueOf(drivername).getDriver();
-			}			
+			
+			if(Utils.isEmpty(drivername))
+				drivername = Driver.DEFAULT_DRIVER.name();
+			
+			driver = Driver.getInstance(drivername);
 		}
+		webdriver = driver.getDriver();
 	}
 	
 	private void work() {
@@ -89,10 +90,14 @@ public class Session implements Runnable {
 	}
 
 	private boolean login() throws Exception {
-		if(driver == null)
+		if(webdriver == null)
 			return false;
+		if(driver.isLoggedIn())
+			return true;
+		
 		KerberosLogin kerberos = new KerberosLogin(this, 10, runLog);
 		if(kerberos.login()) {
+			driver.setLoggedIn(true);
 			return true;
 		}
 		else {
@@ -110,7 +115,7 @@ public class Session implements Runnable {
 	}
 
 	public WebDriver getDriver() {
-		return driver;
+		return webdriver;
 	}
 	
 	public void setLogOutput(OutputStream logOutput) {
@@ -118,7 +123,7 @@ public class Session implements Runnable {
 	}
 
 	private boolean terminate() {
-		if(driver == null)
+		if(webdriver == null)
 			return false;
 		if(config.isHeadless())
 			return true;

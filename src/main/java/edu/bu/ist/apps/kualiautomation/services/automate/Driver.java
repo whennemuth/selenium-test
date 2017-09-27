@@ -2,15 +2,11 @@ package edu.bu.ist.apps.kualiautomation.services.automate;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -80,6 +76,9 @@ public enum Driver {
 	private File driverFile = null;
 	private DesiredCapabilities desiredCapabilities;
 	private String[] identifiers;
+	private String handle;
+	private String sessionId;
+	private boolean loggedIn;
 		
 	private Driver(String systemProperty, Class<? extends WebDriver> driverClass, DesiredCapabilities desiredCapabilities, String...identifiers ) {
 		this.systemProperty = systemProperty;
@@ -97,7 +96,7 @@ public enum Driver {
 	 * @throws Exception 
 	 */
 	public WebDriver getDriver(boolean enableJavascript) throws Exception {		
-		return ReusableWebDriver.getInstance(this, enableJavascript, false);
+		return ReusableWebDriver.getInstance(this, enableJavascript, true);
 	}
 	
 	public WebDriver getDriver() throws Exception {
@@ -110,6 +109,53 @@ public enum Driver {
 		return driverFile;
 	}
 	
+	
+	public String getHandle() {
+		return handle;
+	}
+
+	public void setHandle(String handle) {
+		this.handle = handle;
+	}
+	
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
+	}
+
+	public boolean isLoggedIn() {
+		return loggedIn;
+	}
+
+	public void setLoggedIn(boolean loggedIn) {
+		this.loggedIn = loggedIn;
+	}
+
+	/**
+	 * Use the handle that was cached when the webdriver was first created to find if the associated 
+	 * window is still open. There is no method on the RemoteWebDriver class to determine this, so we
+	 * must catch the runtime error instead to make this determination.
+	 * 
+	 * @param webdriver
+	 * @param handle
+	 * @return
+	 */
+	public boolean hasWindow(RemoteWebDriver webdriver) {
+		if(webdriver == null)
+			return false;
+		
+		try {
+			WebDriver lookup = webdriver.switchTo().window(handle);
+			return lookup != null;
+		}
+		catch(WebDriverException e) {
+			return false;
+		}
+	}
+
 	/**
 	 * @return The driver exe file if it exists.
 	 */
@@ -162,6 +208,16 @@ public enum Driver {
 	 */
 	private boolean findDriver() {
 		return !Utils.isEmpty(systemProperty) && driverClass != null;
+	}
+
+	public static Driver getInstance(String drivername) {
+		if(drivername == null)
+			return null;
+		Driver driver = Driver.valueOf(drivername);
+		Driver cachedDriver = ReusableWebDriver.getCachedInstance(driver);
+		if(cachedDriver == null)
+			return driver;
+		return cachedDriver;
 	}
 	
 	public static List<Driver> getAvailableDrivers() {

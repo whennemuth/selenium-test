@@ -17,44 +17,42 @@ import org.openqa.selenium.remote.Response;
 public class ReusableWebDriver extends RemoteWebDriver {
 
 	public static Map<Driver, RemoteWebDriver> cache = new HashMap<Driver, RemoteWebDriver>();
-
-	@SuppressWarnings("unused")
+	
 	public static WebDriver getInstance(Driver driver, boolean enableJavascript, boolean useCached) throws Exception {
 		boolean remote = RemoteWebDriver.class.isAssignableFrom(driver.getDriverClass());
 		
 		// First determine if a prior remote web driver session existed (want to reuse it).
-		RemoteWebDriver cachedDriver = null;
+		RemoteWebDriver cachedWebDriver = null;
+		WebDriver webdriver = null;		
 		if(remote && useCached) {
-			for(Driver d : cache.keySet()) {
+			Driver d = getCachedInstance(driver);
+			if(d != null) {
 				if(d.equals(driver)) {
-					if(cache.get(driver).getSessionId() != null) {
-						cachedDriver = cache.get(driver);
-						if(true) {
-							/**
-							 * This assumes that the browser window that the cached driver was originally created
-							 * for is still open. That window will be reused for the next activity the driver is
-							 * to be used for.
-							 */
-							return cachedDriver;
-						}
-						else {
-							/**
-							 * A new browser window is to be used for the cached driver and no association yet 
-							 * exists. TODO: Have not tested yet if this works.
-							 */
-							return new ReusableWebDriver(
-								driver, 
-								new URL(cachedDriver.getCurrentUrl()), 
-								cachedDriver.getSessionId().toString());
-							
-						}
+					cachedWebDriver = cache.get(driver);
+					if(driver.hasWindow(cachedWebDriver)) {
+						/**
+						 * This assumes that the browser window that the cached driver was originally created
+						 * for is still open. That window will be reused for the next activity the driver is
+						 * to be used for.
+						 */
+						return cachedWebDriver;
+					}
+					else {
+						/**
+						 * A new browser window is to be used for the cached driver and no association yet 
+						 * exists. The prior browser window was closed by the user. TODO: Have not tested yet if this works.
+						 */
+//						driver.setLoggedIn(false);
+//						return new ReusableWebDriver(
+//							driver, 
+//							new URL(cachedWebDriver.getCurrentUrl()), 
+//							driver.getSessionId());
 					}
 				}
 			}
 		}
 		
 		// Nothing cached, so create a new web driver from scratch.
-		WebDriver webdriver = null;		
 		DesiredCapabilities desiredCapabilities = driver.getDesiredCapabilities();
 		desiredCapabilities.setJavascriptEnabled(enableJavascript);
 		
@@ -93,6 +91,9 @@ public class ReusableWebDriver extends RemoteWebDriver {
 		}		
 		
 		if(remote) {
+			driver.setHandle(webdriver.getWindowHandle());
+			driver.setSessionId(((RemoteWebDriver) webdriver).getSessionId().toString());
+			driver.setLoggedIn(false);
 			cache.put(driver, ((RemoteWebDriver) webdriver));
 		}
 		
@@ -102,6 +103,28 @@ public class ReusableWebDriver extends RemoteWebDriver {
 	public static WebDriver getInstance(Driver driver, boolean enableJavascript) throws Exception {
 		return getInstance(driver, enableJavascript, true);
 	}
+	
+	public static Driver getCachedInstance(Driver driver) {
+		if(RemoteWebDriver.class.isAssignableFrom(driver.getDriverClass())) {	
+			for(Driver d : cache.keySet()) {
+				if(d.equals(driver)) {
+					return d;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public static void setLoggedIn(Driver driver) {
+		Driver d = getCachedInstance(driver);
+		d.setLoggedIn(true);
+	}
+	
+	public static boolean isLoggedIn(Driver driver) {
+		Driver d = getCachedInstance(driver);
+		return d != null && d.isLoggedIn();
+	}
+	
 	
 	/**
 	 * The session whose id is being provided was never associated with the open browser window.

@@ -81,6 +81,7 @@ System.out.println(this);
 		}
 	}
 
+
 	private void addInstance(String ref) {
 		Instance i = new Instance(ref);
 		instances.add(i);		
